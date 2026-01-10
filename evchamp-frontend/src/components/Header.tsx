@@ -23,7 +23,7 @@ const Header: React.FC = () => {
   const navLinks = (
     <>
       <button onClick={() => scrollToSection('features')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left">Features</button>
-      <button onClick={() => scrollToSection('how-it-works')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left">How It Works</button>
+      <button onClick={() => scrollToSection('hero')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left">AI for EV Fleet</button>
       <button onClick={() => scrollToSection('testimonials')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left">Testimonials</button>
       <button onClick={() => scrollToSection('franchise-section')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left">Explore</button>
     </>
@@ -127,7 +127,7 @@ const Header: React.FC = () => {
             {/* Navigation Links */}
             <div className="border-t pt-2 space-y-1">
               <button onClick={() => scrollToSection('features')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left text-sm">Features</button>
-              <button onClick={() => scrollToSection('how-it-works')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left text-sm">How It Works</button>
+              <button onClick={() => scrollToSection('hero')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left text-sm">AI for EV Fleet</button>
               <button onClick={() => scrollToSection('testimonials')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left text-sm">Testimonials</button>
               <button onClick={() => scrollToSection('franchise-section')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left text-sm">Explore</button>
             </div>

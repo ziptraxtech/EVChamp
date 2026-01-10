@@ -18,7 +18,7 @@ const Hero: React.FC = () => {
   };
 
   return (
-    <section className="py-12 bg-gradient-to-tr from-yellow-200 via-green-200 to-blue-300 transition-colors duration-1000">
+    <section id="hero" className="py-12 bg-gradient-to-tr from-yellow-200 via-green-200 to-blue-300 transition-colors duration-1000">
       <div className="container mx-auto px-6 flex flex-col md:flex-row items-stretch justify-between gap-10">
         {/* Text Section */}
         <ScrollReveal className="flex-1 max-w-xl flex flex-col justify-center">
