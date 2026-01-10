@@ -1,4 +1,5 @@
 import React from 'react';
+import { ScrollReveal } from './ScrollReveal';
 
 const features = [
   {
@@ -41,19 +42,21 @@ const features = [
 const Features: React.FC = () => (
   <section id="features" className="py-20 bg-transparent">
     <div className="container mx-auto px-6">
-      <div className="text-center mb-12">
+      <ScrollReveal className="text-center mb-12">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900">Why Choose EVChamp IoT Hardware?</h2>
         <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">Our advanced IoT devices are engineered for precision, security, and reliability—empowering your EV fleet with the latest in connectivity, analytics, and automation.</p>
-      </div>
+      </ScrollReveal>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {features.map((f) => (
-          <div key={f.title} className="bg-gray-50 p-8 rounded-xl shadow-sm hover:shadow-lg transition-shadow border border-gray-200">
-            <div className="bg-green-100 text-green-600 rounded-full h-12 w-12 flex items-center justify-center mb-4">
-              {f.icon}
+        {features.map((f, index) => (
+          <ScrollReveal key={f.title} delay={index * 100}>
+            <div className="bg-gray-50 p-8 rounded-xl shadow-sm hover:shadow-lg transition-shadow border border-gray-200">
+              <div className="bg-green-100 text-green-600 rounded-full h-12 w-12 flex items-center justify-center mb-4">
+                {f.icon}
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">{f.title}</h3>
+              <p className="text-gray-600">{f.desc}</p>
             </div>
-            <h3 className="text-xl font-bold text-gray-800 mb-2">{f.title}</h3>
-            <p className="text-gray-600">{f.desc}</p>
-          </div>
+          </ScrollReveal>
         ))}
       </div>
     </div>

@@ -1,5 +1,6 @@
 // src/components/Coverage.tsx
 import React from 'react';
+import { ScrollReveal } from './components/ScrollReveal';
 
 const coverages = [
   "Accidental damage, fire, and explosion.",
@@ -13,7 +14,7 @@ const coverages = [
 const Coverage: React.FC = () => (
   <section id="coverage" className="py-20 bg-sky-50">
     <div className="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
-      <div className="order-2 md:order-1">
+      <ScrollReveal className="order-2 md:order-1">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900">What's Covered in our EV Insurance?</h2>
         <p className="mt-4 text-lg text-gray-600">Our EV insurance plan covers a wide range of risks, including:</p>
         <ul className="mt-8 space-y-4">
@@ -24,10 +25,10 @@ const Coverage: React.FC = () => (
             </li>
           ))}
         </ul>
-      </div>
-      <div className="order-1 md:order-2">
+      </ScrollReveal>
+      <ScrollReveal className="order-1 md:order-2">
         <img src="https://placehold.co/500x500/ffffff/16a34a?text=Coverage+Details" alt="EV Battery and Charger" className="rounded-2xl shadow-xl w-full h-auto" />
-      </div>
+      </ScrollReveal>
     </div>
   </section>
 );

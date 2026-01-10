@@ -1,5 +1,6 @@
 // src/components/Testimonials.tsx
 import React from 'react';
+import { ScrollReveal } from './components/ScrollReveal';
 
 const testimonials = [
   {
@@ -30,16 +31,18 @@ const Testimonials: React.FC = () => (
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {testimonials.map((t, i) => (
-          <div key={i} className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-            <p className="text-gray-600 mb-6">"{t.quote}"</p>
-            <div className="flex items-center">
-              <img src={t.img} alt={t.name} className="w-12 h-12 rounded-full mr-4" />
-              <div>
-                <p className="font-bold text-gray-800">{t.name}</p>
-                <p className="text-sm text-gray-500">{t.role}</p>
+          <ScrollReveal key={i} delay={i * 100}>
+            <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+              <p className="text-gray-600 mb-6">"{t.quote}"</p>
+              <div className="flex items-center">
+                <img src={t.img} alt={t.name} className="w-12 h-12 rounded-full mr-4" />
+                <div>
+                  <p className="font-bold text-gray-800">{t.name}</p>
+                  <p className="text-sm text-gray-500">{t.role}</p>
+                </div>
               </div>
             </div>
-          </div>
+          </ScrollReveal>
         ))}
       </div>
     </div>

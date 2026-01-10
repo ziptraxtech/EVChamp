@@ -25,7 +25,7 @@ const Header: React.FC = () => {
       <button onClick={() => scrollToSection('features')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left">Features</button>
       <button onClick={() => scrollToSection('how-it-works')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left">How It Works</button>
       <button onClick={() => scrollToSection('testimonials')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left">Testimonials</button>
-      <button onClick={() => scrollToSection('franchise-section')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left">Franchise</button>
+      <button onClick={() => scrollToSection('franchise-section')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left">Explore</button>
     </>
   );
 
@@ -46,7 +46,8 @@ const Header: React.FC = () => {
         <div className="hidden md:flex items-center space-x-4">
           <a id="rent-ev-btn" href="/rent-ev" className="bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all">Rent EV</a>
           <a id="buy-plans-btn" href="/buy-plans" className="cta-gradient text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-green-500 to-green-700">Buy Plans</a>
-          <a id="buy-used-ev-btn" href="/buy-used-ev" className="cta-gradient text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-yellow-400 to-yellow-600">Buy Used EV's</a>
+          <a id="franchise-btn" href="/franchise" className="cta-gradient text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-yellow-400 to-yellow-600">Franchise</a>
+          <a id="buy-used-ev-btn" href="/buy-used-ev" className="cta-gradient text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-cyan-500 to-cyan-700">Buy Used EV's</a>
           
           {/* Account Management Button */}
           <div className="relative">
@@ -107,7 +108,8 @@ const Header: React.FC = () => {
             <div className="border-t my-2"></div>
             <a href="/rent-ev" className="block text-center bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow-md">Rent EV</a>
             <a href="/buy-plans" className="block text-center bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold px-6 py-2 rounded-lg shadow-md">Buy Plans</a>
-            <a href="/buy-used-ev" className="block text-center bg-gradient-to-r from-yellow-400 to-yellow-600 text-white font-semibold px-6 py-2 rounded-lg shadow-md">Buy Used EV's</a>
+            <a href="/franchise" className="block text-center bg-gradient-to-r from-yellow-400 to-yellow-600 text-white font-semibold px-6 py-2 rounded-lg shadow-md">Franchise</a>
+            <a href="/buy-used-ev" className="block text-center bg-gradient-to-r from-cyan-500 to-cyan-700 text-white font-semibold px-6 py-2 rounded-lg shadow-md">Buy Used EV's</a>
             <div className="border-t my-2"></div>
             {isSignedIn ? (
               <>

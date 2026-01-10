@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import headerImg from '../assets/header.jpg';
+import { ScrollReveal } from './ScrollReveal';
 
 const Hero: React.FC = () => {
   // Function to trigger attention effect on navbar buttons
@@ -20,7 +21,7 @@ const Hero: React.FC = () => {
     <section className="py-12 bg-gradient-to-tr from-yellow-200 via-green-200 to-blue-300 transition-colors duration-1000">
       <div className="container mx-auto px-6 flex flex-col md:flex-row items-stretch justify-between gap-10">
         {/* Text Section */}
-        <div className="flex-1 max-w-xl flex flex-col justify-center">
+        <ScrollReveal className="flex-1 max-w-xl flex flex-col justify-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight">
             Empowering Intelligent Electric Mobility<br />
             <span className="text-green-600">with AI &amp; IoT-Driven Fleet Management</span>
@@ -36,9 +37,9 @@ const Hero: React.FC = () => {
               Explore Plans &amp; Solutions
             </button>
           </div>
-        </div>
+        </ScrollReveal>
         {/* Image and Points Section */}
-        <div className="flex-1 flex flex-col items-center justify-center h-full">
+        <ScrollReveal className="flex-1 flex flex-col items-center justify-center h-full">
           <img
             src={headerImg}
             alt="EV Fleet Management Illustration"
@@ -64,7 +65,7 @@ const Hero: React.FC = () => {
               <span className="font-semibold text-gray-700">Real-Time Telematics &amp; Analytics</span>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );

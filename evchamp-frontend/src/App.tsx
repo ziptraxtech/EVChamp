@@ -25,6 +25,7 @@ import BannerLogos from './assets/footer_banner.jpeg'; // Update the path if nee
 function HomePage() {
   return (
     <div className="bg-gradient-to-br from-yellow-200 via-green-200 to-blue-300 min-h-screen w-full">
+      <HowItWorks />
       <Hero />
       <Overview />
       {/* Our Partners Banner below Overview */}
@@ -51,7 +52,6 @@ function HomePage() {
       </div>
       <DashboardFeatures />
       <Features />
-      <HowItWorks />
       <Testimonials />
       <Footer />
     </div>
