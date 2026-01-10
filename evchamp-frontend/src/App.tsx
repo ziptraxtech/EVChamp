@@ -26,6 +26,20 @@ function HomePage() {
   return (
     <div className="bg-gradient-to-br from-yellow-200 via-green-200 to-blue-300 min-h-screen w-full">
       <HowItWorks />
+      {/* Franchise Highlight Section */}
+      <div id="franchise-section" className="w-full flex flex-col items-center py-12 bg-white border-t border-b border-gray-100">
+        <h2 className="text-2xl md:text-3xl font-bold text-green-700 mb-3">Become an EVChamp Franchise Partner</h2>
+        <p className="max-w-2xl text-center text-gray-700 mb-6">
+          Join the EV revolution and build a profitable business with India's leading AI & IoT-driven EV fleet management platform. 
+          As an EVChamp franchisee, you get access to advanced technology, national brand support, and a rapidly growing market.
+        </p>
+        <a
+          href="/franchise"
+          className="inline-block bg-gradient-to-r from-yellow-300 to-yellow-700 text-white font-bold text-lg px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition"
+        >
+          Explore Franchise Opportunities
+        </a>
+      </div>
       <Hero />
       <Overview />
       {/* Our Partners Banner below Overview */}
@@ -36,19 +50,6 @@ function HomePage() {
           alt="Partner Logos"
           className="max-w-6xl w-full rounded-xl shadow-md"
         />
-      </div>
-      {/* Franchise Highlight Section */}
-  <div id="franchise-section" className="w-full flex flex-col items-center py-12 bg-white border-t border-b border-gray-100">
-    <h2 className="text-2xl md:text-3xl font-bold text-green-700 mb-3">Become an EVChamp Franchise Partner</h2>
-    <p className="max-w-2xl text-center text-gray-700 mb-6">
-          Join the EV revolution and build a profitable business with India's leading AI & IoT-driven EV fleet management platform. 
-          As an EVChamp franchisee, you get access to advanced technology, national brand support, and a rapidly growing market.
-        </p>
-        <a
-          href="/franchise"
-         className="inline-block bg-gradient-to-r from-yellow-300 to-yellow-700 text-white font-bold text-lg px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition"        >
-          Explore Franchise Opportunities
-        </a>
       </div>
       <DashboardFeatures />
       <Features />
