@@ -17,12 +17,12 @@ const offerings: Offering[] = [
 ];
 
 const Overview: React.FC = () => (
-  <section className="py-16 bg-gradient-to-br from-yellow-200 via-green-200 to-blue-300">
-    <div className="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+  <section className="py-12 sm:py-16 bg-gradient-to-br from-yellow-200 via-green-200 to-blue-300">
+    <div className="container mx-auto px-4 sm:px-6 grid md:grid-cols-2 gap-10 md:gap-12 items-center">
       {/* Left: QR Code Box */}
       <ScrollReveal>
         <div className="flex flex-col items-center">
-          <div className="w-40 h-40 bg-gradient-to-br from-gray-200 to-blue-100 border-4 border-dashed border-blue-300 flex items-center justify-center rounded-xl shadow-inner mb-3">
+          <div className="w-32 h-32 sm:w-40 sm:h-40 bg-gradient-to-br from-gray-200 to-blue-100 border-4 border-dashed border-blue-300 flex items-center justify-center rounded-xl shadow-inner mb-3">
             <span className="text-blue-400 font-bold text-lg text-center">[QR Code Here]</span>
           </div>
           <span className="text-xs text-gray-400">Scan to download the app</span>
@@ -31,14 +31,14 @@ const Overview: React.FC = () => (
 
       {/* Right: Text & Offerings */}
       <ScrollReveal>
-        <div>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
+        <div className="text-center md:text-left">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
             EVCHAMP Overview
           </h2>
-          <p className="mb-6 text-lg text-gray-700 max-w-xl">
+          <p className="mb-6 text-base sm:text-lg text-gray-700 max-w-xl mx-auto md:mx-0">
             At EVChamp, we are at the forefront of transforming electric vehicle (EV) fleet management through our integrated platform that combines AI-powered software with IoT-enabled smart hardware. Our solutions are designed to make EV operations seamless, efficient, and intelligent.
           </p>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3 sm:gap-4">
             {offerings.map((item, idx) => {
               const Icon = item.icon as React.ElementType;
               return (

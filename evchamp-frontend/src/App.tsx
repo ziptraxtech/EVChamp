@@ -26,15 +26,15 @@ function HomePage() {
     <div className="bg-gradient-to-br from-yellow-200 via-green-200 to-blue-300 min-h-screen w-full">
       <HowItWorks />
       {/* Franchise Highlight Section */}
-      <div id="franchise-section" className="w-full flex flex-col items-center py-12 bg-white border-t border-b border-gray-100">
-        <h2 className="text-2xl md:text-3xl font-bold text-green-700 mb-3">Become an EVChamp Franchise Partner</h2>
-        <p className="max-w-2xl text-center text-gray-700 mb-6">
+      <div id="franchise-section" className="w-full flex flex-col items-center py-10 sm:py-12 bg-white border-t border-b border-gray-100 px-4 sm:px-6">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-green-700 mb-3 text-center">Become an EVChamp Franchise Partner</h2>
+        <p className="max-w-2xl text-center text-gray-700 mb-6 text-sm sm:text-base">
           Join the EV revolution and build a profitable business with India's leading AI & IoT-driven EV fleet management platform. 
           As an EVChamp franchisee, you get access to advanced technology, national brand support, and a rapidly growing market.
         </p>
         <a
           href="/franchise"
-          className="inline-block bg-gradient-to-r from-yellow-300 to-yellow-700 text-white font-bold text-lg px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition"
+          className="inline-block bg-gradient-to-r from-yellow-300 to-yellow-700 text-white font-bold text-base sm:text-lg px-6 sm:px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition"
         >
           Explore Franchise Opportunities
         </a>
@@ -42,12 +42,12 @@ function HomePage() {
       <Hero />
       <Overview />
       {/* Our Partners Banner below Overview */}
-      <div className="w-full flex flex-col items-center py-8 bg-white">
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">Our Partners</h2>
+      <div className="w-full flex flex-col items-center py-8 bg-white px-4 sm:px-6">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-4">Our Partners</h2>
         <img
           src={BannerLogos}
           alt="Partner Logos"
-          className="max-w-6xl w-full rounded-xl shadow-md"
+          className="max-w-6xl w-full rounded-xl shadow-md object-contain"
         />
       </div>
       <DashboardFeatures />

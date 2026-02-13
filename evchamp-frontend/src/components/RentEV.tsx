@@ -242,10 +242,10 @@ const RentEV: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-yellow-50">
       {/* Back Button */}
-      <div className="absolute top-24 left-6 z-10">
+      <div className="static sm:absolute sm:top-24 sm:left-6 z-10 px-4 sm:px-0 pt-4 sm:pt-0">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-lg hover:bg-white/30 transition-all duration-200 shadow-lg"
+          className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-lg hover:bg-white/30 transition-all duration-200 shadow-lg text-sm sm:text-base"
         >
           {FaArrowLeft({ className: "text-lg" })}
           <span className="font-semibold">Back to Home</span>
@@ -253,25 +253,25 @@ const RentEV: React.FC = () => {
       </div>
       
       {/* Hero Section */}
-      <section className="pt-20 pb-12 bg-gradient-to-r from-blue-600 to-green-600 text-white">
-        <div className="container mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+      <section className="pt-16 sm:pt-20 pb-10 sm:pb-12 bg-gradient-to-r from-blue-600 to-green-600 text-white">
+        <div className="container mx-auto px-4 sm:px-6 text-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
             Rent Electric Vehicles
           </h1>
-          <p className="text-xl mb-8 max-w-3xl mx-auto">
+          <p className="text-base sm:text-xl mb-6 sm:mb-8 max-w-3xl mx-auto">
             Experience the future of mobility with our premium EV rental service. 
             Choose from India's finest electric vehicles with flexible rental periods.
           </p>
-          <div className="flex flex-wrap justify-center gap-4 mb-8">
-            <div className="flex items-center space-x-2 bg-white/20 rounded-lg px-4 py-2">
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <div className="flex items-center space-x-2 bg-white/20 rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base">
               {FaCar({ className: "text-2xl" })}
               <span>Premium EVs</span>
             </div>
-            <div className="flex items-center space-x-2 bg-white/20 rounded-lg px-4 py-2">
+            <div className="flex items-center space-x-2 bg-white/20 rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base">
               {FaBatteryFull({ className: "text-2xl" })}
               <span>Long Range</span>
             </div>
-            <div className="flex items-center space-x-2 bg-white/20 rounded-lg px-4 py-2">
+            <div className="flex items-center space-x-2 bg-white/20 rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base">
               {FaShieldAlt({ className: "text-2xl" })}
               <span>Fully Insured</span>
             </div>
@@ -281,8 +281,8 @@ const RentEV: React.FC = () => {
 
       {/* Rental Period Selector */}
       <section className="py-8 bg-white shadow-sm">
-        <div className="container mx-auto px-6">
-          <div className="flex justify-center space-x-4">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
             {[
               { key: 'daily', label: 'Daily', icon: FaClock },
               { key: 'weekly', label: 'Weekly', icon: FaRoute },
@@ -293,7 +293,7 @@ const RentEV: React.FC = () => {
                 <button
                   key={key}
                   onClick={() => setSelectedPeriod(key as 'daily' | 'weekly' | 'monthly')}
-                  className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+                  className={`flex items-center space-x-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold transition-all text-sm sm:text-base ${
                     selectedPeriod === key
                       ? 'bg-green-600 text-white shadow-lg'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -309,8 +309,8 @@ const RentEV: React.FC = () => {
       </section>
 
       {/* EV Cards Grid */}
-      <section className="py-12">
-        <div className="container mx-auto px-6">
+      <section className="py-10 sm:py-12">
+        <div className="container mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {evCars.map((car) => (
               <div
@@ -382,7 +382,7 @@ const RentEV: React.FC = () => {
                     disabled={!car.available}
                     className={`w-full py-3 px-4 rounded-lg font-semibold transition-all ${
                       car.available
-                        ? 'bg-green-600 text-white hover:bg-green-700 transform hover:-translate-y-1'
+                        ? 'bg-green-600 text-white hover:bg-green-700 md:transform md:hover:-translate-y-1'
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                   >
@@ -397,14 +397,14 @@ const RentEV: React.FC = () => {
 
       {/* Booking Form Section */}
       {showBookingModal && selectedCar && (
-        <section id="booking-form" ref={bookingFormRef} className="py-16 bg-white">
-          <div className="container mx-auto px-6">
+        <section id="booking-form" ref={bookingFormRef} className="py-12 sm:py-16 bg-white">
+          <div className="container mx-auto px-4 sm:px-6">
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-8">Book Your EV</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8">Book Your EV</h2>
               
               {/* Selected Car Summary */}
-              <div className="bg-gray-50 rounded-xl p-6 mb-8">
-                <h3 className="text-xl font-semibold mb-4">Selected Vehicle</h3>
+              <div className="bg-gray-50 rounded-xl p-5 sm:p-6 mb-8">
+                <h3 className="text-lg sm:text-xl font-semibold mb-4">Selected Vehicle</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="flex items-center space-x-4">
                     <img 
@@ -413,13 +413,13 @@ const RentEV: React.FC = () => {
                       className="w-24 h-16 object-cover rounded-lg"
                     />
                     <div>
-                      <h4 className="font-semibold text-lg">{selectedCar.brand} {selectedCar.name}</h4>
-                      <p className="text-gray-600">{selectedCar.range} range • {selectedCar.battery}</p>
+                      <h4 className="font-semibold text-base sm:text-lg">{selectedCar.brand} {selectedCar.name}</h4>
+                      <p className="text-gray-600 text-sm sm:text-base">{selectedCar.range} range • {selectedCar.battery}</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-green-600">₹{getRate(selectedCar).toLocaleString()}</div>
-                    <div className="text-gray-500">per {selectedPeriod}</div>
+                  <div className="text-left md:text-right">
+                    <div className="text-xl sm:text-2xl font-bold text-green-600">₹{getRate(selectedCar).toLocaleString()}</div>
+                    <div className="text-gray-500 text-sm sm:text-base">per {selectedPeriod}</div>
                   </div>
                 </div>
               </div>
@@ -523,7 +523,7 @@ const RentEV: React.FC = () => {
                   />
                 </div>
 
-                <div className="flex justify-center pt-8">
+                <div className="flex justify-center pt-6 sm:pt-8">
                   <button
                     type="button"
                     onClick={() => {
@@ -533,7 +533,7 @@ const RentEV: React.FC = () => {
                         block: 'start'
                       });
                     }}
-                    className="bg-green-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-green-700 transform hover:-translate-y-1 transition-all shadow-lg"
+                    className="bg-green-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:bg-green-700 transition-all shadow-lg sm:transform sm:hover:-translate-y-1"
                   >
                     Proceed to Payment
                   </button>
@@ -546,42 +546,42 @@ const RentEV: React.FC = () => {
 
       {/* Payment Section */}
       {showBookingModal && selectedCar && (
-        <section id="payment-section" className="py-16 bg-gray-50">
-          <div className="container mx-auto px-6">
+        <section id="payment-section" className="py-12 sm:py-16 bg-gray-50">
+          <div className="container mx-auto px-4 sm:px-6">
             <div className="max-w-2xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-8">Complete Your Booking</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8">Complete Your Booking</h2>
               
-              <div className="bg-white rounded-xl p-8 shadow-lg">
+              <div className="bg-white rounded-xl p-6 sm:p-8 shadow-lg">
                 <div className="mb-6">
-                  <h3 className="text-xl font-semibold mb-4">Booking Summary</h3>
+                  <h3 className="text-lg sm:text-xl font-semibold mb-4">Booking Summary</h3>
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span>Vehicle:</span>
-                      <span className="font-semibold">{selectedCar.brand} {selectedCar.name}</span>
+                      <span className="text-sm sm:text-base">Vehicle:</span>
+                      <span className="font-semibold text-sm sm:text-base">{selectedCar.brand} {selectedCar.name}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Rental Period:</span>
-                      <span className="font-semibold capitalize">{selectedPeriod}</span>
+                      <span className="text-sm sm:text-base">Rental Period:</span>
+                      <span className="font-semibold capitalize text-sm sm:text-base">{selectedPeriod}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Rate:</span>
-                      <span className="font-semibold">₹{getRate(selectedCar).toLocaleString()}</span>
+                      <span className="text-sm sm:text-base">Rate:</span>
+                      <span className="font-semibold text-sm sm:text-base">₹{getRate(selectedCar).toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Security Deposit:</span>
-                      <span className="font-semibold">₹10,000</span>
+                      <span className="text-sm sm:text-base">Security Deposit:</span>
+                      <span className="font-semibold text-sm sm:text-base">₹10,000</span>
                     </div>
                     <hr className="my-4" />
                     <div className="flex justify-between text-lg font-bold">
-                      <span>Total Amount:</span>
-                      <span className="text-green-600">₹{(getRate(selectedCar) + 10000).toLocaleString()}</span>
+                      <span className="text-base sm:text-lg">Total Amount:</span>
+                      <span className="text-green-600 text-base sm:text-lg">₹{(getRate(selectedCar) + 10000).toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <button
-                    className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white py-4 rounded-lg font-semibold hover:from-green-600 hover:to-blue-600 transition-all"
+                    className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white py-3 sm:py-4 rounded-lg font-semibold hover:from-green-600 hover:to-blue-600 transition-all text-sm sm:text-base"
                     onClick={handlePayment}
                     disabled={isProcessing}
                   >

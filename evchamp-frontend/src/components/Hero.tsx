@@ -18,21 +18,21 @@ const Hero: React.FC = () => {
   };
 
   return (
-    <section id="hero" className="py-12 bg-gradient-to-tr from-yellow-200 via-green-200 to-blue-300 transition-colors duration-1000">
-      <div className="container mx-auto px-6 flex flex-col md:flex-row items-stretch justify-between gap-10">
+    <section id="hero" className="py-10 sm:py-12 bg-gradient-to-tr from-yellow-200 via-green-200 to-blue-300 transition-colors duration-1000">
+      <div className="container mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-stretch justify-between gap-10">
         {/* Text Section */}
-        <ScrollReveal className="flex-1 max-w-xl flex flex-col justify-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight">
+        <ScrollReveal className="flex-1 max-w-xl flex flex-col justify-center text-center md:text-left">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight">
             Empowering Intelligent Electric Mobility<br />
             <span className="text-green-600">with AI &amp; IoT-Driven Fleet Management</span>
           </h1>
-          <p className="mt-6 text-lg text-gray-600">
+          <p className="mt-5 sm:mt-6 text-base sm:text-lg text-gray-600">
             At EVChamp, we are transforming EV fleet management through our integrated platform that combines AI-powered software with IoT-enabled smart hardware. Experience seamless, efficient, and intelligent electric mobility operations.
           </p>
-          <div className="mt-8">
+          <div className="mt-6 sm:mt-8">
             <button
               onClick={handleExploreClick}
-              className="inline-block bg-gradient-to-r from-green-500 to-green-700 text-white font-bold text-lg px-10 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+              className="w-full sm:w-auto inline-block bg-gradient-to-r from-green-500 to-green-700 text-white font-bold text-base sm:text-lg px-6 sm:px-10 py-3 sm:py-4 rounded-xl shadow-lg hover:shadow-xl transition-all sm:transform sm:hover:-translate-y-1"
             >
               Explore Plans &amp; Solutions
             </button>
@@ -43,26 +43,26 @@ const Hero: React.FC = () => {
           <img
             src={headerImg}
             alt="EV Fleet Management Illustration"
-            className="w-full h-full rounded-xl shadow-2xl object-cover mb-6"
+            className="w-full h-56 sm:h-72 md:h-full rounded-xl shadow-2xl object-cover mb-6"
           />
-          <div className="mt-6 flex flex-col sm:flex-row flex-wrap gap-x-10 gap-y-4 w-full justify-center">
+          <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row flex-wrap gap-x-10 gap-y-4 w-full justify-center">
             <div className="flex items-center space-x-2">
               <svg className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              <span className="font-semibold text-gray-700">AI-Driven Leasing &amp; Asset Management</span>
+              <span className="font-semibold text-gray-700 text-sm sm:text-base">AI-Driven Leasing &amp; Asset Management</span>
             </div>
             <div className="flex items-center space-x-2">
               <svg className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              <span className="font-semibold text-gray-700">Smart Buyback &amp; Warranty</span>
+              <span className="font-semibold text-gray-700 text-sm sm:text-base">Smart Buyback &amp; Warranty</span>
             </div>
             <div className="flex items-center space-x-2">
               <svg className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              <span className="font-semibold text-gray-700">Real-Time Telematics &amp; Analytics</span>
+              <span className="font-semibold text-gray-700 text-sm sm:text-base">Real-Time Telematics &amp; Analytics</span>
             </div>
           </div>
         </ScrollReveal>

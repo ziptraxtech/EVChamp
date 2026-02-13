@@ -187,31 +187,31 @@ const BuyPlans: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-10 sm:py-12">
       {/* Back Button at the top */}
-      <div className="container mx-auto px-6 mb-6 flex items-center">
+      <div className="container mx-auto px-4 sm:px-6 mb-6 flex items-center">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center bg-white border border-gray-200 shadow-md rounded-lg px-4 py-2 hover:bg-green-100 transition-all text-green-700 font-semibold text-lg"
+          className="flex items-center bg-white border border-gray-200 shadow-md rounded-lg px-3 sm:px-4 py-2 hover:bg-green-100 transition-all text-green-700 font-semibold text-base sm:text-lg"
         >
           <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
           Back to Home
         </button>
       </div>
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-2 tracking-tight">EVChamp Plans & Pricing</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">Select your hardware and software plans. You can buy both together for a seamless experience.</p>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-2 tracking-tight">EVChamp Plans & Pricing</h1>
+          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">Select your hardware and software plans. You can buy both together for a seamless experience.</p>
         </div>
 
         {/* Hardware Plans */}
         <div className="mb-16">
-          <h2 className="text-3xl font-semibold text-gray-800 mb-8 text-center">IoT Hardware Plans</h2>
+          <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 mb-8 text-center">IoT Hardware Plans</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {hardwarePlans.map((plan) => (
               <div
                 key={plan.id}
-                className={`relative bg-white rounded-2xl shadow-lg p-8 border-2 transition-all duration-200 cursor-pointer hover:scale-105 hover:shadow-2xl ${selectedPlans.some(p => p.id === plan.id && p.type === 'hardware') ? 'border-green-500 ring-4 ring-green-200' : 'border-gray-100'}`}
+                className={`relative bg-white rounded-2xl shadow-lg p-6 sm:p-8 border-2 transition-all duration-200 cursor-pointer md:hover:scale-105 md:hover:shadow-2xl ${selectedPlans.some(p => p.id === plan.id && p.type === 'hardware') ? 'border-green-500 ring-4 ring-green-200' : 'border-gray-100'}`}
                 onClick={() => handleHardwareSelect(plan)}
               >
                 <div className="absolute top-4 right-4">
@@ -232,7 +232,7 @@ const BuyPlans: React.FC = () => {
                   ))}
                 </ul>
                 <button
-                  className={`w-full py-3 rounded-lg font-semibold mt-2 transition-all duration-200 bg-gradient-to-r from-green-500 to-green-700 text-white hover:from-green-600 hover:to-green-800 ${selectedPlans.some(p => p.id === plan.id && p.type === 'hardware') ? 'opacity-80' : ''}`}
+                  className={`w-full py-3 rounded-lg font-semibold mt-2 transition-all duration-200 bg-gradient-to-r from-green-500 to-green-700 text-white hover:from-green-600 hover:to-green-800 text-sm sm:text-base ${selectedPlans.some(p => p.id === plan.id && p.type === 'hardware') ? 'opacity-80' : ''}`}
                   onClick={(e) => { e.stopPropagation(); handleHardwareSelect(plan); }}
                 >
                   {selectedPlans.some(p => p.id === plan.id && p.type === 'hardware') ? 'Deselect' : 'Select Hardware Plan'}
@@ -244,14 +244,14 @@ const BuyPlans: React.FC = () => {
 
         {/* Software Plans */}
         <div className="mb-16">
-          <h2 className="text-3xl font-semibold text-gray-800 mb-8 text-center">Software Subscription Plans</h2>
+          <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 mb-8 text-center">Software Subscription Plans</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {softwarePlans.map((plan) => {
               const isSelected = selectedPlans.some(p => p.id === plan.id && p.type === plan.type);
               return (
                 <div
                   key={plan.id}
-                  className={`relative bg-white rounded-2xl shadow-lg p-8 border-2 transition-all duration-200 cursor-pointer hover:scale-105 hover:shadow-2xl ${isSelected ? 'border-blue-500 ring-4 ring-blue-200' : 'border-gray-100'}`}
+                  className={`relative bg-white rounded-2xl shadow-lg p-6 sm:p-8 border-2 transition-all duration-200 cursor-pointer md:hover:scale-105 md:hover:shadow-2xl ${isSelected ? 'border-blue-500 ring-4 ring-blue-200' : 'border-gray-100'}`}
                   onClick={() => handleSoftwareToggle(plan)}
                 >
                   <div className="absolute top-4 right-4">

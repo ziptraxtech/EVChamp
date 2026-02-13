@@ -58,10 +58,10 @@ const BuyUsedEV: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-yellow-50">
       {/* Back Button */}
-      <div className="absolute top-24 left-6 z-10">
+      <div className="static sm:absolute sm:top-24 sm:left-6 z-10 px-4 sm:px-0 pt-4 sm:pt-0">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-lg hover:bg-white/30 transition-all duration-200 shadow-lg"
+          className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-lg hover:bg-white/30 transition-all duration-200 shadow-lg text-sm sm:text-base"
         >
           <BackArrow className="text-lg" />
           <span className="font-semibold">Back to Home</span>
@@ -69,18 +69,18 @@ const BuyUsedEV: React.FC = () => {
       </div>
       
       {/* Hero Section */}
-      <section className="pt-20 pb-12 bg-gradient-to-r from-yellow-500 to-orange-600 text-white">
-        <div className="container mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Buy Certified Used EVs</h1>
-          <p className="text-xl mb-8 max-w-3xl mx-auto">
+      <section className="pt-16 sm:pt-20 pb-10 sm:pb-12 bg-gradient-to-r from-yellow-500 to-orange-600 text-white">
+        <div className="container mx-auto px-4 sm:px-6 text-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">Buy Certified Used EVs</h1>
+          <p className="text-base sm:text-xl mb-6 sm:mb-8 max-w-3xl mx-auto">
             Get the best value on pre-owned electric vehicles. Each car is certified by EVChamp with a comprehensive battery health report.
           </p>
         </div>
       </section>
 
       {/* EV Cards Grid */}
-      <section className="py-12">
-        <div className="container mx-auto px-6">
+      <section className="py-10 sm:py-12">
+        <div className="container mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {usedEVs.map((car) => (
               <div
@@ -96,7 +96,7 @@ const BuyUsedEV: React.FC = () => {
                     <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">Sold</div>
                   )}
                 </div>
-                <div className="p-6">
+                <div className="p-5 sm:p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div>
                       <h3 className="text-xl font-bold text-gray-900">{car.brand} {car.name}</h3>
@@ -113,7 +113,7 @@ const BuyUsedEV: React.FC = () => {
                   </div>
                   <button
                     disabled={!car.available}
-                    className="w-full bg-yellow-500 text-white font-bold py-3 rounded-lg hover:bg-yellow-600 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    className="w-full bg-yellow-500 text-white font-bold py-3 rounded-lg hover:bg-yellow-600 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed text-sm sm:text-base"
                   >
                     {car.available ? 'Enquire Now' : 'Sold Out'}
                   </button>
@@ -127,7 +127,7 @@ const BuyUsedEV: React.FC = () => {
       {/* Enquiry Modal */}
       {showEnquiryModal && selectedCar && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-8">
+          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
             <h2 className="text-2xl font-bold mb-4">Enquiry for {selectedCar.brand} {selectedCar.name}</h2>
             <p className="mb-6 text-gray-600">Our team will contact you shortly with further details. Please confirm your contact information.</p>
             <div className="space-y-4">

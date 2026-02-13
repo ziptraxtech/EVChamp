@@ -3,11 +3,8 @@ import React from 'react';
 
 const Footer: React.FC = () => (
   <footer className="bg-gradient-to-tr from-blue-900 via-green-900 to-yellow-700 text-white">
-
-
-
-    <div className="container mx-auto px-6 py-12">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <div className="container mx-auto px-4 sm:px-6 py-10 sm:py-12">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left">
         <div>
           <h3 className="text-xl font-bold mb-4">© EVChamp</h3>
           <p className="text-gray-400">India's leading AI & IoT-driven EV fleet management platform.</p>
