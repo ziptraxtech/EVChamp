@@ -5,7 +5,11 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { ClerkProvider } from '@clerk/clerk-react';
 
-const clerkPubKey = 'pk_test_am9pbnQtYW5lbW9uZS01Ny5jbGVyay5hY2NvdW50cy5kZXYk';
+const clerkPubKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
+
+if (!clerkPubKey) {
+  throw new Error('Missing REACT_APP_CLERK_PUBLISHABLE_KEY');
+}
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
