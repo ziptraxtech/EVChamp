@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import headerImg from '../assets/header.jpg';
 import { ScrollReveal } from './ScrollReveal';
 

@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { FaCar, FaBatteryFull, FaRoute, FaClock, FaUsers, FaShieldAlt, FaCheckCircle, FaArrowLeft } from 'react-icons/fa';
-import { IconType } from 'react-icons';
+import { FaCar, FaBatteryFull, FaRoute, FaClock, FaUsers, FaShieldAlt, FaArrowLeft } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
 import razorpayService from '../services/razorpayService';

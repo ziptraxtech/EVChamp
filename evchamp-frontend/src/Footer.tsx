@@ -1,6 +1,5 @@
 // src/components/Footer.tsx
 import React from 'react';
-import footerBanner from './assets/footer_banner.jpeg';
 
 const Footer: React.FC = () => (
   <footer className="bg-gradient-to-tr from-blue-900 via-green-900 to-yellow-700 text-white">

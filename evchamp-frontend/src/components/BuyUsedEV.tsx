@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaCar, FaBatteryFull, FaTachometerAlt, FaCheckCircle, FaArrowLeft } from 'react-icons/fa';
+import { FaBatteryFull, FaTachometerAlt, FaArrowLeft } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
 

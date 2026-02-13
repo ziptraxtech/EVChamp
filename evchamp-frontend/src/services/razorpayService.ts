@@ -200,4 +200,5 @@ class RazorpayService {
   }
 }
 
-export default new RazorpayService();
+const razorpayServiceInstance = new RazorpayService();
+export default razorpayServiceInstance;

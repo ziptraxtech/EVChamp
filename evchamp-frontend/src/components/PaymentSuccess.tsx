@@ -7,7 +7,6 @@ const PaymentSuccess: React.FC = () => {
   
   const paymentId = searchParams.get('razorpay_payment_id');
   const orderId = searchParams.get('razorpay_order_id');
-  const signature = searchParams.get('razorpay_signature');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center py-12">
