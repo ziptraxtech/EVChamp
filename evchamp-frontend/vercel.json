@@ -1,6 +1,6 @@
 {
-  "buildCommand": "cd evchamp-frontend && npm install && npm run build",
-  "outputDirectory": "evchamp-frontend/build",
+  "buildCommand": "npm install && npm run build",
+  "outputDirectory": "build",
   "framework": "create-react-app",
   "rewrites": [
     {
