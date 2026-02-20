@@ -1,0 +1,31 @@
+{
+  "files": {
+    "main.css": "/static/css/main.df643f70.css",
+    "main.js": "/static/js/main.71276283.js",
+    "static/js/453.f21bdd9b.chunk.js": "/static/js/453.f21bdd9b.chunk.js",
+    "static/media/header.jpg": "/static/media/header.c14d6fcbc601a1043cee.jpg",
+    "static/media/f24404fa.png": "/static/media/67e56e1e14be488a8ebef8537bfad7c0f24404fa.b25531dbc8c05543906a.png",
+    "static/media/EVChampLogo.png": "/static/media/EVChampLogo.f2614e788d8108d5c227.png",
+    "static/media/38aba1a9.png": "/static/media/94ce24dbb3ddc2052b8cac541121ded938aba1a9.afedc7cb3d4f2f78a48f.png",
+    "static/media/tigor.png": "/static/media/tigor.3c969a23983515412be5.png",
+    "static/media/expresst.png": "/static/media/expresst.09975622b470010ae641.png",
+    "static/media/b7980ad6.png": "/static/media/9569dab8d8880a11d76d38aa48cddabab7980ad6.7c1ff8bcd8b56320042f.png",
+    "static/media/verito.png": "/static/media/verito.571302e75759bd6f3a25.png",
+    "static/media/punch-ev.jpg": "/static/media/punch-ev.678d5ad502fd954150f3.jpg",
+    "static/media/tiagoev.jpg": "/static/media/tiagoev.1e7d14fb6f2806143222.jpg",
+    "static/media/citroen.jpg": "/static/media/citroen.721efd9a07bdda007a9a.jpg",
+    "static/media/footer_banner.jpeg": "/static/media/footer_banner.2dbfaeaf8ff31f5cb3da.jpeg",
+    "static/media/cometev.jpg": "/static/media/cometev.95f6d8ef3675c4c8d0f7.jpg",
+    "static/media/mgzsev.jpg": "/static/media/mgzsev.97b3594a9b0495cbec91.jpg",
+    "static/media/honda-kona-ev.jpg": "/static/media/honda-kona-ev.0f4e4d700478e261df78.jpg",
+    "static/media/tata-nexon.jpg": "/static/media/tata-nexon.8636502ff9831a3fb372.jpg",
+    "index.html": "/index.html",
+    "main.df643f70.css.map": "/static/css/main.df643f70.css.map",
+    "main.71276283.js.map": "/static/js/main.71276283.js.map",
+    "453.f21bdd9b.chunk.js.map": "/static/js/453.f21bdd9b.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.df643f70.css",
+    "static/js/main.71276283.js"
+  ]
+}
