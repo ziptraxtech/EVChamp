@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaBatteryFull, FaTachometerAlt, FaArrowLeft } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { useUser, useClerk } from '@clerk/clerk-react';
+import { useUser } from '@clerk/clerk-react';
 
 // Re-using images from assets
 import nexonImg from '../assets/tata-nexon.jpg';
@@ -39,13 +39,12 @@ const usedEVs: UsedEVCard[] = [
 const BuyUsedEV: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useUser();
-  const { openSignIn } = useClerk();
   const [selectedCar, setSelectedCar] = useState<UsedEVCard | null>(null);
   const [showEnquiryModal, setShowEnquiryModal] = useState(false);
 
   const handleEnquireNow = (car: UsedEVCard) => {
     if (!user) {
-      openSignIn();
+      navigate('/sign-in');
       return;
     }
     setSelectedCar(car);

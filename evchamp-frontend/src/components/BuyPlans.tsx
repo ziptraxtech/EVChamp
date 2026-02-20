@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUser, useClerk } from '@clerk/clerk-react';
+import { useUser } from '@clerk/clerk-react';
 import razorpayService from '../services/razorpayService';
 
 interface Plan {
@@ -121,7 +121,6 @@ const softwarePlans: Plan[] = [
 const BuyPlans: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useUser();
-  const { openSignIn } = useClerk();
   const [selectedPlans, setSelectedPlans] = useState<Plan[]>([]);
   const [showDetails, setShowDetails] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -157,7 +156,7 @@ const BuyPlans: React.FC = () => {
 
   const handlePayment = async () => {
     if (!user) {
-      openSignIn();
+      navigate('/sign-in');
       return;
     }
 

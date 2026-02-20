@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FaCar, FaBatteryFull, FaRoute, FaClock, FaUsers, FaShieldAlt, FaArrowLeft } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { useUser, useClerk } from '@clerk/clerk-react';
+import { useUser } from '@clerk/clerk-react';
 import razorpayService from '../services/razorpayService';
 // Add imports for local images
 import nexonImg from '../assets/tata-nexon.jpg';
@@ -161,7 +161,6 @@ const evCars: EVCard[] = [
 const RentEV: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useUser();
-  const { openSignIn } = useClerk();
   const [selectedPeriod, setSelectedPeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily');
   const [selectedCar, setSelectedCar] = useState<EVCard | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
@@ -205,7 +204,7 @@ const RentEV: React.FC = () => {
 
   const handleBookNow = (car: EVCard) => {
     if (!user) {
-      openSignIn();
+      navigate('/sign-in');
       return;
     }
     setSelectedCar(car);
@@ -214,7 +213,7 @@ const RentEV: React.FC = () => {
 
   const handlePayment = async () => {
     if (!selectedCar || !user) {
-      openSignIn();
+      navigate('/sign-in');
       return;
     }
 
