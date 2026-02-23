@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import EVChampLogo from '../assets/EVChampLogo.png';
 import { useUser, SignInButton, SignOutButton } from '@clerk/clerk-react';
@@ -6,6 +6,19 @@ import { useUser, SignInButton, SignOutButton } from '@clerk/clerk-react';
 const Header: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isEvPlansOpen, setIsEvPlansOpen] = useState(false);
+  const evPlansRef = useRef<HTMLDivElement>(null);
+
+  // Close EV Plans dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (evPlansRef.current && !evPlansRef.current.contains(event.target as Node)) {
+        setIsEvPlansOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -22,10 +35,10 @@ const Header: React.FC = () => {
 
   const navLinks = (
     <>
-      <button onClick={() => scrollToSection('features')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left">Features</button>
-      <button onClick={() => scrollToSection('hero')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left">AI for EV Fleet</button>
-      <button onClick={() => scrollToSection('testimonials')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left">Testimonials</button>
-      <button onClick={() => scrollToSection('franchise-section')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left">Explore</button>
+      <button onClick={() => scrollToSection('features')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left whitespace-nowrap">Features</button>
+      <button onClick={() => scrollToSection('hero')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left whitespace-nowrap">AI for EV</button>
+      <button onClick={() => scrollToSection('testimonials')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left whitespace-nowrap">Testimonials</button>
+      <button onClick={() => scrollToSection('franchise-section')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left whitespace-nowrap">Explore</button>
     </>
   );
 
@@ -44,10 +57,28 @@ const Header: React.FC = () => {
 
         {/* Desktop CTAs and Account */}
         <div className="hidden lg:flex items-center space-x-3">
-          <a id="rent-ev-btn" href="/rent-ev" className="bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all text-sm">Rent EV</a>
+          {/* EV Plans Dropdown */}
+          <div className="relative" ref={evPlansRef}>
+            <button
+              onClick={() => setIsEvPlansOpen(!isEvPlansOpen)}
+              className="flex items-center space-x-1 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all text-sm"
+            >
+              <span>EV Plans</span>
+              <svg className={`w-4 h-4 transition-transform ${isEvPlansOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+            </button>
+            {isEvPlansOpen && (
+              <div className="absolute left-0 mt-2 w-44 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                <a href="/rent-ev" className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors" onClick={() => setIsEvPlansOpen(false)}>
+                  Rent EV
+                </a>
+                <a href="/buy-used-ev" className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-cyan-50 hover:text-cyan-700 transition-colors" onClick={() => setIsEvPlansOpen(false)}>
+                  Buy Used EV's
+                </a>
+              </div>
+            )}
+          </div>
           <a id="buy-plans-btn" href="/buy-plans" className="cta-gradient text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-green-500 to-green-700 text-sm">Buy Plans</a>
           <a id="franchise-btn" href="/franchise" className="cta-gradient text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-yellow-400 to-yellow-600 text-sm">Franchise</a>
-          <a id="buy-used-ev-btn" href="/buy-used-ev" className="cta-gradient text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-cyan-500 to-cyan-700 text-sm">Buy Used EV's</a>
           
           {/* Account Management Button */}
           <div className="relative">
@@ -117,17 +148,34 @@ const Header: React.FC = () => {
         <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg">
           <div className="px-4 py-3 flex flex-col space-y-1">
             {/* Quick Actions - Compact Grid */}
-            <div className="grid grid-cols-2 gap-2 mb-2">
-              <a href="/rent-ev" className="text-center bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs" onClick={() => setIsMobileMenuOpen(false)}>Rent EV</a>
+            <div className="grid grid-cols-3 gap-2 mb-2">
+              <div className="relative col-span-1">
+                <button
+                  onClick={() => setIsEvPlansOpen(!isEvPlansOpen)}
+                  className="w-full text-center bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs flex items-center justify-center space-x-1"
+                >
+                  <span>EV Plans</span>
+                  <svg className={`w-3 h-3 transition-transform ${isEvPlansOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                </button>
+                {isEvPlansOpen && (
+                  <div className="absolute left-0 mt-1 w-36 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50">
+                    <a href="/rent-ev" className="block px-4 py-2 text-xs font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors" onClick={() => { setIsEvPlansOpen(false); setIsMobileMenuOpen(false); }}>
+                      Rent EV
+                    </a>
+                    <a href="/buy-used-ev" className="block px-4 py-2 text-xs font-medium text-gray-700 hover:bg-cyan-50 hover:text-cyan-700 transition-colors" onClick={() => { setIsEvPlansOpen(false); setIsMobileMenuOpen(false); }}>
+                      Buy Used EV's
+                    </a>
+                  </div>
+                )}
+              </div>
               <a href="/buy-plans" className="text-center bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs" onClick={() => setIsMobileMenuOpen(false)}>Buy Plans</a>
               <a href="/franchise" className="text-center bg-gradient-to-r from-yellow-400 to-yellow-600 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs" onClick={() => setIsMobileMenuOpen(false)}>Franchise</a>
-              <a href="/buy-used-ev" className="text-center bg-gradient-to-r from-cyan-500 to-cyan-700 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs" onClick={() => setIsMobileMenuOpen(false)}>Buy Used EV's</a>
             </div>
             
             {/* Navigation Links */}
             <div className="border-t pt-2 space-y-1">
               <button onClick={() => scrollToSection('features')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left text-sm">Features</button>
-              <button onClick={() => scrollToSection('hero')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left text-sm">AI for EV Fleet</button>
+              <button onClick={() => scrollToSection('hero')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left text-sm">AI for EV</button>
               <button onClick={() => scrollToSection('testimonials')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left text-sm">Testimonials</button>
               <button onClick={() => scrollToSection('franchise-section')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left text-sm">Explore</button>
             </div>
