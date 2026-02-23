@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import EVChampLogo from '../assets/EVChampLogo.png';
 import { useUser, SignInButton, SignOutButton } from '@clerk/clerk-react';
@@ -6,7 +6,19 @@ import { useUser, SignInButton, SignOutButton } from '@clerk/clerk-react';
 const Header: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isIotDropdownOpen, setIsIotDropdownOpen] = useState(false);
+  const [isEvPlansOpen, setIsEvPlansOpen] = useState(false);
+  const evPlansRef = useRef<HTMLDivElement>(null);
+
+  // Close EV Plans dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (evPlansRef.current && !evPlansRef.current.contains(event.target as Node)) {
+        setIsEvPlansOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -45,29 +57,29 @@ const Header: React.FC = () => {
 
         {/* Desktop CTAs and Account */}
         <div className="hidden lg:flex items-center space-x-3">
-          {/* IOT Plans Dropdown */}
-          <div className="relative group">
+          {/* EV Plans Dropdown */}
+          <div className="relative" ref={evPlansRef}>
             <button
-              className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all text-sm flex items-center"
-              type="button"
-              aria-haspopup="true"
-              aria-expanded={isIotDropdownOpen}
-              tabIndex={0}
-              onClick={() => setIsIotDropdownOpen((open) => !open)}
-              onBlur={() => setTimeout(() => setIsIotDropdownOpen(false), 150)}
+              onClick={() => setIsEvPlansOpen(!isEvPlansOpen)}
+              className="flex items-center space-x-1 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all text-sm"
             >
-              EV Plans
-              <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+              <span>EV Plans</span>
+              <svg className={`w-4 h-4 transition-transform ${isEvPlansOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
             </button>
-            {isIotDropdownOpen && (
-              <div className="absolute left-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                <Link to="/rent-ev" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Rent EV</Link>
-                <Link to="/buy-used-ev" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Buy Used EV's</Link>
+            {isEvPlansOpen && (
+              <div className="absolute left-0 mt-2 w-44 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                <a href="/rent-ev" className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors" onClick={() => setIsEvPlansOpen(false)}>
+                  Rent EV
+                </a>
+                <a href="/buy-used-ev" className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-cyan-50 hover:text-cyan-700 transition-colors" onClick={() => setIsEvPlansOpen(false)}>
+                  Buy Used EV's
+                </a>
               </div>
             )}
           </div>
           <a id="buy-plans-btn" href="/buy-plans" className="cta-gradient text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-green-500 to-green-700 text-sm">Buy Plans</a>
           <a id="franchise-btn" href="/franchise" className="cta-gradient text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-yellow-400 to-yellow-600 text-sm">Franchise</a>
+          
           {/* Account Management Button */}
           <div className="relative">
             {isSignedIn ? (
@@ -136,20 +148,28 @@ const Header: React.FC = () => {
         <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg">
           <div className="px-4 py-3 flex flex-col space-y-1">
             {/* Quick Actions - Compact Grid */}
-            <div className="mb-2">
-              {/* IOT Plans Dropdown for Mobile */}
-              <div className="relative group w-full mb-2">
-                <button className="w-full text-center bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs flex items-center justify-center">
-                  IOT Plans
-                  <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+            <div className="grid grid-cols-3 gap-2 mb-2">
+              <div className="relative col-span-1">
+                <button
+                  onClick={() => setIsEvPlansOpen(!isEvPlansOpen)}
+                  className="w-full text-center bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs flex items-center justify-center space-x-1"
+                >
+                  <span>EV Plans</span>
+                  <svg className={`w-3 h-3 transition-transform ${isEvPlansOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                 </button>
-                <div className="absolute left-0 mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-200 py-2 opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 pointer-events-none group-focus-within:pointer-events-auto group-hover:pointer-events-auto transition-opacity z-50">
-                  <a href="/rent-ev" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Rent EV</a>
-                  <a href="/buy-used-ev" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Buy Used EV's</a>
-                </div>
+                {isEvPlansOpen && (
+                  <div className="absolute left-0 mt-1 w-36 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50">
+                    <a href="/rent-ev" className="block px-4 py-2 text-xs font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors" onClick={() => { setIsEvPlansOpen(false); setIsMobileMenuOpen(false); }}>
+                      Rent EV
+                    </a>
+                    <a href="/buy-used-ev" className="block px-4 py-2 text-xs font-medium text-gray-700 hover:bg-cyan-50 hover:text-cyan-700 transition-colors" onClick={() => { setIsEvPlansOpen(false); setIsMobileMenuOpen(false); }}>
+                      Buy Used EV's
+                    </a>
+                  </div>
+                )}
               </div>
-              <a href="/buy-plans" className="w-full text-center bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs block mb-2" onClick={() => setIsMobileMenuOpen(false)}>Buy Plans</a>
-              <a href="/franchise" className="w-full text-center bg-gradient-to-r from-yellow-400 to-yellow-600 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs block" onClick={() => setIsMobileMenuOpen(false)}>Franchise</a>
+              <a href="/buy-plans" className="text-center bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs" onClick={() => setIsMobileMenuOpen(false)}>Buy Plans</a>
+              <a href="/franchise" className="text-center bg-gradient-to-r from-yellow-400 to-yellow-600 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs" onClick={() => setIsMobileMenuOpen(false)}>Franchise</a>
             </div>
             
             {/* Navigation Links */}
