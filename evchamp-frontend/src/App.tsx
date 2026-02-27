@@ -16,7 +16,10 @@ import RefundPolicy from './components/RefundPolicy';
 import PaymentSuccess from './components/PaymentSuccess';
 import { SignIn, SignUp, UserProfile, RedirectToSignIn, useUser } from '@clerk/clerk-react';
 import Franchise from './components/Franchise';
+<<<<<<< HEAD
 import Ziptrax from './components/Ziptrax';
+=======
+>>>>>>> 8a0879474b392953f3c1bd31579c5105139ea1af
 import BuyUsedEV from './components/BuyUsedEV'; // Import the new component
 
 // Add this import for the banner image
@@ -161,7 +164,10 @@ function App() {
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/refund" element={<RefundPolicy />} />
           <Route path="/franchise" element={<Franchise />} />
+<<<<<<< HEAD
           <Route path="/ziptrax" element={<Ziptrax />} />
+=======
+>>>>>>> 8a0879474b392953f3c1bd31579c5105139ea1af
           <Route path="/buy-used-ev" element={
             <ProtectedRoute>
               <BuyUsedEV />
