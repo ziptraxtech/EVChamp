@@ -1,6 +1,4 @@
 {
-<<<<<<< HEAD
-=======
   "name": "evchamp-frontend",
   "version": "0.1.0",
   "private": true,
@@ -52,14 +50,9 @@
       "last 1 safari version"
     ]
   },
->>>>>>> 8a0879474b392953f3c1bd31579c5105139ea1af
   "devDependencies": {
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.3"
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 8a0879474b392953f3c1bd31579c5105139ea1af
