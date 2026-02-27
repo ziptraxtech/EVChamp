@@ -18,24 +18,35 @@ const Franchise: React.FC = () => {
       <h1 className="text-3xl sm:text-4xl font-bold text-green-700 mb-6">EVChamp Franchise Partnership</h1>
       <p className="mb-4 text-base sm:text-lg font-semibold text-gray-800">The Electrifying Opportunity is Now!</p>
       <p className="mb-4 text-sm sm:text-base">India's roads are transforming, and the future is electric. EVChamp offers an unparalleled franchise opportunity to build a highly profitable business at the heart of India's Electric Vehicle revolution. Are you ready to charge ahead with the undisputed leader in EV Leasing services and AI Diagnostics?</p>
+
       <a
-        href="https://newdepin-deployment.vercel.app/"
+        href="https://investyz.com/"
         target="_blank"
         rel="noopener noreferrer"
-        className="block rounded-3xl p-8 bg-white hover:bg-green-400/80 active:bg-green-500/90 transition-colors shadow-xl max-w-2xl mx-auto mb-8 mt-8 cursor-pointer group"
-        style={{ textDecoration: 'none' }}
+        className="mt-10 block rounded-2xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+        style={{ background: 'linear-gradient(135deg, #e8f5e9 0%, #a5d6a7 30%, #66bb6a 60%, #43a047 100%)' }}
       >
-        <div className="flex items-center mb-4">
-          <span className="inline-flex items-center px-4 py-1 rounded-full bg-white text-green-700 font-bold text-base mr-2">
-            <svg className="w-5 h-5 mr-1 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-            Investyz
-          </span>
+        <div className="p-6 sm:p-8">
+          <div className="inline-flex items-center bg-white/80 backdrop-blur-sm rounded-full px-4 py-1.5 mb-4 shadow-sm">
+            <svg className="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="font-bold text-gray-900 text-sm tracking-wide">INVESTYZ</span>
+          </div>
+
+          <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">INVESTYZ</h3>
+
+          <p className="text-gray-800 text-sm sm:text-base leading-relaxed mb-5 max-w-xl">
+            Invest in the Infrastructure of Tomorrow. Earn sustainable yields by investing in real-world assets like data centers, battery storage, EV charging, and renewable energy through decentralized physical infrastructure on Polygon.
+          </p>
+          
+          <div className="inline-flex items-center text-blue-700 font-semibold text-sm sm:text-base hover:text-blue-900 transition-colors">
+            <span>Visit site</span>
+            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </div>
         </div>
-        <h2 className="text-2xl font-bold text-black mb-2">Investyz</h2>
-        <p className="text-lg text-gray-700 mb-6">Earn sustainable yields by investing in real-world assets like data centers, battery storage, EV charging, and renewable energy through decentralized physical infrastructure on Polygon.</p>
-        <span className="font-bold text-blue-700 text-lg flex items-center group-hover:underline group-hover:text-blue-800 transition-colors">
-          Visit site <span className="ml-2">→</span>
-        </span>
       </a>
       <h2 className="text-xl sm:text-2xl font-bold mt-8 mb-2">Why Choose an EVChamp Franchise?</h2>
       <ul className="list-disc ml-4 sm:ml-6 mb-4 text-sm sm:text-base">

@@ -16,6 +16,7 @@ import RefundPolicy from './components/RefundPolicy';
 import PaymentSuccess from './components/PaymentSuccess';
 import { SignIn, SignUp, UserProfile, RedirectToSignIn, useUser } from '@clerk/clerk-react';
 import Franchise from './components/Franchise';
+import Ziptrax from './components/Ziptrax';
 import BuyUsedEV from './components/BuyUsedEV'; // Import the new component
 
 // Add this import for the banner image
@@ -37,6 +38,41 @@ function HomePage() {
           className="inline-block bg-gradient-to-r from-yellow-300 to-yellow-700 text-white font-bold text-base sm:text-lg px-6 sm:px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition"
         >
           Explore Franchise Opportunities
+        </a>
+
+        {/* Investyz Card */}
+        <a
+          href="https://investyz.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-8 w-full max-w-3xl block rounded-2xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+          style={{ background: 'linear-gradient(135deg, #e8f5e9 0%, #a5d6a7 30%, #66bb6a 60%, #43a047 100%)' }}
+        >
+          <div className="p-6 sm:p-8">
+            {/* Badge */}
+            <div className="inline-flex items-center bg-white/80 backdrop-blur-sm rounded-full px-4 py-1.5 mb-4 shadow-sm">
+              <svg className="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="font-bold text-gray-900 text-sm tracking-wide">INVESTYZ</span>
+            </div>
+
+            {/* Title */}
+            <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">INVESTYZ</h3>
+
+            {/* Description */}
+            <p className="text-gray-800 text-sm sm:text-base leading-relaxed mb-5 max-w-xl">
+              Invest in the Infrastructure of Tomorrow. Earn sustainable yields by investing in real-world assets like data centers, battery storage, EV charging, and renewable energy through decentralized physical infrastructure on Polygon.
+            </p>
+
+            {/* Visit Site Link */}
+            <div className="inline-flex items-center text-blue-700 font-semibold text-sm sm:text-base hover:text-blue-900 transition-colors">
+              <span>Visit site</span>
+              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </div>
+          </div>
         </a>
       </div>
       <Hero />
@@ -125,6 +161,7 @@ function App() {
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/refund" element={<RefundPolicy />} />
           <Route path="/franchise" element={<Franchise />} />
+          <Route path="/ziptrax" element={<Ziptrax />} />
           <Route path="/buy-used-ev" element={
             <ProtectedRoute>
               <BuyUsedEV />
