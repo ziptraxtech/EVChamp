@@ -204,11 +204,7 @@ const RentEV: React.FC = () => {
 
   const handleBookNow = (car: EVCard) => {
     if (!user) {
-<<<<<<< HEAD
       alert('Please sign in to rent an EV.');
-=======
-      navigate('/sign-in');
->>>>>>> 8a0879474b392953f3c1bd31579c5105139ea1af
       return;
     }
     setSelectedCar(car);
@@ -217,11 +213,7 @@ const RentEV: React.FC = () => {
 
   const handlePayment = async () => {
     if (!selectedCar || !user) {
-<<<<<<< HEAD
       alert('Please select a car and sign in to proceed.');
-=======
-      navigate('/sign-in');
->>>>>>> 8a0879474b392953f3c1bd31579c5105139ea1af
       return;
     }
 
