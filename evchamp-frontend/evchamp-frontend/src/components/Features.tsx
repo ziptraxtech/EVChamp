@@ -120,7 +120,7 @@ const Features: React.FC = () => (
 			<div className="text-center mt-8">
 				<a
 					href="/ziptrax"
-					className="inline-block bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-bold text-base sm:text-lg px-6 sm:px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition"
+					className="inline-block bg-gradient-to-r from-blue-300 to-blue-700 text-white font-bold text-base sm:text-lg px-6 sm:px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition"
 				>
 					Explore Ziptrax Opportunities
 				</a>

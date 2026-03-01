@@ -156,7 +156,7 @@ const BuyPlans: React.FC = () => {
 
   const handlePayment = async () => {
     if (!user) {
-      alert('Please sign in to proceed with payment.');
+      navigate('/sign-in');
       return;
     }
 

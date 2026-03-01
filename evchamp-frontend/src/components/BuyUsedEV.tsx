@@ -44,7 +44,7 @@ const BuyUsedEV: React.FC = () => {
 
   const handleEnquireNow = (car: UsedEVCard) => {
     if (!user) {
-      alert('Please sign in to enquire about a used EV.');
+      navigate('/sign-in');
       return;
     }
     setSelectedCar(car);

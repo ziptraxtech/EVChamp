@@ -79,6 +79,7 @@ const Header: React.FC = () => {
           </div>
           <a id="buy-plans-btn" href="/buy-plans" className="cta-gradient text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-green-500 to-green-700 text-sm">Buy Plans</a>
           <a id="franchise-btn" href="/franchise" className="cta-gradient text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-yellow-400 to-yellow-600 text-sm">Franchise</a>
+          <a id="zipbattery-btn" href="/zipbattery" className="cta-gradient text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-orange-400 to-red-600 text-sm">ZipBattery</a>
           
           {/* Account Management Button */}
           <div className="relative">
@@ -148,7 +149,7 @@ const Header: React.FC = () => {
         <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg">
           <div className="px-4 py-3 flex flex-col space-y-1">
             {/* Quick Actions - Compact Grid */}
-            <div className="grid grid-cols-3 gap-2 mb-2">
+            <div className="grid grid-cols-4 gap-2 mb-2">
               <div className="relative col-span-1">
                 <button
                   onClick={() => setIsEvPlansOpen(!isEvPlansOpen)}
@@ -170,6 +171,7 @@ const Header: React.FC = () => {
               </div>
               <a href="/buy-plans" className="text-center bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs" onClick={() => setIsMobileMenuOpen(false)}>Buy Plans</a>
               <a href="/franchise" className="text-center bg-gradient-to-r from-yellow-400 to-yellow-600 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs" onClick={() => setIsMobileMenuOpen(false)}>Franchise</a>
+              <a href="/zipbattery" className="text-center bg-gradient-to-r from-orange-400 to-red-600 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs" onClick={() => setIsMobileMenuOpen(false)}>ZipBattery</a>
             </div>
             
             {/* Navigation Links */}

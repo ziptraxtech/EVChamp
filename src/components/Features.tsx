@@ -43,22 +43,15 @@ const Features: React.FC = () => (
   <section id="features" className="py-12 sm:py-20 bg-transparent">
     <div className="container mx-auto px-4 sm:px-6">
       <ScrollReveal className="text-center mb-12">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">Why Choose EVChamp IoT Hardware?</h2>
-        <p className="mt-4 text-base sm:text-lg text-gray-600 max-w-3xl mx-auto">Our advanced IoT devices are engineered for precision, security, and reliability—empowering your EV fleet with the latest in connectivity, analytics, and automation.</p>
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-green-700 mb-3 text-center">ZipBattery</h2>
+        <p className="mt-4 text-base sm:text-lg text-gray-600 max-w-3xl mx-auto">ZipBattery extends the lifespan of Li-ion batteries by combining it with our AI-based Technology. It has a vision to provide a world with greener, smarter and longer lasting lithium ion batteries. </p>
+        <a
+          href="/zipbattery"
+          className="inline-block bg-gradient-to-r from-orange-400 to-red-600 text-white font-bold text-base sm:text-lg px-6 sm:px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition mt-6"
+        >
+          Explore ZipBattery Opportunities
+        </a>
       </ScrollReveal>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {features.map((f, index) => (
-          <ScrollReveal key={f.title} delay={index * 100}>
-            <div className="bg-gray-50 p-6 sm:p-8 rounded-xl shadow-sm hover:shadow-lg transition-shadow border border-gray-200">
-              <div className="bg-green-100 text-green-600 rounded-full h-12 w-12 flex items-center justify-center mb-4">
-                {f.icon}
-              </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">{f.title}</h3>
-              <p className="text-gray-600">{f.desc}</p>
-            </div>
-          </ScrollReveal>
-        ))}
-      </div>
     </div>
   </section>
 );
