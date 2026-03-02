@@ -138,11 +138,12 @@ const ZipBattery: React.FC = () => {
               >
                 Get in Touch
               </a>
-              <button
+              <a
+                href="#"
                 className="inline-block w-full text-center bg-white/20 backdrop-blur-sm text-white font-bold py-3 rounded-lg hover:bg-white/30 transition-colors border border-white/40"
               >
                 Learn More
-              </button>
+              </a>
             </div>
           </div>
         </div>
