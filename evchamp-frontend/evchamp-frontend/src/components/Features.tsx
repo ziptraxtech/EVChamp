@@ -1,6 +1,7 @@
 import React from 'react';
 import { ScrollReveal } from './ScrollReveal';
 
+// delete this if unused
 const features = [
 	{
 		icon: (
