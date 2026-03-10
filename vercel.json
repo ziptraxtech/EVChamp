@@ -2,16 +2,10 @@
   "buildCommand": "CI=false npm run build",
   "outputDirectory": "build",
   "framework": "create-react-app",
-  "functions": {
-    "api/index.js": {
-      "memory": 256,
-      "maxDuration": 10
-    }
-  },
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.js"
+      "source": "/api/:path*",
+      "destination": "http://100.24.9.16:5000/api/:path*"
     },
     {
       "source": "/(.*)",
