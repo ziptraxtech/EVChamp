@@ -41,9 +41,8 @@ class RazorpayService {
   private keySecret: string;
 
   constructor() {
-    // Live Razorpay keys
-    this.keyId = 'rzp_live_4QS6rb1lpyfBXF';
-    this.keySecret = 'aG1mnuj1s60HYTE86u9IOI2X';
+    this.keyId = process.env.REACT_APP_RAZORPAY_KEY_ID || '';
+    this.keySecret = process.env.REACT_APP_RAZORPAY_KEY_SECRET || '';
   }
 
   // Initialize Razorpay script

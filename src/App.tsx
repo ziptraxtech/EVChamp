@@ -18,6 +18,7 @@ import { SignIn, SignUp, UserProfile, RedirectToSignIn, useUser } from '@clerk/c
 import Franchise from './components/Franchise';
 import BuyUsedEV from './components/BuyUsedEV'; // Import the new component
 import ZipBattery from './components/ZipBattery';
+import AdvanceAnalysis from './components/AdvanceAnalysis';
 
 // Add this import for the banner image
 import BannerLogos from './assets/footer_banner.jpeg'; // Update the path if needed
@@ -129,6 +130,11 @@ function App() {
           <Route path="/refund" element={<RefundPolicy />} />
           <Route path="/franchise" element={<Franchise />} />
           <Route path="/zipbattery" element={<ZipBattery />} />
+          <Route path="/advance-analysis" element={
+            <ProtectedRoute>
+              <AdvanceAnalysis />
+            </ProtectedRoute>
+          } />
           <Route path="/buy-used-ev" element={
             <ProtectedRoute>
               <BuyUsedEV />

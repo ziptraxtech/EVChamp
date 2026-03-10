@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 8a0879474b392953f3c1bd31579c5105139ea1af
 # Dependencies
 node_modules/
 npm-debug.log*
@@ -14,35 +10,15 @@ yarn-error.log*
 
 # Environment variables
 .env
-<<<<<<< HEAD
-=======
-=======
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-
-# testing
-/coverage
-
-# production
-/build
-
-# misc
-.DS_Store
->>>>>>> a6146d9 (Initial commit)
->>>>>>> 8a0879474b392953f3c1bd31579c5105139ea1af
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+server/.env
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 8a0879474b392953f3c1bd31579c5105139ea1af
+# SSH keys
+*.pem
+
 # IDE files
 .vscode/
 .idea/
@@ -68,11 +44,11 @@ pids
 *.seed
 *.pid.lock
 
-# Coverage directory used by tools like istanbul
+# Testing / Coverage
 coverage/
-
-# nyc test coverage
 .nyc_output
+/.pnp
+.pnp.js
 
 # Dependency directories
 jspm_packages/
@@ -89,36 +65,16 @@ jspm_packages/
 # Yarn Integrity file
 .yarn-integrity
 
-# parcel-bundler cache (https://parceljs.org/)
+# Build caches
 .cache
 .parcel-cache
-
-# next.js build output
 .next
-
-# nuxt.js build output
 .nuxt
-
-# vuepress build output
 .vuepress/dist
-
-# Serverless directories
 .serverless
-
-# FuseBox cache
 .fusebox/
-
-# DynamoDB Local files
 .dynamodb/
+.tern-port
 
-# TernJS port file
-.tern-port 
-<<<<<<< HEAD
-=======
-=======
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
->>>>>>> a6146d9 (Initial commit)
->>>>>>> 8a0879474b392953f3c1bd31579c5105139ea1af
+# Vercel
 .vercel
