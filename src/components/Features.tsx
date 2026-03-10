@@ -1,6 +1,7 @@
 import React from 'react';
 import { ScrollReveal } from './ScrollReveal';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const features = [
   {
     icon: (
