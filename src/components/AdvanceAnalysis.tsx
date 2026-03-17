@@ -35,9 +35,47 @@ const AdvanceAnalysis: React.FC = () => {
   const [decodedQR, setDecodedQR] = useState<DecodedQR | null>(null);
   const [qrValidation, setQrValidation] = useState<QRValidation | null>(null);
   const [savingAudit, setSavingAudit] = useState(false);
+  const [manualEntry, setManualEntry] = useState(false);
+  const [cameraSupported, setCameraSupported] = useState(true);
   const scannerRef = useRef<Html5Qrcode | null>(null);
 
   const BackArrow = FaArrowLeft as React.ElementType;
+
+  // Device detection and capability check
+  const checkDeviceCapabilities = useCallback(() => {
+    try {
+      const isHTTPS = window.location.protocol === 'https:' || window.location.hostname === 'localhost';
+      const hasMediaDevices = !!(navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+      const ua = navigator.userAgent.toLowerCase();
+      const isIOS = /iphone|ipad|ipod/.test(ua);
+      const isAndroid = /android/.test(ua);
+      const isMobile = isIOS || isAndroid;
+
+      console.log('📊 Device Capabilities:', {
+        isHTTPS,
+        hasMediaDevices,
+        isIOS,
+        isAndroid,
+        isMobile,
+        browser: ua.includes('safari') ? 'Safari' : ua.includes('chrome') ? 'Chrome' : ua.includes('firefox') ? 'Firefox' : 'Other',
+      });
+
+      if (!isHTTPS && window.location.hostname !== 'localhost') {
+        console.warn('⚠️ Not using HTTPS - camera may not work');
+      }
+
+      if (!hasMediaDevices) {
+        console.error('❌ Browser does not support mediaDevices API');
+        setCameraSupported(false);
+        return false;
+      }
+
+      return true;
+    } catch (err) {
+      console.error('Error checking device capabilities:', err);
+      return false;
+    }
+  }, []);
 
   const stopScanner = useCallback(async () => {
     if (scannerRef.current) {
@@ -53,30 +91,64 @@ const AdvanceAnalysis: React.FC = () => {
     }
   }, []);
 
+  const getOSSpecificInstructions = (): string => {
+    const ua = navigator.userAgent.toLowerCase();
+    const isIOS = /iphone|ipad|ipod/.test(ua);
+    const isSafari = ua.includes('safari') && !ua.includes('chrome');
+    
+    if (isIOS && isSafari) {
+      return '📱 **iOS (Safari):**\n1. Tap Share button (square with arrow)\n2. Tap Settings → Camera\n3. Tap Allow camera access\n4. Close & try again';
+    } else if (isIOS) {
+      return '📱 **iOS (Chrome/Firefox):**\n1. Settings → Safari → Camera\n2. Or: Settings → App Settings → Camera\n3. Enable camera access\n4. Close & try again';
+    } else if (/android/.test(ua)) {
+      return '🔧 **Android:**\n1. Settings → Apps → Permissions → Camera\n2. Or: Open browser settings → Site permissions → Camera\n3. Allow camera access\n4. Close & try again';
+    }
+    return '🖥️ **Desktop/Other:**\n1. Check browser bar for camera icon\n2. Click to allow camera\n3. Or: Settings → Privacy & Security → Camera\n4. Refresh page';
+  };
+
   const startScanner = useCallback(async () => {
     setScannerError('');
-    setShowScanner(true);
+    
+    // Check capabilities first
+    if (!checkDeviceCapabilities()) {
+      setScannerError('🔴 Your device or browser does not support camera access.\n\n' + 
+        'Try:\n• Using Chrome or Firefox\n• On a device with a camera\n• Using mobile instead of desktop\n\n' +
+        'Or use manual entry below to enter the serial number.');
+      setManualEntry(true);
+      return;
+    }
 
-    // Increase delay and add element check for mobile
+    // Check HTTPS
+    const isSecure = window.location.protocol === 'https:' || window.location.hostname === 'localhost';
+    if (!isSecure) {
+      setScannerError('🔒 Camera requires HTTPS connection.\n\nThis site is using HTTP which blocks camera access.\nTry:\n• Refreshing the page\n• Using a secure HTTPS connection\n• Manual entry below');
+      setManualEntry(true);
+      return;
+    }
+
+    setShowScanner(true);
+    setManualEntry(false);
+
+    // Delay to allow DOM to render
     setTimeout(async () => {
       try {
-        // Check if the element exists
         const readerElement = document.getElementById('qr-reader');
         if (!readerElement) {
           console.error('qr-reader element not found in DOM');
           setScannerError('❌ Scanner element not found. Try refreshing the page.');
           setShowScanner(false);
+          setManualEntry(true);
           return;
         }
 
-        console.log('Starting QR scanner, element found:', readerElement);
+        console.log('✅ Starting QR scanner, element found');
         
         const html5Qrcode = new Html5Qrcode('qr-reader', {
           formatsToSupport: [0, 4, 2, 3, 7, 8, 11, 12, 13],
         } as any);
         scannerRef.current = html5Qrcode;
 
-        console.log('Html5Qrcode instance created, starting camera access');
+        console.log('📸 Html5Qrcode instance created, requesting camera access');
         
         await html5Qrcode.start(
           { facingMode: 'environment' },
@@ -86,20 +158,17 @@ const AdvanceAnalysis: React.FC = () => {
             aspectRatio: 1.0,
           },
           (decodedText: string) => {
-            // On successful scan, close scanner
             const scannedValue = decodedText.trim();
             setShowScanner(false);
             html5Qrcode.stop().catch(() => {});
             scannerRef.current = null;
 
-            // Check if it's a 24-digit encoded QR identity
             if (is24DigitQR(scannedValue)) {
               const decoded = decodeQRString(scannedValue);
               if (decoded) {
                 setDecodedQR(decoded);
                 setQrValidation(validateQR(decoded));
                 setSerialInput(decoded.serialNumber);
-                // Auto-fetch using QR-decoded data immediately
                 setLoading(true);
                 setError('');
                 getQRAnalysis(decoded.raw, {
@@ -130,7 +199,6 @@ const AdvanceAnalysis: React.FC = () => {
                 setSerialInput(scannedValue);
               }
             } else {
-              // Regular serial number or other QR content
               setDecodedQR(null);
               setQrValidation(null);
               setSerialInput(scannedValue);
@@ -140,37 +208,63 @@ const AdvanceAnalysis: React.FC = () => {
             // QR code not detected in this frame - ignore
           }
         );
-        console.log('Camera started successfully');
+        console.log('✅ Camera started successfully');
       } catch (err: any) {
-        console.error('Scanner error details:', err);
+        console.error('❌ Scanner error:', err);
         console.error('Error name:', err?.name);
+        console.error('Error code:', err?.code);
         console.error('Error message:', err?.message);
         
-        // Handle specific error types
-        let errorMessage = 'Could not access camera. Please allow camera permissions and try again.';
-        
-        if (err?.name === 'NotAllowedError' || err?.message?.includes('Permission denied')) {
-          errorMessage = '📱 Camera Permission Denied.\n\n1. Check your browser permissions\n2. Go to Settings → Site Permissions → Camera\n3. Allow camera access for this site\n4. Refresh and try again';
-        } else if (err?.name === 'NotFoundError' || err?.message?.includes('No camera')) {
-          errorMessage = '❌ No camera found. Make sure your device has a camera.';
-        } else if (err?.name === 'NotReadableError' || err?.message?.includes('already in use')) {
-          errorMessage = '⚠️ Camera is already in use. Close other apps using the camera and try again.';
-        } else if (err?.name === 'SecurityError' || err?.message?.includes('https')) {
-          errorMessage = '🔒 This site must use HTTPS for camera access. Make sure you\'re using a secure connection.';
+        let errorMessage = '❌ Could not access camera.';
+        let showManualFallback = true;
+
+        switch (err?.name) {
+          case 'NotAllowedError':
+          case 'PermissionDeniedError':
+            errorMessage = '📱 **Camera Permission Denied**\n\n' + getOSSpecificInstructions();
+            break;
+          case 'NotFoundError':
+            errorMessage = '❌ **No Camera Found**\n\nYour device does not have a camera.\n\nUse manual entry to type the serial number.';
+            break;
+          case 'NotReadableError':
+          case 'OverconstrainedError':
+            errorMessage = '⚠️ **Camera In Use**\n\n1. Close other apps using the camera\n2. Close other browser tabs with camera\n3. Close this app/tab completely\n4. Wait 5 seconds\n5. Try again';
+            break;
+          case 'SecurityError':
+            if (err.message?.includes('https') || err.message?.includes('HTTPS')) {
+              errorMessage = '🔒 **HTTPS Required**\n\nCamera only works on secure HTTPS connections.\n\nTry:\n• Refreshing the page\n• Checking your connection\n• Using a different browser';
+            } else {
+              errorMessage = '🔒 **Security Blocked**\n\nYour browser blocked camera access.\n\nTry:\n• Check browser security settings\n• Refresh the page\n• Use a different browser';
+            }
+            break;
+          default:
+            if (err?.message?.includes('Permission') || err?.message?.includes('permission')) {
+              errorMessage = '📱 **Camera Permission Required**\n\n' + getOSSpecificInstructions();
+            } else if (err?.message?.includes('https') || err?.message?.includes('HTTPS')) {
+              errorMessage = '🔒 **HTTPS Required**\n\nCamera needs a secure connection.';
+            } else if (err?.message?.includes('camera') || err?.message?.includes('Camera')) {
+              errorMessage = '❌ **Camera Error**\n\n' + err?.message + '\n\nTry:\n• Refreshing\n• Restarting the browser\n• Using a different browser';
+            } else {
+              errorMessage = '❌ **Camera Error**\n\n' + (err?.message || err?.toString()) + '\n\nUse manual entry below to continue.';
+            }
         }
         
         setScannerError(errorMessage);
         setShowScanner(false);
+        setManualEntry(showManualFallback);
       }
     }, 500);
-  }, []);
+  }, [checkDeviceCapabilities]);
 
   // Cleanup scanner on unmount
   useEffect(() => {
+    // Check capabilities on mount
+    checkDeviceCapabilities();
+    
     return () => {
       stopScanner();
     };
-  }, [stopScanner]);
+  }, [stopScanner, checkDeviceCapabilities]);
 
   useEffect(() => {
     if (scanType === 'battery') {
@@ -982,6 +1076,18 @@ const AdvanceAnalysis: React.FC = () => {
             </div>
           </div>
 
+          {/* Camera Not Supported Warning */}
+          {!cameraSupported && (
+            <div className="mb-6 p-4 rounded-xl border-2 border-orange-400 bg-orange-50">
+              <p className="text-sm font-semibold text-orange-800">
+                ⚠️ Camera not available on this device/browser
+              </p>
+              <p className="text-xs text-gray-600 mt-2">
+                You can still use manual entry below to analyze batteries.
+              </p>
+            </div>
+          )}
+
           {/* Scan / Serial Input Form */}
           <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
             <form onSubmit={handleAuditFetch} className="space-y-4">
@@ -1050,12 +1156,51 @@ const AdvanceAnalysis: React.FC = () => {
                 ) : (
                   <div className="bg-black rounded-xl p-3 sm:p-4 mb-3 relative w-full">
                     <div id="qr-reader" className="w-full h-72 sm:h-80 rounded-lg overflow-hidden bg-gray-900 flex items-center justify-center"></div>
-                    {scannerError && (
-                      <div className="bg-red-600 text-white text-xs sm:text-sm rounded-lg p-3 mt-3 whitespace-pre-line font-semibold">
-                        {scannerError}
+                    {scannerError ? (
+                      <div>
+                        <div className="bg-red-600 text-white text-xs sm:text-sm rounded-lg p-3 mt-3 whitespace-pre-line font-semibold">
+                          {scannerError}
+                        </div>
+                        {manualEntry && (
+                          <div className="mt-4 p-4 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
+                            <p className="text-sm font-semibold text-gray-700 mb-3">💡 Alternative: Type Serial Number</p>
+                            <div className="flex space-x-2">
+                              <input
+                                type="text"
+                                placeholder="Enter serial number manually..."
+                                value={serialInput}
+                                onChange={(e) => setSerialInput(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' && serialInput.trim()) {
+                                    stopScanner();
+                                    setShowScanner(false);
+                                    setScannerError('');
+                                    handleAuditFetch(e as any);
+                                  }
+                                }}
+                                className="flex-1 border-2 border-yellow-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  stopScanner();
+                                  setShowScanner(false);
+                                  setScannerError('');
+                                  if (serialInput.trim()) {
+                                    handleAuditFetch({ preventDefault: () => {} } as any);
+                                  }
+                                }}
+                                className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-4 py-2 rounded-lg text-sm transition-colors"
+                              >
+                                Submit
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
+                    ) : (
+                      <p className="text-gray-300 text-xs mt-3">Point your camera at a QR code or barcode</p>
                     )}
-                    <p className="text-gray-300 text-xs mt-3">Point your camera at a QR code or barcode</p>
                     <button
                       type="button"
                       className="mt-3 bg-red-500 text-white font-semibold px-4 sm:px-6 py-2 rounded-lg hover:bg-red-600 transition-colors inline-flex items-center space-x-2 text-sm sm:text-base w-full sm:w-auto justify-center"
