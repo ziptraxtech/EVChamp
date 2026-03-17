@@ -129,11 +129,20 @@ const AdvanceAnalysis: React.FC = () => {
         );
       } catch (err: any) {
         console.error('Scanner error:', err);
-        setScannerError(
-          typeof err === 'string'
-            ? err
-            : err?.message || 'Could not access camera. Please allow camera permissions and try again.'
-        );
+        
+        // Handle specific error types
+        let errorMessage = 'Could not access camera. Please allow camera permissions and try again.';
+        
+        if (err?.name === 'NotAllowedError' || err?.message?.includes('Permission denied')) {
+          errorMessage = '📱 Camera Permission Denied.\n\n1. Check your browser permissions\n2. Go to Settings → Site Permissions → Camera\n3. Allow camera access for this site\n4. Refresh and try again';
+        } else if (err?.name === 'NotFoundError' || err?.message?.includes('No camera')) {
+          errorMessage = '❌ No camera found. Make sure your device has a camera.';
+        } else if (err?.name === 'NotReadableError' || err?.message?.includes('already in use')) {
+          errorMessage = '⚠️ Camera is already in use. Close other apps using the camera and try again.';
+        }
+        
+        setScannerError(errorMessage);
+        setShowScanner(false);
       }
     }, 300);
   }, []);
@@ -1021,17 +1030,17 @@ const AdvanceAnalysis: React.FC = () => {
                     </button>
                   </div>
                 ) : (
-                  <div className="bg-black rounded-xl p-4 mb-3 relative">
-                    <div id="qr-reader" className="w-full max-w-sm mx-auto rounded-lg overflow-hidden"></div>
+                  <div className="bg-black rounded-xl p-3 sm:p-4 mb-3 relative w-full">
+                    <div id="qr-reader" className="w-full rounded-lg overflow-hidden"></div>
                     {scannerError && (
-                      <div className="bg-red-500/90 text-white text-sm rounded-lg p-3 mt-3">
+                      <div className="bg-red-600 text-white text-xs sm:text-sm rounded-lg p-3 mt-3 whitespace-pre-line font-semibold">
                         {scannerError}
                       </div>
                     )}
                     <p className="text-gray-300 text-xs mt-3">Point your camera at a QR code or barcode</p>
                     <button
                       type="button"
-                      className="mt-3 bg-red-500 text-white font-semibold px-6 py-2 rounded-lg hover:bg-red-600 transition-colors inline-flex items-center space-x-2"
+                      className="mt-3 bg-red-500 text-white font-semibold px-4 sm:px-6 py-2 rounded-lg hover:bg-red-600 transition-colors inline-flex items-center space-x-2 text-sm sm:text-base w-full sm:w-auto justify-center"
                       onClick={() => {
                         stopScanner();
                         setShowScanner(false);
@@ -1236,18 +1245,18 @@ const AdvanceAnalysis: React.FC = () => {
                     </button>
                   </div>
                 ) : (
-                  <div className="bg-black rounded-xl p-4 mb-3 relative">
+                  <div className="bg-black rounded-xl p-3 sm:p-4 mb-3 relative w-full">
                     {/* Live Camera Scanner */}
-                    <div id="qr-reader" className="w-full max-w-sm mx-auto rounded-lg overflow-hidden"></div>
+                    <div id="qr-reader" className="w-full rounded-lg overflow-hidden"></div>
                     {scannerError && (
-                      <div className="bg-red-500/90 text-white text-sm rounded-lg p-3 mt-3">
+                      <div className="bg-red-600 text-white text-xs sm:text-sm rounded-lg p-3 mt-3 whitespace-pre-line font-semibold">
                         {scannerError}
                       </div>
                     )}
                     <p className="text-gray-300 text-xs mt-3">Point your camera at a QR code or barcode</p>
                     <button
                       type="button"
-                      className="mt-3 bg-red-500 text-white font-semibold px-6 py-2 rounded-lg hover:bg-red-600 transition-colors inline-flex items-center space-x-2"
+                      className="mt-3 bg-red-500 text-white font-semibold px-4 sm:px-6 py-2 rounded-lg hover:bg-red-600 transition-colors inline-flex items-center space-x-2 text-sm sm:text-base w-full sm:w-auto justify-center"
                       onClick={() => {
                         stopScanner();
                         setShowScanner(false);
