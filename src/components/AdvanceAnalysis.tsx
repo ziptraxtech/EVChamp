@@ -106,6 +106,52 @@ const AdvanceAnalysis: React.FC = () => {
     return '🖥️ **Desktop/Other:**\n1. Check browser bar for camera icon\n2. Click to allow camera\n3. Or: Settings → Privacy & Security → Camera\n4. Refresh page';
   };
 
+  const testCameraPermission = async (): Promise<boolean> => {
+    try {
+      console.log('📸 Testing camera permission with getUserMedia...');
+      
+      // First, try to request camera permission directly
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' },
+        audio: false,
+      });
+
+      console.log('✅ Camera permission granted! Stream obtained:', stream);
+
+      // Stop the test stream immediately
+      stream.getTracks().forEach(track => {
+        track.stop();
+        console.log('🛑 Test stream track stopped');
+      });
+
+      return true;
+    } catch (err: any) {
+      console.error('❌ Camera permission test failed:', err);
+      console.error('Error name:', err?.name);
+      console.error('Error message:', err?.message);
+      
+      // Log permission-related errors specifically
+      if (err?.name === 'NotAllowedError') {
+        console.warn('⚠️ User denied camera permission');
+      } else if (err?.name === 'NotFoundError') {
+        console.warn('⚠️ No camera device found');
+      } else if (err?.name === 'NotReadableError') {
+        console.warn('⚠️ Camera is in use by another application');
+      } else if (err?.name === 'SecurityError') {
+        console.warn('⚠️ Security error - HTTPS required or feature blocked');
+      } else if (err?.name === 'TypeError') {
+        console.warn('⚠️ Browser does not support camera access');
+      }
+      
+      return false;
+    }
+  };
+
+  const getOSSpecificInstructions = (): string => {
+    const ua = navigator.userAgent.toLowerCase();
+    const isIOS = /iphone|ipad|ipod/.test(ua);
+    const isSafari = ua.includes('safari') && !ua.includes('chrome');
+
   const startScanner = useCallback(async () => {
     setScannerError('');
     
@@ -126,8 +172,31 @@ const AdvanceAnalysis: React.FC = () => {
       return;
     }
 
+    console.log('🎬 Starting scanner workflow...');
     setShowScanner(true);
     setManualEntry(false);
+
+    // CRITICAL: Test camera permission FIRST to trigger browser prompt on mobile
+    const ua = navigator.userAgent.toLowerCase();
+    const isMobile = /iphone|ipad|ipod|android/.test(ua);
+    
+    if (isMobile) {
+      console.log('📱 Mobile device detected - testing camera permission first');
+      setScannerError('🔄 Requesting camera access...');
+      
+      const hasPermission = await testCameraPermission();
+      
+      if (!hasPermission) {
+        console.error('❌ Camera permission test failed - user denied or camera unavailable');
+        setScannerError('📱 **Camera Permission Denied or Unavailable**\n\n' + getOSSpecificInstructions() + '\n\nOr use manual entry to type the serial number.');
+        setShowScanner(false);
+        setManualEntry(true);
+        return;
+      }
+      
+      console.log('✅ Camera permission granted on mobile, proceeding to scanner');
+      setScannerError('');
+    }
 
     // Delay to allow DOM to render
     setTimeout(async () => {
@@ -159,6 +228,7 @@ const AdvanceAnalysis: React.FC = () => {
           },
           (decodedText: string) => {
             const scannedValue = decodedText.trim();
+            console.log('✅ QR code scanned successfully:', scannedValue.substring(0, 20) + '...');
             setShowScanner(false);
             html5Qrcode.stop().catch(() => {});
             scannerRef.current = null;
