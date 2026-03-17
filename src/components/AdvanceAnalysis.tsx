@@ -57,14 +57,27 @@ const AdvanceAnalysis: React.FC = () => {
     setScannerError('');
     setShowScanner(true);
 
-    // Small delay to let the DOM render the reader element
+    // Increase delay and add element check for mobile
     setTimeout(async () => {
       try {
+        // Check if the element exists
+        const readerElement = document.getElementById('qr-reader');
+        if (!readerElement) {
+          console.error('qr-reader element not found in DOM');
+          setScannerError('❌ Scanner element not found. Try refreshing the page.');
+          setShowScanner(false);
+          return;
+        }
+
+        console.log('Starting QR scanner, element found:', readerElement);
+        
         const html5Qrcode = new Html5Qrcode('qr-reader', {
           formatsToSupport: [0, 4, 2, 3, 7, 8, 11, 12, 13],
         } as any);
         scannerRef.current = html5Qrcode;
 
+        console.log('Html5Qrcode instance created, starting camera access');
+        
         await html5Qrcode.start(
           { facingMode: 'environment' },
           {
@@ -127,8 +140,11 @@ const AdvanceAnalysis: React.FC = () => {
             // QR code not detected in this frame - ignore
           }
         );
+        console.log('Camera started successfully');
       } catch (err: any) {
-        console.error('Scanner error:', err);
+        console.error('Scanner error details:', err);
+        console.error('Error name:', err?.name);
+        console.error('Error message:', err?.message);
         
         // Handle specific error types
         let errorMessage = 'Could not access camera. Please allow camera permissions and try again.';
@@ -139,12 +155,14 @@ const AdvanceAnalysis: React.FC = () => {
           errorMessage = '❌ No camera found. Make sure your device has a camera.';
         } else if (err?.name === 'NotReadableError' || err?.message?.includes('already in use')) {
           errorMessage = '⚠️ Camera is already in use. Close other apps using the camera and try again.';
+        } else if (err?.name === 'SecurityError' || err?.message?.includes('https')) {
+          errorMessage = '🔒 This site must use HTTPS for camera access. Make sure you\'re using a secure connection.';
         }
         
         setScannerError(errorMessage);
         setShowScanner(false);
       }
-    }, 300);
+    }, 500);
   }, []);
 
   // Cleanup scanner on unmount
@@ -1031,7 +1049,7 @@ const AdvanceAnalysis: React.FC = () => {
                   </div>
                 ) : (
                   <div className="bg-black rounded-xl p-3 sm:p-4 mb-3 relative w-full">
-                    <div id="qr-reader" className="w-full rounded-lg overflow-hidden"></div>
+                    <div id="qr-reader" className="w-full h-72 sm:h-80 rounded-lg overflow-hidden bg-gray-900 flex items-center justify-center"></div>
                     {scannerError && (
                       <div className="bg-red-600 text-white text-xs sm:text-sm rounded-lg p-3 mt-3 whitespace-pre-line font-semibold">
                         {scannerError}
@@ -1247,7 +1265,7 @@ const AdvanceAnalysis: React.FC = () => {
                 ) : (
                   <div className="bg-black rounded-xl p-3 sm:p-4 mb-3 relative w-full">
                     {/* Live Camera Scanner */}
-                    <div id="qr-reader" className="w-full rounded-lg overflow-hidden"></div>
+                    <div id="qr-reader" className="w-full h-72 sm:h-80 rounded-lg overflow-hidden bg-gray-900 flex items-center justify-center"></div>
                     {scannerError && (
                       <div className="bg-red-600 text-white text-xs sm:text-sm rounded-lg p-3 mt-3 whitespace-pre-line font-semibold">
                         {scannerError}
