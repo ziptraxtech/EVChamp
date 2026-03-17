@@ -147,11 +147,6 @@ const AdvanceAnalysis: React.FC = () => {
     }
   };
 
-  const getOSSpecificInstructions = (): string => {
-    const ua = navigator.userAgent.toLowerCase();
-    const isIOS = /iphone|ipad|ipod/.test(ua);
-    const isSafari = ua.includes('safari') && !ua.includes('chrome');
-
   const startScanner = useCallback(async () => {
     setScannerError('');
     
