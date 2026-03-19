@@ -64,7 +64,8 @@ class RazorpayService {
   // Create order on your backend (you'll need to implement this)
   async createOrder(amount: number, currency: string = 'INR'): Promise<OrderDetails> {
     try {
-      const response = await fetch('/api/create-order', {
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+      const response = await fetch(`${apiUrl}/create-order`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -102,6 +103,12 @@ class RazorpayService {
     userName?: string
   ): Promise<void> {
     try {
+      // Verify key is loaded
+      console.log('Razorpay Key ID:', this.keyId ? 'Loaded ✓' : 'NOT LOADED ✗');
+      if (!this.keyId) {
+        throw new Error('Razorpay Key ID not configured. Please add REACT_APP_RAZORPAY_KEY_ID to .env');
+      }
+
       await this.loadScript();
 
       const order = await this.createOrder(amount);
