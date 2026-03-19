@@ -242,47 +242,46 @@ const RentEV: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-yellow-50">
       {/* Back Button */}
-      <div className="static sm:absolute sm:top-24 sm:left-6 z-10 px-4 sm:px-0 pt-4 sm:pt-0">
+      <div className="static sm:absolute sm:top-24 sm:left-6 z-10 px-4 sm:px-0 pt-3 sm:pt-0">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-lg hover:bg-white/30 transition-all duration-200 shadow-lg text-sm sm:text-base"
+          className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-white/30 active:bg-white/40 transition-all duration-200 shadow-lg text-xs sm:text-sm"
         >
-          {FaArrowLeft({ className: "text-lg" })}
-          <span className="font-semibold">Back to Home</span>
+          {FaArrowLeft({ className: "text-base flex-shrink-0" })}
+          <span className="font-semibold">Back</span>
         </button>
       </div>
       
       {/* Hero Section */}
-      <section className="pt-16 sm:pt-20 pb-10 sm:pb-12 bg-gradient-to-r from-blue-600 to-green-600 text-white">
+      <section className="pt-14 sm:pt-20 pb-8 sm:pb-12 bg-gradient-to-r from-blue-600 to-green-600 text-white">
         <div className="container mx-auto px-4 sm:px-6 text-center">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-3 sm:mb-6 leading-tight">
             Rent Electric Vehicles
           </h1>
-          <p className="text-base sm:text-xl mb-6 sm:mb-8 max-w-3xl mx-auto">
-            Experience the future of mobility with our premium EV rental service. 
-            Choose from India's finest electric vehicles with flexible rental periods.
+          <p className="text-sm sm:text-lg md:text-xl mb-4 sm:mb-6 max-w-3xl mx-auto">
+            Experience the future of mobility with our premium EV rental service.
           </p>
-          <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-6 sm:mb-8">
-            <div className="flex items-center space-x-2 bg-white/20 rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base">
-              {FaCar({ className: "text-2xl" })}
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-4 sm:mb-8">
+            <div className="flex items-center space-x-1 sm:space-x-2 bg-white/20 rounded-lg px-2 sm:px-4 py-2 text-xs sm:text-base">
+              {FaCar({ className: "text-lg sm:text-2xl flex-shrink-0" })}
               <span>Premium EVs</span>
             </div>
-            <div className="flex items-center space-x-2 bg-white/20 rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base">
-              {FaBatteryFull({ className: "text-2xl" })}
+            <div className="flex items-center space-x-1 sm:space-x-2 bg-white/20 rounded-lg px-2 sm:px-4 py-2 text-xs sm:text-base">
+              {FaBatteryFull({ className: "text-lg sm:text-2xl flex-shrink-0" })}
               <span>Long Range</span>
             </div>
-            <div className="flex items-center space-x-2 bg-white/20 rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base">
-              {FaShieldAlt({ className: "text-2xl" })}
-              <span>Fully Insured</span>
+            <div className="flex items-center space-x-1 sm:space-x-2 bg-white/20 rounded-lg px-2 sm:px-4 py-2 text-xs sm:text-base">
+              {FaShieldAlt({ className: "text-lg sm:text-2xl flex-shrink-0" })}
+              <span>Insured</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* Rental Period Selector */}
-      <section className="py-8 bg-white shadow-sm">
+      <section className="py-6 sm:py-8 bg-white shadow-sm sticky top-0 z-40">
         <div className="container mx-auto px-4 sm:px-6">
-          <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
             {[
               { key: 'daily', label: 'Daily', icon: FaClock },
               { key: 'weekly', label: 'Weekly', icon: FaRoute },
@@ -293,14 +292,14 @@ const RentEV: React.FC = () => {
                 <button
                   key={key}
                   onClick={() => setSelectedPeriod(key as 'daily' | 'weekly' | 'monthly')}
-                  className={`flex items-center space-x-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold transition-all text-sm sm:text-base ${
+                  className={`flex items-center space-x-1 sm:space-x-2 px-3 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all duration-200 text-xs sm:text-base active:scale-95 ${
                     selectedPeriod === key
                       ? 'bg-green-600 text-white shadow-lg'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300'
                   }`}
                 >
-                  {IconComponent({ className: "text-lg" })}
-                  <span>{label}</span>
+                  {IconComponent({ className: "text-base sm:text-lg flex-shrink-0" })}
+                  <span className="whitespace-nowrap">{label}</span>
                 </button>
               );
             })}
@@ -309,66 +308,65 @@ const RentEV: React.FC = () => {
       </section>
 
       {/* EV Cards Grid */}
-      <section className="py-10 sm:py-12">
+      <section className="py-8 sm:py-10 lg:py-12">
         <div className="container mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {evCars.map((car) => (
               <div
                 key={car.id}
-                className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
-                onClick={() => handleBookNow(car)}
+                className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 active:shadow-md"
               >
                 <div className="relative">
                   <img 
                     src={car.image} 
                     alt={`${car.brand} ${car.name}`} 
-                    className="w-full h-48 object-cover"
+                    className="w-full h-40 sm:h-48 object-cover"
                   />
                   {car.available ? (
-                    <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    <div className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-green-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold">
                       Available
                     </div>
                   ) : (
-                    <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    <div className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-red-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold">
                       Booked
                     </div>
                   )}
                 </div>
                 
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900">{car.brand} {car.name}</h3>
-                      <p className="text-gray-600">Electric Vehicle</p>
+                <div className="p-4 sm:p-6">
+                  <div className="flex justify-between items-start mb-3 sm:mb-4">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 line-clamp-1">{car.brand} {car.name}</h3>
+                      <p className="text-gray-600 text-xs sm:text-sm">Electric Vehicle</p>
                     </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-green-600">₹{getRate(car).toLocaleString()}</div>
-                      <div className="text-sm text-gray-500">per {selectedPeriod}</div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div className="flex items-center space-x-2">
-                      {FaRoute({ className: "text-green-600" })}
-                      <span className="text-sm text-gray-600">{car.range} range</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      {FaBatteryFull({ className: "text-green-600" })}
-                      <span className="text-sm text-gray-600">{car.battery}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      {FaUsers({ className: "text-green-600" })}
-                      <span className="text-sm text-gray-600">{car.seats} seats</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      {FaCar({ className: "text-green-600" })}
-                      <span className="text-sm text-gray-600">EV</span>
+                    <div className="text-right ml-2 flex-shrink-0">
+                      <div className="text-xl sm:text-2xl font-bold text-green-600 whitespace-nowrap">₹{getRate(car).toLocaleString()}</div>
+                      <div className="text-xs sm:text-sm text-gray-500">per {selectedPeriod}</div>
                     </div>
                   </div>
 
-                  <div className="mb-6">
-                    <h4 className="font-semibold text-gray-900 mb-2">Key Features:</h4>
-                    <div className="flex flex-wrap gap-2">
+                  <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4 sm:mb-6">
+                    <div className="flex items-center space-x-1 sm:space-x-2 min-w-0">
+                      {FaRoute({ className: "text-green-600 flex-shrink-0" })}
+                      <span className="text-xs sm:text-sm text-gray-600 truncate">{car.range}</span>
+                    </div>
+                    <div className="flex items-center space-x-1 sm:space-x-2 min-w-0">
+                      {FaBatteryFull({ className: "text-green-600 flex-shrink-0" })}
+                      <span className="text-xs sm:text-sm text-gray-600 truncate">{car.battery}</span>
+                    </div>
+                    <div className="flex items-center space-x-1 sm:space-x-2 min-w-0">
+                      {FaUsers({ className: "text-green-600 flex-shrink-0" })}
+                      <span className="text-xs sm:text-sm text-gray-600 truncate">{car.seats} seats</span>
+                    </div>
+                    <div className="flex items-center space-x-1 sm:space-x-2 min-w-0">
+                      {FaCar({ className: "text-green-600 flex-shrink-0" })}
+                      <span className="text-xs sm:text-sm text-gray-600 truncate">EV</span>
+                    </div>
+                  </div>
+
+                  <div className="mb-4 sm:mb-6">
+                    <h4 className="font-semibold text-gray-900 mb-2 text-xs sm:text-sm">Key Features:</h4>
+                    <div className="flex flex-wrap gap-1 sm:gap-2">
                       {car.features.map((feature, index) => (
                         <span key={index} className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
                           {feature}
@@ -378,11 +376,11 @@ const RentEV: React.FC = () => {
                   </div>
 
                   <button
-                    onClick={(e) => { e.stopPropagation(); handleBookNow(car); }}
+                    onClick={() => handleBookNow(car)}
                     disabled={!car.available}
-                    className={`w-full py-3 px-4 rounded-lg font-semibold transition-all ${
+                    className={`w-full py-2.5 sm:py-3 px-4 rounded-lg font-semibold transition-all duration-200 active:scale-95 ${
                       car.available
-                        ? 'bg-green-600 text-white hover:bg-green-700 md:transform md:hover:-translate-y-1'
+                        ? 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800 lg:hover:-translate-y-1'
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                   >
@@ -397,114 +395,117 @@ const RentEV: React.FC = () => {
 
       {/* Booking Form Section */}
       {showBookingModal && selectedCar && (
-        <section id="booking-form" ref={bookingFormRef} className="py-12 sm:py-16 bg-white">
+        <section id="booking-form" ref={bookingFormRef} className="py-8 sm:py-12 lg:py-16 bg-white">
           <div className="container mx-auto px-4 sm:px-6">
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8">Book Your EV</h2>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-6 sm:mb-8">Book Your EV</h2>
               
               {/* Selected Car Summary */}
-              <div className="bg-gray-50 rounded-xl p-5 sm:p-6 mb-8">
-                <h3 className="text-lg sm:text-xl font-semibold mb-4">Selected Vehicle</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="flex items-center space-x-4">
+              <div className="bg-gray-50 rounded-lg sm:rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
+                <h3 className="text-base sm:text-lg lg:text-xl font-semibold mb-3 sm:mb-4">Selected Vehicle</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
                     <img 
                       src={selectedCar.image} 
                       alt={`${selectedCar.brand} ${selectedCar.name}`} 
-                      className="w-24 h-16 object-cover rounded-lg"
+                      className="w-full sm:w-24 h-32 sm:h-16 object-cover rounded-lg mb-3 sm:mb-0 flex-shrink-0"
                     />
-                    <div>
+                    <div className="flex-1">
                       <h4 className="font-semibold text-base sm:text-lg">{selectedCar.brand} {selectedCar.name}</h4>
-                      <p className="text-gray-600 text-sm sm:text-base">{selectedCar.range} range • {selectedCar.battery}</p>
+                      <p className="text-gray-600 text-xs sm:text-sm">{selectedCar.range} range • {selectedCar.battery}</p>
                     </div>
                   </div>
-                  <div className="text-left md:text-right">
-                    <div className="text-xl sm:text-2xl font-bold text-green-600">₹{getRate(selectedCar).toLocaleString()}</div>
-                    <div className="text-gray-500 text-sm sm:text-base">per {selectedPeriod}</div>
+                  <div className="text-left md:text-right flex items-center md:items-end justify-between md:flex-col">
+                    <span className="text-gray-600 text-sm md:hidden">Price:</span>
+                    <div>
+                      <div className="text-xl sm:text-2xl font-bold text-green-600">₹{getRate(selectedCar).toLocaleString()}</div>
+                      <div className="text-gray-500 text-xs sm:text-sm">per {selectedPeriod}</div>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Booking Form */}
-              <form className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <form className="space-y-4 sm:space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Full Name *</label>
                     <input
                       type="text"
                       value={bookingDetails.name}
                       onChange={(e) => setBookingDetails({...bookingDetails, name: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm sm:text-base"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Email *</label>
                     <input
                       type="email"
                       value={bookingDetails.email}
                       onChange={(e) => setBookingDetails({...bookingDetails, email: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm sm:text-base"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Phone Number *</label>
                     <input
                       type="tel"
                       value={bookingDetails.phone}
                       onChange={(e) => setBookingDetails({...bookingDetails, phone: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm sm:text-base"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">License Number *</label>
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">License Number *</label>
                     <input
                       type="text"
                       value={bookingDetails.licenseNumber}
                       onChange={(e) => setBookingDetails({...bookingDetails, licenseNumber: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm sm:text-base"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Pickup Date *</label>
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Pickup Date *</label>
                     <input
                       type="date"
                       value={bookingDetails.pickupDate}
                       onChange={(e) => setBookingDetails({...bookingDetails, pickupDate: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm sm:text-base"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Return Date *</label>
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Return Date *</label>
                     <input
                       type="date"
                       value={bookingDetails.returnDate}
                       onChange={(e) => setBookingDetails({...bookingDetails, returnDate: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm sm:text-base"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Pickup Location *</label>
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Pickup Location *</label>
                     <input
                       type="text"
                       value={bookingDetails.pickupLocation}
                       onChange={(e) => setBookingDetails({...bookingDetails, pickupLocation: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm sm:text-base"
                       placeholder="Enter pickup address"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Return Location *</label>
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Return Location *</label>
                     <input
                       type="text"
                       value={bookingDetails.returnLocation}
                       onChange={(e) => setBookingDetails({...bookingDetails, returnLocation: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm sm:text-base"
                       placeholder="Enter return address"
                       required
                     />
@@ -512,18 +513,18 @@ const RentEV: React.FC = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">ID Proof Number (Aadhar/PAN) *</label>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">ID Proof Number (Aadhar/PAN) *</label>
                   <input
                     type="text"
                     value={bookingDetails.idProof}
                     onChange={(e) => setBookingDetails({...bookingDetails, idProof: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm sm:text-base"
                     placeholder="Enter Aadhar or PAN number"
                     required
                   />
                 </div>
 
-                <div className="flex justify-center pt-6 sm:pt-8">
+                <div className="flex justify-center pt-4 sm:pt-6 lg:pt-8">
                   <button
                     type="button"
                     onClick={() => {
@@ -533,7 +534,7 @@ const RentEV: React.FC = () => {
                         block: 'start'
                       });
                     }}
-                    className="bg-green-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:bg-green-700 transition-all shadow-lg sm:transform sm:hover:-translate-y-1"
+                    className="bg-green-600 text-white px-4 sm:px-8 py-2.5 sm:py-4 rounded-lg font-semibold text-sm sm:text-base lg:text-lg hover:bg-green-700 active:bg-green-800 transition-all duration-200 shadow-lg active:scale-95 lg:hover:-translate-y-1"
                   >
                     Proceed to Payment
                   </button>
@@ -546,42 +547,42 @@ const RentEV: React.FC = () => {
 
       {/* Payment Section */}
       {showBookingModal && selectedCar && (
-        <section id="payment-section" className="py-12 sm:py-16 bg-gray-50">
+        <section id="payment-section" className="py-8 sm:py-12 lg:py-16 bg-gray-50">
           <div className="container mx-auto px-4 sm:px-6">
             <div className="max-w-2xl mx-auto">
-              <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8">Complete Your Booking</h2>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-6 sm:mb-8">Complete Your Booking</h2>
               
-              <div className="bg-white rounded-xl p-6 sm:p-8 shadow-lg">
+              <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-8 shadow-lg">
                 <div className="mb-6">
-                  <h3 className="text-lg sm:text-xl font-semibold mb-4">Booking Summary</h3>
-                  <div className="space-y-3">
+                  <h3 className="text-base sm:text-lg lg:text-xl font-semibold mb-4">Booking Summary</h3>
+                  <div className="space-y-3 text-sm sm:text-base">
                     <div className="flex justify-between">
-                      <span className="text-sm sm:text-base">Vehicle:</span>
-                      <span className="font-semibold text-sm sm:text-base">{selectedCar.brand} {selectedCar.name}</span>
+                      <span className="text-gray-600">Vehicle:</span>
+                      <span className="font-semibold">{selectedCar.brand} {selectedCar.name}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm sm:text-base">Rental Period:</span>
-                      <span className="font-semibold capitalize text-sm sm:text-base">{selectedPeriod}</span>
+                      <span className="text-gray-600">Rental Period:</span>
+                      <span className="font-semibold capitalize">{selectedPeriod}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm sm:text-base">Rate:</span>
-                      <span className="font-semibold text-sm sm:text-base">₹{getRate(selectedCar).toLocaleString()}</span>
+                      <span className="text-gray-600">Rate:</span>
+                      <span className="font-semibold">₹{getRate(selectedCar).toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm sm:text-base">Security Deposit:</span>
-                      <span className="font-semibold text-sm sm:text-base">₹10,000</span>
+                      <span className="text-gray-600">Security Deposit:</span>
+                      <span className="font-semibold">₹10,000</span>
                     </div>
-                    <hr className="my-4" />
-                    <div className="flex justify-between text-lg font-bold">
-                      <span className="text-base sm:text-lg">Total Amount:</span>
-                      <span className="text-green-600 text-base sm:text-lg">₹{(getRate(selectedCar) + 10000).toLocaleString()}</span>
+                    <hr className="my-3 sm:my-4" />
+                    <div className="flex justify-between text-base sm:text-lg lg:text-xl font-bold">
+                      <span>Total Amount:</span>
+                      <span className="text-green-600">₹{(getRate(selectedCar) + 10000).toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   <button
-                    className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white py-3 sm:py-4 rounded-lg font-semibold hover:from-green-600 hover:to-blue-600 transition-all text-sm sm:text-base"
+                    className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white py-2.5 sm:py-4 rounded-lg font-semibold hover:from-green-600 hover:to-blue-600 active:from-green-700 active:to-blue-700 transition-all duration-200 active:scale-95 text-sm sm:text-base"
                     onClick={handlePayment}
                     disabled={isProcessing}
                   >
@@ -589,10 +590,10 @@ const RentEV: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="mt-6 text-center">
+                <div className="mt-4 sm:mt-6 text-center">
                   <button
                     onClick={() => setShowBookingModal(false)}
-                    className="text-gray-500 hover:text-gray-700 underline"
+                    className="text-gray-500 hover:text-gray-700 underline text-xs sm:text-sm"
                   >
                     Cancel Booking
                   </button>
