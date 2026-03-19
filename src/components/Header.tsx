@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import EVChampLogo from '../assets/EVChampLogo.png';
 import { useUser, SignInButton, SignOutButton } from '@clerk/clerk-react';
 
 const Header: React.FC = () => {
+  const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isEvPlansOpen, setIsEvPlansOpen] = useState(false);
@@ -68,18 +69,18 @@ const Header: React.FC = () => {
             </button>
             {isEvPlansOpen && (
               <div className="absolute left-0 mt-2 w-44 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
-                <a href="/rent-ev" className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors" onClick={() => setIsEvPlansOpen(false)}>
+                <button onClick={() => { navigate('/rent-ev'); setIsEvPlansOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
                   Rent EV
-                </a>
-                <a href="/buy-used-ev" className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-cyan-50 hover:text-cyan-700 transition-colors" onClick={() => setIsEvPlansOpen(false)}>
+                </button>
+                <button onClick={() => { navigate('/buy-used-ev'); setIsEvPlansOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-cyan-50 hover:text-cyan-700 transition-colors">
                   Buy Used EV's
-                </a>
+                </button>
               </div>
             )}
           </div>
-          <a id="buy-plans-btn" href="/buy-plans" className="cta-gradient text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-green-500 to-green-700 text-sm">Buy Plans</a>
-          <a id="franchise-btn" href="/franchise" className="cta-gradient text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-yellow-400 to-yellow-600 text-sm">Franchise</a>
-          <a id="zipbattery-btn" href="/zipbattery" className="cta-gradient text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-orange-400 to-red-600 text-sm">ZipBattery</a>
+          <button onClick={() => navigate('/buy-plans')} className="cta-gradient text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-green-500 to-green-700 text-sm">Buy Plans</button>
+          <button onClick={() => navigate('/franchise')} className="cta-gradient text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-yellow-400 to-yellow-600 text-sm">Franchise</button>
+          <button onClick={() => navigate('/zipbattery')} className="cta-gradient text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-orange-400 to-red-600 text-sm">ZipBattery</button>
           
           {/* Account Management Button */}
           <div className="relative">
@@ -103,10 +104,10 @@ const Header: React.FC = () => {
                   <p className="text-sm font-semibold text-gray-900">{user?.firstName} {user?.lastName}</p>
                   <p className="text-xs text-gray-500">{user?.primaryEmailAddress?.emailAddress}</p>
                 </div>
-                <a href="/user" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" onClick={() => setIsDropdownOpen(false)}>
+                <button onClick={() => { navigate('/user'); setIsDropdownOpen(false); }} className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                   <svg className="w-4 h-4 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                   Profile Settings
-                </a>
+                </button>
                 <SignOutButton>
                   <button className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors" onClick={() => setIsDropdownOpen(false)}>
                     <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
@@ -147,57 +148,58 @@ const Header: React.FC = () => {
       {/* Mobile Menu Panel - Compact Design */}
       {isMobileMenuOpen && (
         <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg">
-          <div className="px-4 py-3 flex flex-col space-y-1">
-            {/* Quick Actions - Compact Grid */}
-            <div className="grid grid-cols-4 gap-2 mb-3">
-              <div className="relative col-span-2 sm:col-span-1">
+          <div className="px-4 py-3 flex flex-col space-y-3">
+            {/* Quick Actions - Horizontal Button Row */}
+            <div className="flex gap-2 flex-wrap">
+              <div className="relative flex-1 min-w-max" ref={evPlansRef}>
                 <button
-                  onClick={() => setIsEvPlansOpen(!isEvPlansOpen)}
-                  className="w-full text-center bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs flex items-center justify-center space-x-1 whitespace-nowrap"
+                  type="button"
+                  onClick={(e) => { e.preventDefault(); setIsEvPlansOpen(!isEvPlansOpen); }}
+                  className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold px-4 py-2 rounded-md shadow-sm text-xs flex items-center justify-center gap-1 cursor-pointer hover:shadow-md"
                 >
                   <span>EV Plans</span>
-                  <svg className={`w-3 h-3 transition-transform flex-shrink-0 ${isEvPlansOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  <svg className={`w-3 h-3 transition-transform ${isEvPlansOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                 </button>
                 {isEvPlansOpen && (
                   <div className="absolute top-full left-0 mt-1 w-40 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
-                    <a href="/rent-ev" className="block px-4 py-3 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors" onClick={() => { setIsEvPlansOpen(false); setIsMobileMenuOpen(false); }}>
-                      🚗 Rent EV
-                    </a>
-                    <a href="/buy-used-ev" className="block px-4 py-3 text-sm font-medium text-gray-700 hover:bg-cyan-50 hover:text-cyan-700 transition-colors" onClick={() => { setIsEvPlansOpen(false); setIsMobileMenuOpen(false); }}>
-                      🛒 Buy Used EV's
-                    </a>
+                    <button type="button" onClick={(e) => { e.preventDefault(); navigate('/rent-ev'); setIsEvPlansOpen(false); setIsMobileMenuOpen(false); }} className="block w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-blue-50 cursor-pointer">
+                      Rent EV
+                    </button>
+                    <button type="button" onClick={(e) => { e.preventDefault(); navigate('/buy-used-ev'); setIsEvPlansOpen(false); setIsMobileMenuOpen(false); }} className="block w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-cyan-50 cursor-pointer">
+                      Buy Used EV's
+                    </button>
                   </div>
                 )}
               </div>
-              <a href="/buy-plans" className="text-center bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs whitespace-nowrap" onClick={() => setIsMobileMenuOpen(false)}>Buy Plans</a>
-              <a href="/franchise" className="text-center bg-gradient-to-r from-yellow-400 to-yellow-600 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs whitespace-nowrap" onClick={() => setIsMobileMenuOpen(false)}>Franchise</a>
-              <a href="/zipbattery" className="text-center bg-gradient-to-r from-orange-400 to-red-600 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs whitespace-nowrap" onClick={() => setIsMobileMenuOpen(false)}>ZipBattery</a>
+              <button type="button" onClick={() => { navigate('/buy-plans'); setIsMobileMenuOpen(false); }} className="flex-1 bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs cursor-pointer hover:shadow-md">Buy Plans</button>
+              <button type="button" onClick={() => { navigate('/franchise'); setIsMobileMenuOpen(false); }} className="flex-1 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs cursor-pointer hover:shadow-md">Franchise</button>
+              <button type="button" onClick={() => { navigate('/zipbattery'); setIsMobileMenuOpen(false); }} className="flex-1 bg-gradient-to-r from-orange-400 to-red-600 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs cursor-pointer hover:shadow-md">ZipBattery</button>
             </div>
             
             {/* Navigation Links */}
-            <div className="border-t pt-2 space-y-1">
-              <button onClick={() => scrollToSection('features')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left text-sm">Features</button>
-              <button onClick={() => scrollToSection('hero')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left text-sm">AI for EV</button>
-              <button onClick={() => scrollToSection('testimonials')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left text-sm">Testimonials</button>
-              <button onClick={() => scrollToSection('franchise-section')} className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left text-sm">Explore</button>
+            <div className="border-t pt-3 space-y-2">
+              <button type="button" onClick={() => { scrollToSection('features'); setIsMobileMenuOpen(false); }} className="text-gray-700 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left text-sm font-medium">Features</button>
+              <button type="button" onClick={() => { scrollToSection('hero'); setIsMobileMenuOpen(false); }} className="text-gray-700 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left text-sm font-medium">AI for EV</button>
+              <button type="button" onClick={() => { scrollToSection('testimonials'); setIsMobileMenuOpen(false); }} className="text-gray-700 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left text-sm font-medium">Testimonials</button>
+              <button type="button" onClick={() => { scrollToSection('franchise-section'); setIsMobileMenuOpen(false); }} className="text-gray-700 hover:text-green-600 transition-colors cursor-pointer py-2 w-full text-left text-sm font-medium">Explore</button>
             </div>
             
             {/* Account Section */}
-            <div className="border-t pt-2 space-y-1">
+            <div className="border-t pt-3 space-y-2">
               {isSignedIn ? (
                 <>
                   <div className="px-2 py-1">
                     <p className="text-sm font-semibold text-gray-900">{user?.firstName} {user?.lastName}</p>
                     <p className="text-xs text-gray-500 truncate">{user?.primaryEmailAddress?.emailAddress}</p>
                   </div>
-                  <a href="/user" className="text-gray-700 font-medium py-2 w-full text-left block text-sm hover:bg-gray-50 px-2 rounded" onClick={() => setIsMobileMenuOpen(false)}>Profile Settings</a>
+                  <button type="button" onClick={() => { navigate('/user'); setIsMobileMenuOpen(false); }} className="text-gray-700 font-medium py-2 w-full text-left text-sm hover:bg-gray-50 px-2 rounded cursor-pointer">Profile Settings</button>
                   <SignOutButton>
-                    <button className="text-red-600 font-medium py-2 w-full text-left text-sm hover:bg-red-50 px-2 rounded" onClick={() => setIsMobileMenuOpen(false)}>Sign Out</button>
+                    <button className="text-red-600 font-medium py-2 w-full text-left text-sm hover:bg-red-50 px-2 rounded cursor-pointer" onClick={() => setIsMobileMenuOpen(false)}>Sign Out</button>
                   </SignOutButton>
                 </>
               ) : (
                 <SignInButton mode="modal">
-                  <button className="w-full text-center bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold px-4 py-2 rounded-md shadow-sm text-sm" onClick={() => setIsMobileMenuOpen(false)}>Sign In</button>
+                  <button className="w-full text-center bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold px-4 py-2 rounded-md shadow-sm text-sm cursor-pointer" onClick={() => setIsMobileMenuOpen(false)}>Sign In</button>
                 </SignInButton>
               )}
             </div>
