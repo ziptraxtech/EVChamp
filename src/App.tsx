@@ -19,6 +19,8 @@ import Franchise from './components/Franchise';
 import BuyUsedEV from './components/BuyUsedEV'; // Import the new component
 import ZipBattery from './components/ZipBattery';
 import AdvanceAnalysis from './components/AdvanceAnalysis';
+import DeleteAccount from './components/DeleteAccount';
+import RSAPlans from './components/RSAPlans';
 
 // Add this import for the banner image
 import BannerLogos from './assets/footer_banner.jpeg'; // Update the path if needed
@@ -138,6 +140,16 @@ function App() {
           <Route path="/buy-used-ev" element={
             <ProtectedRoute>
               <BuyUsedEV />
+            </ProtectedRoute>
+          } />
+          <Route path="/delete-account" element={
+            <ProtectedRoute>
+              <DeleteAccount />
+            </ProtectedRoute>
+          } />
+          <Route path="/rsa-plans" element={
+            <ProtectedRoute>
+              <RSAPlans />
             </ProtectedRoute>
           } />
         </Routes>

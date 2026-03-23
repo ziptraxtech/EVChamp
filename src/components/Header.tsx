@@ -7,14 +7,14 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isEvPlansOpen, setIsEvPlansOpen] = useState(false);
-  const evPlansRef = useRef<HTMLDivElement>(null);
+  const [isBuyPlansOpen, setIsBuyPlansOpen] = useState(false);
+  const buyPlansRef = useRef<HTMLDivElement>(null);
 
-  // Close EV Plans dropdown when clicking outside
+  // Close Buy Plans dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (evPlansRef.current && !evPlansRef.current.contains(event.target as Node)) {
-        setIsEvPlansOpen(false);
+      if (buyPlansRef.current && !buyPlansRef.current.contains(event.target as Node)) {
+        setIsBuyPlansOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -58,27 +58,26 @@ const Header: React.FC = () => {
 
         {/* Desktop CTAs and Account */}
         <div className="hidden lg:flex items-center space-x-3">
-          {/* EV Plans Dropdown */}
-          <div className="relative" ref={evPlansRef}>
+          {/* Buy Plans Dropdown */}
+          <div className="relative" ref={buyPlansRef}>
             <button
-              onClick={() => setIsEvPlansOpen(!isEvPlansOpen)}
-              className="flex items-center space-x-1 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all text-sm"
+              onClick={() => setIsBuyPlansOpen(!isBuyPlansOpen)}
+              className="flex items-center space-x-1 cta-gradient text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-green-500 to-green-700 text-sm"
             >
-              <span>EV Plans</span>
-              <svg className={`w-4 h-4 transition-transform ${isEvPlansOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+              <span>Buy Plans</span>
+              <svg className={`w-4 h-4 transition-transform ${isBuyPlansOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
             </button>
-            {isEvPlansOpen && (
+            {isBuyPlansOpen && (
               <div className="absolute left-0 mt-2 w-44 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
-                <button onClick={() => { navigate('/rent-ev'); setIsEvPlansOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
-                  Rent EV
+                <button onClick={() => { navigate('/buy-plans'); setIsBuyPlansOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors">
+                  IoT Plans
                 </button>
-                <button onClick={() => { navigate('/buy-used-ev'); setIsEvPlansOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-cyan-50 hover:text-cyan-700 transition-colors">
-                  Buy Used EV's
+                <button onClick={() => { navigate('/rsa-plans'); setIsBuyPlansOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors">
+                  RSA Plans
                 </button>
               </div>
             )}
           </div>
-          <button onClick={() => navigate('/buy-plans')} className="cta-gradient text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-green-500 to-green-700 text-sm">Buy Plans</button>
           <button onClick={() => navigate('/franchise')} className="cta-gradient text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-yellow-400 to-yellow-600 text-sm">Franchise</button>
           <button onClick={() => navigate('/zipbattery')} className="cta-gradient text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-orange-400 to-red-600 text-sm">ZipBattery</button>
           
@@ -151,27 +150,26 @@ const Header: React.FC = () => {
           <div className="px-4 py-3 flex flex-col space-y-3">
             {/* Quick Actions - Horizontal Button Row */}
             <div className="flex gap-2 flex-wrap">
-              <div className="relative flex-1 min-w-max" ref={evPlansRef}>
+              <div className="relative flex-1 min-w-max" ref={buyPlansRef}>
                 <button
                   type="button"
-                  onClick={(e) => { e.preventDefault(); setIsEvPlansOpen(!isEvPlansOpen); }}
-                  className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold px-4 py-2 rounded-md shadow-sm text-xs flex items-center justify-center gap-1 cursor-pointer hover:shadow-md"
+                  onClick={(e) => { e.preventDefault(); setIsBuyPlansOpen(!isBuyPlansOpen); }}
+                  className="w-full bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold px-4 py-2 rounded-md shadow-sm text-xs flex items-center justify-center gap-1 cursor-pointer hover:shadow-md"
                 >
-                  <span>EV Plans</span>
-                  <svg className={`w-3 h-3 transition-transform ${isEvPlansOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  <span>Buy Plans</span>
+                  <svg className={`w-3 h-3 transition-transform ${isBuyPlansOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                 </button>
-                {isEvPlansOpen && (
+                {isBuyPlansOpen && (
                   <div className="absolute top-full left-0 mt-1 w-40 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
-                    <button type="button" onClick={(e) => { e.preventDefault(); navigate('/rent-ev'); setIsEvPlansOpen(false); setIsMobileMenuOpen(false); }} className="block w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-blue-50 cursor-pointer">
-                      Rent EV
+                    <button type="button" onClick={(e) => { e.preventDefault(); navigate('/buy-plans'); setIsBuyPlansOpen(false); setIsMobileMenuOpen(false); }} className="block w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-green-50 cursor-pointer">
+                      IoT Plans
                     </button>
-                    <button type="button" onClick={(e) => { e.preventDefault(); navigate('/buy-used-ev'); setIsEvPlansOpen(false); setIsMobileMenuOpen(false); }} className="block w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-cyan-50 cursor-pointer">
-                      Buy Used EV's
+                    <button type="button" onClick={(e) => { e.preventDefault(); navigate('/rsa-plans'); setIsBuyPlansOpen(false); setIsMobileMenuOpen(false); }} className="block w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-green-50 cursor-pointer">
+                      RSA Plans
                     </button>
                   </div>
                 )}
               </div>
-              <button type="button" onClick={() => { navigate('/buy-plans'); setIsMobileMenuOpen(false); }} className="flex-1 bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs cursor-pointer hover:shadow-md">Buy Plans</button>
               <button type="button" onClick={() => { navigate('/franchise'); setIsMobileMenuOpen(false); }} className="flex-1 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs cursor-pointer hover:shadow-md">Franchise</button>
               <button type="button" onClick={() => { navigate('/zipbattery'); setIsMobileMenuOpen(false); }} className="flex-1 bg-gradient-to-r from-orange-400 to-red-600 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs cursor-pointer hover:shadow-md">ZipBattery</button>
             </div>

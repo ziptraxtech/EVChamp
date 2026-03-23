@@ -25,6 +25,7 @@ const Footer: React.FC = () => (
             <li><a href="/privacy" className="underline text-gray-300 hover:text-white">Privacy Policy</a></li>
             <li><a href="/terms" className="underline text-gray-300 hover:text-white">Terms of Use</a></li>
             <li><a href="/refund" className="underline text-gray-300 hover:text-white">Refund & Cancellation Policy</a></li>
+            <li><a href="/delete-account" className="underline text-red-400 hover:text-red-300">Delete Account</a></li>
           </ul>
         </div>
         <div>

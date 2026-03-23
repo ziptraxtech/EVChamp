@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const RefundPolicy: React.FC = () => (
   <div className="max-w-3xl mx-auto py-12 px-4 text-gray-800">
@@ -31,6 +32,21 @@ const RefundPolicy: React.FC = () => (
         </ul>
       </li>
     </ol>
+
+    {/* Delete Account Section */}
+    <div className="mt-10 p-6 border border-red-200 bg-red-50 rounded-2xl">
+      <h2 className="text-xl font-bold text-red-700 mb-2">Delete Your Account</h2>
+      <p className="text-gray-700 text-sm mb-4">
+        If you wish to permanently delete your EVChamp account and all associated data, you can do so below.
+        Please note this action is <strong>irreversible</strong> and will cancel any active subscriptions.
+      </p>
+      <Link
+        to="/delete-account"
+        className="inline-block bg-red-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-red-700 transition shadow-md"
+      >
+        Delete My Account
+      </Link>
+    </div>
   </div>
 );
 
