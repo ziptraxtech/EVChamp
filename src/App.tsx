@@ -40,7 +40,7 @@ function HomePage() {
           href="/franchise"
           className="inline-block bg-gradient-to-r from-yellow-300 to-yellow-700 text-white font-bold text-base sm:text-lg px-6 sm:px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition"
         >
-          Explore Franchise Opportunities
+          Explore Franchise & EV Charging Opportunities
         </a>
 
 

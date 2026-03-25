@@ -15,6 +15,7 @@ const DeleteAccount: React.FC = () => {
     if (confirmText.trim().toUpperCase() !== 'DELETE') return;
     setStep('deleting');
     try {
+      // Try to delete the account
       await user?.delete();
       setStep('done');
       setTimeout(() => {
@@ -22,7 +23,26 @@ const DeleteAccount: React.FC = () => {
         navigate('/');
       }, 3000);
     } catch (err: any) {
-      setErrorMsg(err?.message || 'Something went wrong. Please try again or contact support.');
+      console.error('Delete account error:', err);
+      
+      // Check if the error is about verification or requires re-authentication
+      const errorMessage = err?.errors?.[0]?.message || err?.message || '';
+      const errorCode = err?.errors?.[0]?.code || '';
+      
+      if (errorCode === 'verification_required' || 
+          errorCode === 'requires_second_factor' ||
+          errorMessage.toLowerCase().includes('verification') || 
+          errorMessage.toLowerCase().includes('additional') ||
+          errorMessage.toLowerCase().includes('re-authenticate')) {
+        // Provide clear instructions for verification-required scenarios
+        setErrorMsg(
+          'For security reasons, you need to verify your identity before deleting your account. ' +
+          'Please sign out, sign back in, and then try deleting your account again. ' +
+          'If the issue persists, contact our support team.'
+        );
+      } else {
+        setErrorMsg(errorMessage || 'Something went wrong. Please try again or contact support.');
+      }
       setStep('error');
     }
   };
@@ -77,6 +97,10 @@ const DeleteAccount: React.FC = () => {
 
   // Error state
   if (step === 'error') {
+    const isVerificationError = errorMsg.toLowerCase().includes('verify') || 
+                                 errorMsg.toLowerCase().includes('sign out') ||
+                                 errorMsg.toLowerCase().includes('re-authenticate');
+    
     return (
       <div className="min-h-screen bg-gradient-to-br from-yellow-100 via-green-100 to-blue-200 flex items-center justify-center px-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
@@ -85,16 +109,32 @@ const DeleteAccount: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Deletion Failed</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            {isVerificationError ? 'Verification Required' : 'Deletion Failed'}
+          </h2>
           <p className="text-gray-600 mb-4">{errorMsg}</p>
           <p className="text-sm text-gray-500 mb-6">
-            Please contact us at{' '}
+            {isVerificationError ? (
+              <>Need help? Contact us at </>
+            ) : (
+              <>Please contact us at </>
+            )}
             <a href="mailto:support@zipsureai.com" className="text-green-600 underline">
               support@zipsureai.com
-            </a>{' '}
-            for assistance.
+            </a>
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            {isVerificationError && (
+              <button
+                onClick={async () => {
+                  await signOut();
+                  navigate('/sign-in');
+                }}
+                className="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition"
+              >
+                Sign Out & Sign In Again
+              </button>
+            )}
             <button
               onClick={() => { setStep('info'); setConfirmText(''); setErrorMsg(''); }}
               className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg font-semibold hover:bg-gray-200 transition"
@@ -103,7 +143,7 @@ const DeleteAccount: React.FC = () => {
             </button>
             <button
               onClick={() => navigate('/')}
-              className="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition"
+              className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg font-semibold hover:bg-gray-200 transition"
             >
               Go Home
             </button>

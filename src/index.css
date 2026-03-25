@@ -2,3 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom Leaflet popup styles */
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  padding: 0;
+}
+
+.leaflet-popup-content {
+  margin: 0;
+  max-width: 280px;
+}
+
+.leaflet-popup-tip {
+  background: white;
+}
