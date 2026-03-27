@@ -21,6 +21,7 @@ import ZipBattery from './components/ZipBattery';
 import AdvanceAnalysis from './components/AdvanceAnalysis';
 import DeleteAccount from './components/DeleteAccount';
 import RSAPlans from './components/RSAPlans';
+import SellEV from './components/SellEV';
 
 // Add this import for the banner image
 import BannerLogos from './assets/footer_banner.jpeg'; // Update the path if needed
@@ -131,6 +132,7 @@ function App() {
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/refund" element={<RefundPolicy />} />
           <Route path="/franchise" element={<Franchise />} />
+          <Route path="/sell-ev" element={<SellEV />} />
           <Route path="/zipbattery" element={<ZipBattery />} />
           <Route path="/advance-analysis" element={
             <ProtectedRoute>

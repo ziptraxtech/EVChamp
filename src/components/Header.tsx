@@ -58,6 +58,9 @@ const Header: React.FC = () => {
 
         {/* Desktop CTAs and Account */}
         <div className="hidden lg:flex items-center space-x-3">
+          {/* Sell EV Button */}
+          <button onClick={() => navigate('/sell-ev')} className="cta-gradient text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-blue-500 to-blue-700 text-sm whitespace-nowrap">Sell EV</button>
+          
           {/* Buy Plans Dropdown */}
           <div className="relative" ref={buyPlansRef}>
             <button
@@ -78,7 +81,7 @@ const Header: React.FC = () => {
               </div>
             )}
           </div>
-          <button onClick={() => navigate('/franchise')} className="cta-gradient text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-yellow-400 to-yellow-600 text-sm">EV Charging</button>
+          <button onClick={() => navigate('/franchise')} className="cta-gradient text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-yellow-400 to-yellow-600 text-sm">EV Chargers</button>
           <button onClick={() => navigate('/zipbattery')} className="cta-gradient text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-orange-400 to-red-600 text-sm">ZipBattery</button>
           
           {/* Account Management Button */}
@@ -150,6 +153,7 @@ const Header: React.FC = () => {
           <div className="px-4 py-3 flex flex-col space-y-3">
             {/* Quick Actions - Horizontal Button Row */}
             <div className="flex gap-2 flex-wrap">
+              <button type="button" onClick={() => { navigate('/sell-ev'); setIsMobileMenuOpen(false); }} className="flex-1 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs cursor-pointer hover:shadow-md whitespace-nowrap">Sell EV</button>
               <div className="relative flex-1 min-w-max" ref={buyPlansRef}>
                 <button
                   type="button"
@@ -170,7 +174,7 @@ const Header: React.FC = () => {
                   </div>
                 )}
               </div>
-              <button type="button" onClick={() => { navigate('/franchise'); setIsMobileMenuOpen(false); }} className="flex-1 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs cursor-pointer hover:shadow-md">EV Charging</button>
+              <button type="button" onClick={() => { navigate('/franchise'); setIsMobileMenuOpen(false); }} className="flex-1 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs cursor-pointer hover:shadow-md">EV Chargers</button>
               <button type="button" onClick={() => { navigate('/zipbattery'); setIsMobileMenuOpen(false); }} className="flex-1 bg-gradient-to-r from-orange-400 to-red-600 text-white font-semibold px-3 py-2 rounded-md shadow-sm text-xs cursor-pointer hover:shadow-md">ZipBattery</button>
             </div>
             
