@@ -25,27 +25,11 @@ interface Vehicle {
   listingDate: string;
 }
 
-interface DiagnosticReport {
-  batteryHealth: number;
-  diagnosticScore: number;
-  vehicleCondition: 'Excellent' | 'Good' | 'Fair' | 'Needs Attention';
-  estimatedValue: number;
-  recommendations: string[];
-  healthFactors: {
-    ageScore: number;
-    mileageScore: number;
-    batteryScore: number;
-    overallScore: number;
-  };
-}
-
 const SellEV: React.FC = () => {
   const navigate = useNavigate();
   const { isSignedIn, user } = useUser();
   const [showListingForm, setShowListingForm] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
-  const [generatedReport, setGeneratedReport] = useState<DiagnosticReport | null>(null);
-  const [showReport, setShowReport] = useState(false);
   const [formData, setFormData] = useState({
     vehicleModel: '',
     brand: '',
@@ -56,96 +40,6 @@ const SellEV: React.FC = () => {
     description: '',
     contactNumber: ''
   });
-
-  // Function to generate diagnostic report based on age and mileage
-  const generateDiagnosticReport = (year: number, mileage: number, expectedPrice: number): DiagnosticReport => {
-    const currentYear = 2026;
-    const vehicleAge = currentYear - year;
-    
-    // Age-based scoring (out of 100)
-    let ageScore = 100;
-    if (vehicleAge <= 1) ageScore = 100;
-    else if (vehicleAge <= 2) ageScore = 95;
-    else if (vehicleAge <= 3) ageScore = 90;
-    else if (vehicleAge <= 4) ageScore = 85;
-    else if (vehicleAge <= 5) ageScore = 80;
-    else ageScore = Math.max(70, 100 - (vehicleAge * 5));
-
-    // Mileage-based scoring (out of 100)
-    // Average EV drives ~12,000 km/year
-    const expectedMileage = vehicleAge * 12000;
-    const mileageRatio = mileage / Math.max(expectedMileage, 1);
-    let mileageScore = 100;
-    
-    if (mileageRatio <= 0.5) mileageScore = 100; // Under-driven
-    else if (mileageRatio <= 1.0) mileageScore = 95; // Normal usage
-    else if (mileageRatio <= 1.5) mileageScore = 85; // Slightly over-driven
-    else if (mileageRatio <= 2.0) mileageScore = 75; // Over-driven
-    else mileageScore = Math.max(60, 100 - (mileageRatio * 20)); // Heavily used
-
-    // Battery health estimation
-    // EVs typically lose 2-3% capacity per year and 0.1% per 1000 km
-    const ageDegradation = vehicleAge * 2.5;
-    const mileageDegradation = (mileage / 1000) * 0.1;
-    const batteryHealth = Math.max(70, 100 - ageDegradation - mileageDegradation);
-    const batteryScore = batteryHealth;
-
-    // Overall score (weighted average)
-    const overallScore = (ageScore * 0.3 + mileageScore * 0.3 + batteryScore * 0.4);
-    
-    // Diagnostic score out of 10
-    const diagnosticScore = Number((overallScore / 10).toFixed(1));
-
-    // Determine condition
-    let vehicleCondition: 'Excellent' | 'Good' | 'Fair' | 'Needs Attention';
-    if (overallScore >= 90) vehicleCondition = 'Excellent';
-    else if (overallScore >= 80) vehicleCondition = 'Good';
-    else if (overallScore >= 70) vehicleCondition = 'Fair';
-    else vehicleCondition = 'Needs Attention';
-
-    // Estimated value adjustment based on scores
-    const valueMultiplier = overallScore / 100;
-    const estimatedValue = Math.round(expectedPrice * valueMultiplier);
-
-    // Generate recommendations
-    const recommendations: string[] = [];
-    
-    if (vehicleAge > 4) {
-      recommendations.push('Consider comprehensive battery diagnostics due to vehicle age');
-    }
-    if (mileage > vehicleAge * 15000) {
-      recommendations.push('Higher than average mileage - thorough inspection recommended');
-    }
-    if (batteryHealth < 85) {
-      recommendations.push('Battery health below 85% - may affect resale value');
-    }
-    if (overallScore >= 90) {
-      recommendations.push('Excellent condition - premium pricing possible');
-    }
-    if (mileage < vehicleAge * 8000) {
-      recommendations.push('Low mileage for age - highlight this to buyers');
-    }
-    if (vehicleAge <= 2 && batteryHealth > 95) {
-      recommendations.push('Near-new condition - fast sale expected');
-    }
-    
-    recommendations.push('Professional inspection will provide detailed battery cell analysis');
-    recommendations.push('Keep all service records ready for potential buyers');
-
-    return {
-      batteryHealth: Math.round(batteryHealth),
-      diagnosticScore,
-      vehicleCondition,
-      estimatedValue,
-      recommendations,
-      healthFactors: {
-        ageScore: Math.round(ageScore),
-        mileageScore: Math.round(mileageScore),
-        batteryScore: Math.round(batteryScore),
-        overallScore: Math.round(overallScore)
-      }
-    };
-  };
 
   // Sample vehicles (in production, this would come from your backend)
   const sampleVehicles: Vehicle[] = [
@@ -229,23 +123,22 @@ const SellEV: React.FC = () => {
       return;
     }
     
-    // Generate diagnostic report
-    const report = generateDiagnosticReport(
-      parseInt(formData.year),
-      parseInt(formData.mileage),
-      parseInt(formData.price)
-    );
+    // Here you would send the data to your backend with user's Clerk data
+    const submissionData = {
+      ...formData,
+      userId: user?.id,
+      userEmail: user?.primaryEmailAddress?.emailAddress,
+      userName: user?.fullName || `${user?.firstName} ${user?.lastName}`,
+      submittedAt: new Date().toISOString()
+    };
     
-    setGeneratedReport(report);
+    console.log('Submitting vehicle listing:', submissionData);
+    
+    // Success message and reset form
+    alert('Vehicle listing submitted successfully! Our team will contact you within 24 hours to schedule a comprehensive battery diagnostic test and vehicle inspection. The certification process takes 2-3 days.');
+    
+    // Reset form and close modal
     setShowListingForm(false);
-    setShowReport(true);
-  };
-
-  const handleConfirmListing = () => {
-    // Here you would send the data to your backend with the report
-    alert('Vehicle listing submitted! Our team will contact you for physical diagnostics within 24 hours.');
-    setShowReport(false);
-    setGeneratedReport(null);
     setFormData({
       vehicleModel: '',
       brand: '',
@@ -323,7 +216,13 @@ const SellEV: React.FC = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={() => setShowListingForm(true)}
+                onClick={() => {
+                  if (!isSignedIn) {
+                    alert('Please sign in to list your vehicle');
+                    return;
+                  }
+                  setShowListingForm(true);
+                }}
                 className="bg-white text-blue-600 font-semibold px-8 py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
               >
                 List Your EV
@@ -506,189 +405,6 @@ const SellEV: React.FC = () => {
         </div>
       )}
 
-      {/* Diagnostic Report Modal */}
-      {showReport && generatedReport && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full my-8">
-            <div className="p-6 border-b bg-gradient-to-r from-blue-600 to-green-600">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h2 className="text-2xl font-bold text-white">AI-Generated Diagnostic Report</h2>
-                  <p className="text-blue-100 text-sm mt-1">Based on vehicle age and mileage analysis</p>
-                </div>
-                <button onClick={() => setShowReport(false)} className="text-white hover:text-gray-200">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-            
-            <div className="p-6 space-y-6">
-              {/* Vehicle Info */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-semibold text-lg mb-2">{formData.brand} {formData.vehicleModel}</h3>
-                <div className="grid md:grid-cols-3 gap-3 text-sm">
-                  <div><span className="text-gray-600">Year:</span> <span className="font-semibold">{formData.year}</span></div>
-                  <div><span className="text-gray-600">Mileage:</span> <span className="font-semibold">{parseInt(formData.mileage).toLocaleString()} km</span></div>
-                  <div><span className="text-gray-600">Expected Price:</span> <span className="font-semibold">₹{(parseInt(formData.price) / 100000).toFixed(2)}L</span></div>
-                </div>
-              </div>
-
-              {/* Overall Score */}
-              <div className="text-center bg-gradient-to-br from-blue-50 to-green-50 p-6 rounded-lg">
-                <div className="inline-block">
-                  <div className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600">
-                    {generatedReport.diagnosticScore}/10
-                  </div>
-                  <div className="text-sm text-gray-600 mt-2">Preliminary Diagnostic Score</div>
-                  <div className={`mt-3 px-4 py-2 rounded-full text-sm font-semibold inline-block ${
-                    generatedReport.vehicleCondition === 'Excellent' ? 'bg-green-100 text-green-800' :
-                    generatedReport.vehicleCondition === 'Good' ? 'bg-blue-100 text-blue-800' :
-                    generatedReport.vehicleCondition === 'Fair' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-orange-100 text-orange-800'
-                  }`}>
-                    {generatedReport.vehicleCondition} Condition
-                  </div>
-                </div>
-              </div>
-
-              {/* Health Factors */}
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Health Factor Analysis</h3>
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-sm font-medium">Age Score</span>
-                      <span className="text-sm font-semibold">{generatedReport.healthFactors.ageScore}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div 
-                        className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all"
-                        style={{ width: `${generatedReport.healthFactors.ageScore}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-sm font-medium">Mileage Score</span>
-                      <span className="text-sm font-semibold">{generatedReport.healthFactors.mileageScore}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div 
-                        className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full transition-all"
-                        style={{ width: `${generatedReport.healthFactors.mileageScore}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-sm font-medium">Estimated Battery Health</span>
-                      <span className="text-sm font-semibold">{generatedReport.batteryHealth}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div 
-                        className={`h-3 rounded-full transition-all ${
-                          generatedReport.batteryHealth >= 95 ? 'bg-gradient-to-r from-green-500 to-green-600' :
-                          generatedReport.batteryHealth >= 85 ? 'bg-gradient-to-r from-yellow-500 to-yellow-600' :
-                          'bg-gradient-to-r from-orange-500 to-orange-600'
-                        }`}
-                        style={{ width: `${generatedReport.batteryHealth}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-sm font-medium">Overall Health Score</span>
-                      <span className="text-sm font-semibold">{generatedReport.healthFactors.overallScore}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div 
-                        className="bg-gradient-to-r from-purple-500 to-purple-600 h-3 rounded-full transition-all"
-                        style={{ width: `${generatedReport.healthFactors.overallScore}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Market Value Estimation */}
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold mb-2">Estimated Market Value</h3>
-                <div className="flex items-baseline gap-3">
-                  <span className="text-3xl font-bold text-blue-600">₹{(generatedReport.estimatedValue / 100000).toFixed(2)}L</span>
-                  <span className="text-sm text-gray-600">
-                    (Based on condition: {generatedReport.vehicleCondition})
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  *Actual value may vary based on physical inspection, market demand, and vehicle history
-                </p>
-              </div>
-
-              {/* Recommendations */}
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Expert Recommendations</h3>
-                <ul className="space-y-2">
-                  {generatedReport.recommendations.map((recommendation, index) => (
-                    <li key={index} className="flex items-start">
-                      <svg className="w-5 h-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span className="text-sm text-gray-700">{recommendation}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Next Steps */}
-              <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg border-2 border-green-200">
-                <h3 className="text-lg font-semibold mb-2 text-green-800">📋 Next Steps</h3>
-                <ol className="space-y-2 text-sm text-gray-700">
-                  <li className="flex items-start">
-                    <span className="font-bold mr-2">1.</span>
-                    <span>Our team will contact you within 24 hours to schedule a physical inspection</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="font-bold mr-2">2.</span>
-                    <span>Comprehensive battery diagnostics will be conducted at your location</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="font-bold mr-2">3.</span>
-                    <span>Final certification and listing on marketplace (2-3 days)</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="font-bold mr-2">4.</span>
-                    <span>Start receiving buyer inquiries and schedule test drives</span>
-                  </li>
-                </ol>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-4">
-                <button 
-                  type="button" 
-                  onClick={() => { setShowReport(false); setShowListingForm(true); }} 
-                  className="flex-1 px-6 py-3 border-2 border-gray-300 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
-                >
-                  Edit Details
-                </button>
-                <button 
-                  type="button" 
-                  onClick={handleConfirmListing} 
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
-                >
-                  Confirm & Submit Listing
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Marketplace */}
       <div id="marketplace" className="py-16">
         <div className="container mx-auto px-4 sm:px-6">
@@ -835,7 +551,13 @@ const SellEV: React.FC = () => {
             Get the best value for your electric vehicle with our certified diagnostic process
           </p>
           <button
-            onClick={() => setShowListingForm(true)}
+            onClick={() => {
+              if (!isSignedIn) {
+                alert('Please sign in to list your vehicle');
+                return;
+              }
+              setShowListingForm(true);
+            }}
             className="bg-white text-blue-600 font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all text-lg"
           >
             List Your EV Now
