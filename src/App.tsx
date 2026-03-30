@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Features from './components/Features';
@@ -26,29 +26,73 @@ import SellEV from './components/SellEV';
 // Add this import for the banner image
 import BannerLogos from './assets/footer_banner.jpeg'; // Update the path if needed
 
+interface FeatureCardProps {
+  icon: string;
+  title: string;
+  description: string;
+  route: string;
+  gradient: string;
+}
+
+function FeatureCard({ icon, title, description, route, gradient }: FeatureCardProps) {
+  const navigate = useNavigate();
+  const handleClick = () => {
+    navigate(route);
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  };
+  return (
+    <div
+      onClick={handleClick}
+      className={`cursor-pointer bg-gradient-to-r ${gradient} rounded-xl p-8 sm:p-10 flex flex-col items-center text-center text-white shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300`}
+    >
+      <span className="text-5xl sm:text-6xl mb-4">{icon}</span>
+      <h3 className="text-xl sm:text-2xl font-bold mb-2">{title}</h3>
+      <p className="text-sm sm:text-base opacity-90 leading-snug">{description}</p>
+    </div>
+  );
+}
+
 function HomePage() {
   return (
     <div className="bg-gradient-to-br from-yellow-200 via-green-200 to-blue-300 min-h-screen w-full">
       <HowItWorks />
       {/* Franchise Highlight Section */}
-      <div id="franchise-section" className="w-full flex flex-col items-center py-10 sm:py-12 bg-white border-t border-b border-gray-100 px-4 sm:px-6">
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-green-700 mb-3 text-center">Become an EVChamp Franchise Partner</h2>
-        <p className="max-w-2xl text-center text-gray-700 mb-6 text-sm sm:text-base">
-          Join the EV revolution and build a profitable business with India's leading AI & IoT-driven EV fleet management platform. 
-          As an EVChamp franchisee, you get access to advanced technology, national brand support, and a rapidly growing market.
-        </p>
-        <a
-          href="/franchise"
-          className="inline-block bg-gradient-to-r from-yellow-300 to-yellow-700 text-white font-bold text-base sm:text-lg px-6 sm:px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition"
-        >
-          Explore Franchise & EV Charging Opportunities
-        </a>
-
-
+      
+      {/* Feature Navigation Cards */}
+      <div className="w-full flex flex-col items-center py-8 bg-white px-4 sm:px-6">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-10">Explore EVChamp Services</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 sm:gap-6">
+          <FeatureCard
+            icon="🚗"
+            title="Sell EV"
+            description="List & sell your electric vehicle easily"
+            route="/sell-ev"
+            gradient="from-blue-500 to-blue-700"
+          />
+          <FeatureCard
+            icon="📋"
+            title="Buy Plans"
+            description="Choose the best IOT and RSA plans for your vehicle"
+            route="/buy-plans"
+            gradient="from-green-500 to-green-700"
+          />
+          <FeatureCard
+            icon="⚡"
+            title="EV Chargers"
+            description="Find & utilize EV charging stations and explore Franchise opportunites"
+            route="/franchise"
+            gradient="from-yellow-400 to-yellow-600"
+          />
+          <FeatureCard
+            icon="🔋"
+            title="ZipBattery"
+            description="Extend Battery Lifespan with AI Intelligence"
+            route="/zipbattery"
+            gradient="from-orange-400 to-red-600"
+          />
+        </div>
       </div>
-      <Hero />
-      <Overview />
-      {/* Our Partners Banner below Overview */}
+      {/* Our Partners Banner */}
       <div className="w-full flex flex-col items-center py-8 bg-white px-4 sm:px-6">
         <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-4">Our Partners</h2>
         <img
@@ -58,7 +102,6 @@ function HomePage() {
         />
       </div>
       <DashboardFeatures />
-      <Features />
       <Testimonials />
       <Footer />
     </div>
