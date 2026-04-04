@@ -33,7 +33,7 @@ const hardwarePlans: Plan[] = [
   {
     id: 2,
     name: 'PRO',
-    price: 6999,
+    price: 8999,
     duration: '1 Year (includes device & data plan)',
     features: [
       'All SMART features',
@@ -65,7 +65,7 @@ const softwarePlans: Plan[] = [
   {
     id: 2,
     name: 'App BASIC',
-    price: 5100,
+    price: 2400,
     duration: 'Annual (per vehicle)',
     features: [
       'Real-time Vehicle Data',
@@ -79,7 +79,7 @@ const softwarePlans: Plan[] = [
   {
     id: 3,
     name: 'App PRO',
-    price: 18,
+    price: 3600,
     duration: 'Annual (per vehicle)',
     features: [
       'All BASIC features',
@@ -93,7 +93,7 @@ const softwarePlans: Plan[] = [
   {
     id: 4,
     name: 'Dashboard STANDARD',
-    price: 3000,
+    price: 4500,
     duration: 'Annual (per vehicle)',
     features: [
       'Fleet Overview Dashboard',
@@ -106,7 +106,7 @@ const softwarePlans: Plan[] = [
   {
     id: 5,
     name: 'Dashboard ENTERPRISE',
-    price: 5000,
+    price: 6500,
     duration: 'Annual (per vehicle)',
     features: [
       'All STANDARD features',
