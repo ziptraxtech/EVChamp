@@ -79,7 +79,7 @@ const softwarePlans: Plan[] = [
   {
     id: 3,
     name: 'App PRO',
-    price: 1800,
+    price: 18,
     duration: 'Annual (per vehicle)',
     features: [
       'All BASIC features',
