@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-route
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Features from './components/Features';
-import HowItWorks from './HowItWorks';
 import Testimonials from './Testimonials';
 import Footer from './Footer';
 import Overview from './Overview';
@@ -17,11 +16,14 @@ import PaymentSuccess from './components/PaymentSuccess';
 import { SignIn, SignUp, UserProfile, RedirectToSignIn, useUser } from '@clerk/clerk-react';
 import Franchise from './components/Franchise';
 import BuyUsedEV from './components/BuyUsedEV'; // Import the new component
+import ServiceCentres from './components/ServiceCentres';
 import ZipBattery from './components/ZipBattery';
 import AdvanceAnalysis from './components/AdvanceAnalysis';
 import DeleteAccount from './components/DeleteAccount';
 import RSAPlans from './components/RSAPlans';
 import SellEV from './components/SellEV';
+import ServicesShowcase from './components/ServicesShowcase';
+import { ScrollReveal } from './components/ScrollReveal';
 
 // Add this import for the banner image
 import BannerLogos from './assets/footer_banner.jpeg'; // Update the path if needed
@@ -54,56 +56,39 @@ function FeatureCard({ icon, title, description, route, gradient }: FeatureCardP
 
 function HomePage() {
   return (
-    <div className="bg-gradient-to-br from-yellow-200 via-green-200 to-blue-300 min-h-screen w-full">
-      <HowItWorks />
-      {/* Franchise Highlight Section */}
-      
-      {/* Feature Navigation Cards */}
-      <div className="w-full flex flex-col items-center py-8 bg-white px-4 sm:px-6">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-10">Explore EVChamp Services</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 sm:gap-6">
-          <FeatureCard
-            icon="🚗"
-            title="Sell EV"
-            description="List & sell your electric vehicle easily"
-            route="/sell-ev"
-            gradient="from-blue-500 to-blue-700"
-          />
-          <FeatureCard
-            icon="📋"
-            title="Buy Plans"
-            description="Choose the best IOT and RSA plans for your vehicle"
-            route="/buy-plans"
-            gradient="from-green-500 to-green-700"
-          />
-          <FeatureCard
-            icon="⚡"
-            title="EV Chargers"
-            description="Find & utilize EV charging stations and explore Franchise opportunites"
-            route="/franchise"
-            gradient="from-yellow-400 to-yellow-600"
-          />
-          <FeatureCard
-            icon="🔋"
-            title="ZipBattery"
-            description="Extend Battery Lifespan with AI Intelligence"
-            route="/zipbattery"
-            gradient="from-orange-400 to-red-600"
-          />
-        </div>
+    <div className="home-page relative overflow-hidden bg-gradient-to-br from-yellow-200 via-green-200 to-blue-300 min-h-screen w-full">
+      <div className="home-ambient home-orb-1" />
+      <div className="home-ambient home-orb-2" />
+      <div className="home-ambient home-orb-3" />
+
+      <div className="relative z-10">
+        <ScrollReveal className="home-section-shell" duration={850} threshold={0.15}>
+          <ServicesShowcase />
+        </ScrollReveal>
+
+        <ScrollReveal className="home-section-shell" duration={900} delay={80} threshold={0.15}>
+          <div className="partner-banner-frame w-full flex flex-col items-center py-8 bg-white/85 backdrop-blur-sm px-4 sm:px-6">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-4">Our Partners</h2>
+            <img
+              src={BannerLogos}
+              alt="Partner Logos"
+              className="partner-banner-image max-w-6xl w-full rounded-xl shadow-md object-contain"
+            />
+          </div>
+        </ScrollReveal>
+
+        <ScrollReveal className="home-section-shell" duration={850} delay={120} threshold={0.15}>
+          <DashboardFeatures />
+        </ScrollReveal>
+
+        <ScrollReveal className="home-section-shell" duration={900} delay={160} threshold={0.15}>
+          <Testimonials />
+        </ScrollReveal>
+
+        <ScrollReveal className="home-footer-shell" duration={850} delay={200} threshold={0.1}>
+          <Footer />
+        </ScrollReveal>
       </div>
-      {/* Our Partners Banner */}
-      <div className="w-full flex flex-col items-center py-8 bg-white px-4 sm:px-6">
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-4">Our Partners</h2>
-        <img
-          src={BannerLogos}
-          alt="Partner Logos"
-          className="max-w-6xl w-full rounded-xl shadow-md object-contain"
-        />
-      </div>
-      <DashboardFeatures />
-      <Testimonials />
-      <Footer />
     </div>
   );
 }
@@ -187,6 +172,7 @@ function App() {
               <BuyUsedEV />
             </ProtectedRoute>
           } />
+          <Route path="/service-centres" element={<ServiceCentres />} />
           <Route path="/delete-account" element={
             <ProtectedRoute>
               <DeleteAccount />

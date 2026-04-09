@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import Papa from 'papaparse';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import HowItWorks from '../HowItWorks';
 
 // Fix for default marker icons in react-leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -36,6 +37,8 @@ const Franchise: React.FC = () => {
 
   // Load CSV data
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+
     Papa.parse('/device_locations_api-stations.csv', {
       download: true,
       header: true,
@@ -88,7 +91,7 @@ const Franchise: React.FC = () => {
   };
 
   return (
-    <section className="py-12 sm:py-16 px-4 sm:px-6 max-w-4xl mx-auto">
+    <section className="py-12 sm:py-16 px-4 sm:px-6 max-w-6xl mx-auto">
       <Link 
         to="/" 
         className="inline-flex items-center text-gray-600 hover:text-green-700 transition-colors mb-8 font-semibold"
@@ -96,6 +99,10 @@ const Franchise: React.FC = () => {
         <BackArrow className="mr-2" />
         Back to Home
       </Link>
+
+      <div className="mb-10">
+        <HowItWorks />
+      </div>
       
       {/* Charging Stations Map */}
       <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-8 mb-16">
