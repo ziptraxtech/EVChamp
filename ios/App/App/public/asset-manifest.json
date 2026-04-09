@@ -1,8 +1,9 @@
 {
   "files": {
-    "main.css": "/static/css/main.df643f70.css",
-    "main.js": "/static/js/main.71276283.js",
-    "static/js/453.f21bdd9b.chunk.js": "/static/js/453.f21bdd9b.chunk.js",
+    "main.css": "/static/css/main.9654a3a7.css",
+    "main.js": "/static/js/main.09f72e6f.js",
+    "static/js/453.8950d877.chunk.js": "/static/js/453.8950d877.chunk.js",
+    "static/media/mockuo.png": "/static/media/mockuo.eea2406289e23bde7b06.png",
     "static/media/header.jpg": "/static/media/header.c14d6fcbc601a1043cee.jpg",
     "static/media/f24404fa.png": "/static/media/67e56e1e14be488a8ebef8537bfad7c0f24404fa.b25531dbc8c05543906a.png",
     "static/media/EVChampLogo.png": "/static/media/EVChampLogo.f2614e788d8108d5c227.png",
@@ -20,12 +21,12 @@
     "static/media/honda-kona-ev.jpg": "/static/media/honda-kona-ev.0f4e4d700478e261df78.jpg",
     "static/media/tata-nexon.jpg": "/static/media/tata-nexon.8636502ff9831a3fb372.jpg",
     "index.html": "/index.html",
-    "main.df643f70.css.map": "/static/css/main.df643f70.css.map",
-    "main.71276283.js.map": "/static/js/main.71276283.js.map",
-    "453.f21bdd9b.chunk.js.map": "/static/js/453.f21bdd9b.chunk.js.map"
+    "main.9654a3a7.css.map": "/static/css/main.9654a3a7.css.map",
+    "main.09f72e6f.js.map": "/static/js/main.09f72e6f.js.map",
+    "453.8950d877.chunk.js.map": "/static/js/453.8950d877.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.df643f70.css",
-    "static/js/main.71276283.js"
+    "static/css/main.9654a3a7.css",
+    "static/js/main.09f72e6f.js"
   ]
 }
