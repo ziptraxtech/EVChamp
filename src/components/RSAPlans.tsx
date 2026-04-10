@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useUser } from '@clerk/clerk-react';
 import razorpayService from '../services/razorpayService';
 
@@ -73,7 +73,6 @@ const rsaPlans: RSAPlan[] = [
 ];
 
 const RSAPlans: React.FC = () => {
-  const navigate = useNavigate();
   const { user } = useUser();
   const [selectedPlan, setSelectedPlan] = useState<RSAPlan | null>(null);
   const [showDetails, setShowDetails] = useState(false);
@@ -116,37 +115,24 @@ const RSAPlans: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-green-50 py-10 sm:py-12">
+    <div className="min-h-screen bg-white">
+      <Helmet>
+        <title>EV Roadside Assistance India | Emergency EV Support by EVChamp</title>
+        <meta name="description" content="24/7 EV roadside assistance across India — battery jump-start, towing, flat tyre support, and more. Choose from Basic, Standard, or Premium RSA plans." />
+        <meta name="keywords" content="EV roadside assistance, emergency EV support India, EV towing, battery assistance, EVChamp RSA" />
+      </Helmet>
 
-      {/* Back Button */}
-      <div className="container mx-auto px-4 sm:px-6 mb-6 flex items-center">
-        <button
-          onClick={() => navigate('/')}
-          className="flex items-center bg-white border border-gray-200 shadow-md rounded-lg px-3 sm:px-4 py-2 hover:bg-orange-50 transition-all text-orange-700 font-semibold text-base sm:text-lg"
-        >
-          <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to Home
-        </button>
-      </div>
-
-      <div className="container mx-auto px-4 sm:px-6">
-
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl shadow-lg mb-4">
-            <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-3 tracking-tight">
-            Roadside Assistance Plans
-          </h1>
-          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-            Never get stranded again. EVChamp RSA plans provide round-the-clock emergency support for your electric vehicle — from towing to battery assistance and beyond.
+      {/* Hero */}
+      <section className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+        <div className="container mx-auto px-4 sm:px-6 py-14 sm:py-18 text-center max-w-3xl">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-3">EV Roadside Assistance</h1>
+          <p className="text-gray-300 text-base sm:text-lg leading-relaxed">
+            Never get stranded again. Round-the-clock emergency support for your electric vehicle — from towing to battery assistance and beyond.
           </p>
         </div>
+      </section>
+
+      <div className="py-10 sm:py-12">
 
         {/* Trust Badges */}
         <div className="flex flex-wrap justify-center gap-4 sm:gap-8 mb-12">

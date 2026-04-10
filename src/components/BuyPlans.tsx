@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
+import { Helmet } from 'react-helmet-async';
 import razorpayService from '../services/razorpayService';
 import headerImg from '../assets/header.jpg';
 
@@ -188,7 +189,12 @@ const BuyPlans: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+    <div className="min-h-screen bg-gray-50">
+      <Helmet>
+        <title>EV IoT Hardware &amp; Software Plans | Connected EV Monitoring by EVChamp</title>
+        <meta name="description" content="Explore EVChamp IoT hardware plans for real-time vehicle tracking, battery monitoring, EV diagnostics, fleet visibility, and software subscription plans for analytics and optimization." />
+        <meta name="keywords" content="EV IoT hardware, EV tracking device, fleet monitoring hardware, EV software subscription, fleet analytics platform, EV monitoring software" />
+      </Helmet>
       
 
       {/* Plans Section */}
@@ -197,30 +203,30 @@ const BuyPlans: React.FC = () => {
       <div className="container mx-auto px-4 sm:px-6 mb-6 flex items-center">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center bg-white border border-gray-200 shadow-md rounded-lg px-3 sm:px-4 py-2 hover:bg-green-100 transition-all text-green-700 font-semibold text-base sm:text-lg"
+          className="flex items-center text-gray-600 hover:text-gray-900 rounded-lg px-3 sm:px-4 py-2 hover:bg-gray-50 transition-all font-medium text-sm"
         >
-          <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
-          Back to Home
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+          Back
         </button>    
       </div>
-    {/* Hero Section - Moved from Landing Page */}
-      <section className="py-10 sm:py-12 bg-gradient-to-tr from-yellow-200 via-green-200 to-blue-300 transition-colors duration-1000">
+    {/* Hero Section */}
+      <section className="py-10 sm:py-12 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
         <div className="container mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-stretch justify-between gap-10">
           {/* Text Section */}
           <div className="flex-1 max-w-xl flex flex-col justify-center text-center md:text-left">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight">
-              Empowering Intelligent Electric Mobility<br />
-              <span className="text-green-600">with AI &amp; IoT-Driven Fleet Management</span>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
+              Smart Hardware &amp; Software for<br />
+              <span className="text-green-400">Smarter EV Operations</span>
             </h1>
-            <p className="mt-5 sm:mt-6 text-base sm:text-lg text-gray-600">
-              At EVChamp, we are transforming EV fleet management through our integrated platform that combines AI-powered software with IoT-enabled smart hardware. Experience seamless, efficient, and intelligent electric mobility operations.
+            <p className="mt-5 text-gray-300 text-base sm:text-lg leading-relaxed">
+              EVChamp combines IoT hardware plans for real-time fleet intelligence with software subscriptions for monitoring, analytics, and optimization. Built for modern electric mobility.
             </p>
             <div className="mt-6 sm:mt-8">
               <button
                 onClick={() => {
                   document.getElementById('plans-section')?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="w-full sm:w-auto inline-block bg-gradient-to-r from-green-500 to-green-700 text-white font-bold text-base sm:text-lg px-6 sm:px-10 py-3 sm:py-4 rounded-xl shadow-lg hover:shadow-xl transition-all sm:transform sm:hover:-translate-y-1"
+                className="w-full sm:w-auto inline-block bg-white text-gray-900 font-semibold text-base sm:text-lg px-6 sm:px-10 py-3 sm:py-4 rounded-xl shadow-lg hover:bg-gray-100 transition-all sm:transform sm:hover:-translate-y-1"
               >
                 Explore Plans &amp; Solutions
               </button>
@@ -233,78 +239,86 @@ const BuyPlans: React.FC = () => {
               alt="EV Fleet Management Illustration"
               className="w-full h-56 sm:h-72 md:h-full rounded-xl shadow-2xl object-cover mb-6"
             />
-            <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row flex-wrap gap-x-10 gap-y-4 w-full justify-center">
-              <div className="flex items-center space-x-2">
-                <svg className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="mt-4 sm:mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+              <div className="flex items-center space-x-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+                <svg className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span className="font-semibold text-gray-700 text-sm sm:text-base">AI-Driven Leasing &amp; Asset Management</span>
+                <span className="font-medium text-gray-100 text-sm sm:text-base">AI-Driven Leasing &amp; Asset Management</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <svg className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="flex items-center space-x-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+                <svg className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span className="font-semibold text-gray-700 text-sm sm:text-base">Smart Buyback &amp; Warranty</span>
+                <span className="font-medium text-gray-100 text-sm sm:text-base">Smart Buyback &amp; Warranty</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <svg className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="flex items-center space-x-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 sm:col-span-2">
+                <svg className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span className="font-semibold text-gray-700 text-sm sm:text-base">Real-Time Telematics &amp; Analytics</span>
+                <span className="font-medium text-gray-100 text-sm sm:text-base">Real-Time Telematics &amp; Analytics</span>
               </div>
             </div>
           </div>
         </div>
-      </section>  
+      </section>
 
       {/* EVCHAMP Overview Section */}
-      <section className="py-12 sm:py-16 bg-gradient-to-br from-yellow-200 via-green-200 to-blue-300">
-        <div className="container mx-auto px-4 sm:px-6 grid md:grid-cols-2 gap-10 md:gap-12 items-center">
-          {/* Left: QR Code Box */}
-          <div className="flex flex-col items-center">
-            <div className="w-32 h-32 sm:w-40 sm:h-40 bg-gradient-to-br from-gray-200 to-blue-100 border-4 border-dashed border-blue-300 flex items-center justify-center rounded-xl shadow-inner mb-3">
-              <span className="text-blue-400 font-bold text-lg text-center">[QR Code Here]</span>
+      <section className="py-12 sm:py-16 bg-white border-y border-gray-100">
+        <div className="container mx-auto px-4 sm:px-6 max-w-6xl grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+          <div className="bg-gray-50 rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-sm">
+            <span className="inline-flex items-center rounded-full bg-green-100 text-green-800 px-3 py-1 text-xs font-semibold uppercase tracking-wide mb-4">
+              Platform Snapshot
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
+              Designed for Real-World EV Operations
+            </h2>
+            <p className="text-gray-600 leading-relaxed mb-6">
+              EVChamp combines connected hardware, AI-led diagnostics, and operational dashboards to help owners, fleets, and businesses run EV operations with more visibility and less downtime.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="rounded-xl bg-white border border-gray-200 p-4">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">IoT</p>
+                <p className="text-sm font-bold text-gray-900">Live vehicle data</p>
+              </div>
+              <div className="rounded-xl bg-white border border-gray-200 p-4">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">AI</p>
+                <p className="text-sm font-bold text-gray-900">Predictive insights</p>
+              </div>
+              <div className="rounded-xl bg-white border border-gray-200 p-4">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Dashboards</p>
+                <p className="text-sm font-bold text-gray-900">Actionable reports</p>
+              </div>
             </div>
-            <span className="text-xs text-gray-400">Scan to download the app</span>
           </div>
 
-          {/* Right: Text & Offerings */}
           <div className="text-center md:text-left">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
-              EVCHAMP Overview
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              EVChamp Overview
             </h2>
-            <p className="mb-6 text-base sm:text-lg text-gray-700 max-w-xl mx-auto md:mx-0">
-              At EVChamp, we are at the forefront of transforming electric vehicle (EV) fleet management through our integrated platform that combines AI-powered software with IoT-enabled smart hardware. Our solutions are designed to make EV operations seamless, efficient, and intelligent.
+            <p className="mb-6 text-base sm:text-lg text-gray-600 max-w-xl mx-auto md:mx-0">
+              At EVChamp, we simplify electric fleet management through a connected platform that blends smart hardware with intelligent software. The result is better control, faster decision-making, and a more dependable EV ecosystem.
             </p>
-            <div className="flex flex-col gap-3 sm:gap-4">
-              <div className="flex items-center">
-                <svg className="text-blue-600 text-2xl mr-3 w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M13 7H7v6h6V7z" />
-                  <path fillRule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clipRule="evenodd" />
-                </svg>
+            <div className="space-y-3 sm:space-y-4">
+              <div className="flex items-center rounded-lg bg-gray-50 border border-gray-100 px-4 py-3">
+                <span className="w-8 h-8 rounded-full bg-green-100 text-green-700 flex items-center justify-center mr-3 font-bold">1</span>
                 <span className="text-gray-800 font-medium">AI-Driven EV Leasing & Asset Management</span>
               </div>
-              <div className="flex items-center">
-                <svg className="text-green-600 text-2xl mr-3 w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z" />
-                </svg>
+              <div className="flex items-center rounded-lg bg-gray-50 border border-gray-100 px-4 py-3">
+                <span className="w-8 h-8 rounded-full bg-green-100 text-green-700 flex items-center justify-center mr-3 font-bold">2</span>
                 <span className="text-gray-800 font-medium">Smart Buyback & Warranty Solutions</span>
               </div>
-              <div className="flex items-center">
-                <svg className="text-purple-600 text-2xl mr-3 w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                </svg>
+              <div className="flex items-center rounded-lg bg-gray-50 border border-gray-100 px-4 py-3">
+                <span className="w-8 h-8 rounded-full bg-green-100 text-green-700 flex items-center justify-center mr-3 font-bold">3</span>
                 <span className="text-gray-800 font-medium">Real-Time Telematics & Predictive Maintenance</span>
               </div>
-              <div className="flex items-center">
-                <svg className="text-pink-600 text-2xl mr-3 w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                </svg>
+              <div className="flex items-center rounded-lg bg-gray-50 border border-gray-100 px-4 py-3">
+                <span className="w-8 h-8 rounded-full bg-green-100 text-green-700 flex items-center justify-center mr-3 font-bold">4</span>
                 <span className="text-gray-800 font-medium">Integrated Mobile App & Web Dashboard</span>
               </div>
             </div>
             <div className="mt-6">
-              <span className="inline-block bg-gradient-to-r from-blue-500 to-green-400 text-white px-4 py-1 rounded-full text-sm font-semibold shadow">
+              <span className="inline-block bg-gray-900 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-sm">
                 Available on Android, iOS & Web
               </span>
             </div>
@@ -312,7 +326,7 @@ const BuyPlans: React.FC = () => {
         </div>
       </section>
 
-      <div className="container mx-auto px-4 sm:px-6">
+      <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
         <div className="text-center mb-12">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-2 tracking-tight">EVChamp Plans & Pricing</h1>
           <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">Select your hardware and software plans. You can buy both together for a seamless experience.</p>
@@ -346,7 +360,7 @@ const BuyPlans: React.FC = () => {
                   ))}
                 </ul>
                 <button
-                  className={`w-full py-3 rounded-lg font-semibold mt-2 transition-all duration-200 bg-gradient-to-r from-green-500 to-green-700 text-white hover:from-green-600 hover:to-green-800 text-sm sm:text-base ${selectedPlans.some(p => p.id === plan.id && p.type === 'hardware') ? 'opacity-80' : ''}`}
+                  className={`w-full py-3 rounded-lg font-semibold mt-2 transition-all duration-200 bg-gray-900 text-white hover:bg-gray-800 text-sm sm:text-base ${selectedPlans.some(p => p.id === plan.id && p.type === 'hardware') ? 'opacity-80' : ''}`}
                   onClick={(e) => { e.stopPropagation(); handleHardwareSelect(plan); }}
                 >
                   {selectedPlans.some(p => p.id === plan.id && p.type === 'hardware') ? 'Deselect' : 'Select Hardware Plan'}
@@ -386,7 +400,7 @@ const BuyPlans: React.FC = () => {
                     ))}
                   </ul>
                   <button
-                    className={`w-full py-3 rounded-lg font-semibold mt-2 transition-all duration-200 bg-gradient-to-r from-blue-500 to-blue-700 text-white hover:from-blue-600 hover:to-blue-800 ${isSelected ? 'opacity-80' : ''}`}
+                    className={`w-full py-3 rounded-lg font-semibold mt-2 transition-all duration-200 bg-gray-900 text-white hover:bg-gray-800 ${isSelected ? 'opacity-80' : ''}`}
                     onClick={(e) => { e.stopPropagation(); handleSoftwareToggle(plan); }}
                   >
                     {isSelected ? 'Deselect' : 'Select Software Plan'}
@@ -418,7 +432,7 @@ const BuyPlans: React.FC = () => {
             </div>
             <button
               onClick={handleOrderClick}
-              className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-bold text-lg px-10 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+              className="w-full bg-gray-900 text-white font-bold text-lg px-10 py-4 rounded-xl shadow-lg hover:bg-gray-800 transform hover:-translate-y-1 transition-all"
             >
               Place Order
             </button>
@@ -429,8 +443,8 @@ const BuyPlans: React.FC = () => {
         {showDetails && (
           <div ref={detailsSectionRef} className="max-w-lg mx-auto mt-16 bg-white rounded-2xl shadow-2xl p-10 border border-gray-200 animate-fade-in-up">
             <h3 className="text-2xl font-bold text-gray-800 mb-4">Place Your Order</h3>
-            <div className="mb-6 bg-blue-50 rounded-lg p-4 border-l-4 border-blue-400">
-              <div className="font-semibold text-blue-700 mb-2">Selected Plans:</div>
+            <div className="mb-6 bg-gray-50 rounded-lg p-4 border-l-4 border-green-500">
+              <div className="font-semibold text-gray-900 mb-2">Selected Plans:</div>
               <ul className="mb-2">
                 {selectedPlans.map((plan) => (
                   <li key={plan.type + plan.id} className="flex items-center justify-between">
@@ -458,7 +472,7 @@ const BuyPlans: React.FC = () => {
                 <label className="block text-gray-700 font-medium mb-2">Company (optional)</label>
                 <input type="text" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Enter your company name" />
               </div>
-              <button type="button" className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white py-4 px-6 rounded-lg font-semibold text-lg hover:bg-green-700 transition-colors transform hover:scale-105" onClick={handlePayment} disabled={isProcessing}>
+              <button type="button" className="w-full bg-green-600 text-white py-4 px-6 rounded-lg font-semibold text-lg hover:bg-green-700 transition-colors transform hover:scale-105" onClick={handlePayment} disabled={isProcessing}>
                 {isProcessing ? 'Processing Payment...' : 'Place Order'}
               </button>
             </form>

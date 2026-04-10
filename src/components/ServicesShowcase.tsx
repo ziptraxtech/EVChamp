@@ -40,7 +40,7 @@ const ServicesShowcase: React.FC = () => {
     <section className="py-12 sm:py-16 bg-[#f0f0f0]">
       <div className="container mx-auto px-4 sm:px-6">
         <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-8">
-          Explore EVChamp Services
+          Explore Our Top Services
         </h2>
 
         <div className="flex flex-col lg:flex-row gap-4">
@@ -49,7 +49,7 @@ const ServicesShowcase: React.FC = () => {
           <div
             onClick={() => goTo('/buy-plans')}
             style={{ '--tile-delay': '0.05s' } as React.CSSProperties}
-            className="service-tile group lg:w-[32%] bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl p-7 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 min-h-[420px] overflow-hidden"
+            className="service-tile group lg:w-[32%] bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-2xl p-7 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 min-h-[420px] overflow-hidden"
           >
             <div>
               <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight mb-2">
@@ -83,7 +83,7 @@ const ServicesShowcase: React.FC = () => {
               <div
                 onClick={() => goTo('/sell-ev')}
                 style={{ '--tile-delay': '0.10s' } as React.CSSProperties}
-                className="service-tile group bg-white rounded-2xl p-6 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden min-h-[200px]"
+                className="service-tile group bg-gradient-to-br from-blue-50 to-sky-50 rounded-2xl p-6 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden min-h-[200px]"
               >
                 <div className="flex justify-between items-start gap-3">
                   <div className="flex-1">
@@ -109,7 +109,7 @@ const ServicesShowcase: React.FC = () => {
               <div
                 onClick={() => goTo('/service-centres')}
                 style={{ '--tile-delay': '0.15s' } as React.CSSProperties}
-                className="service-tile group bg-white rounded-2xl p-6 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden min-h-[200px]"
+                className="service-tile group bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl p-6 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden min-h-[200px]"
               >
                 <div className="flex justify-between items-start gap-3">
                   <div className="flex-1">
@@ -139,7 +139,7 @@ const ServicesShowcase: React.FC = () => {
               <div
                 onClick={() => goTo('/rsa-plans')}
                 style={{ '--tile-delay': '0.20s' } as React.CSSProperties}
-                className="service-tile group bg-white rounded-2xl p-5 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
+                className="service-tile group bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-5 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
               >
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-1">RSA Plans</h3>
@@ -165,7 +165,7 @@ const ServicesShowcase: React.FC = () => {
               <div
                 onClick={() => goTo('/franchise')}
                 style={{ '--tile-delay': '0.25s' } as React.CSSProperties}
-                className="service-tile group bg-white rounded-2xl p-5 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
+                className="service-tile group bg-gradient-to-br from-yellow-50 to-lime-50 rounded-2xl p-5 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
               >
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-1">EV Charger Network</h3>
@@ -191,7 +191,7 @@ const ServicesShowcase: React.FC = () => {
               <div
                 onClick={() => goTo('/zipbattery')}
                 style={{ '--tile-delay': '0.30s' } as React.CSSProperties}
-                className="service-tile group bg-gradient-to-br from-orange-50 to-red-100 rounded-2xl p-5 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
+                className="service-tile group bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl p-5 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
               >
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-1">ZipBattery</h3>

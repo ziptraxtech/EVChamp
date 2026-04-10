@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
+import { Helmet } from 'react-helmet-async';
 
 // Import vehicle images
 import nexonEvImage from '../assets/tata-nexon.jpg';
@@ -26,7 +26,6 @@ interface Vehicle {
 }
 
 const SellEV: React.FC = () => {
-  const navigate = useNavigate();
   const { isSignedIn, user } = useUser();
   const [showListingForm, setShowListingForm] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
@@ -203,16 +202,22 @@ const SellEV: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-blue-50">
+    <div className="min-h-screen bg-white">
+      <Helmet>
+        <title>Sell Your EV Online | EVChamp EV Marketplace India</title>
+        <meta name="description" content="Sell your electric vehicle with complete battery diagnostics and accurate vehicle information. Increase buyer confidence with EVChamp's trusted EV marketplace." />
+        <meta name="keywords" content="sell EV online, sell electric vehicle India, EV marketplace, EV battery diagnostics" />
+      </Helmet>
+
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-green-600 text-white py-16">
+      <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white py-16">
         <div className="container mx-auto px-4 sm:px-6">
-          <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-              EV Marketplace
+          <div className="text-center max-w-3xl mx-auto">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
+              Sell Your EV with Confidence
             </h1>
-            <p className="text-xl mb-6">
-              Buy certified pre-owned EVs or sell yours with complete battery diagnostics
+            <p className="text-gray-300 text-base sm:text-lg leading-relaxed mb-6">
+              Present your vehicle with complete battery diagnostics and accurate information. EVChamp helps increase buyer trust and supports a smoother selling process.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button

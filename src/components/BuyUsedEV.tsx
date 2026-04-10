@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FaBatteryFull, FaTachometerAlt, FaArrowLeft } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
+import { Helmet } from 'react-helmet-async';
 
 // Re-using images from assets
 import nexonImg from '../assets/tata-nexon.jpg';
@@ -56,25 +57,36 @@ const BuyUsedEV: React.FC = () => {
   const BatteryIcon = FaBatteryFull as React.ElementType;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-yellow-50">
+    <div className="min-h-screen bg-white">
+      <Helmet>
+        <title>EV Marketplace India | Buy Certified Pre-Owned EVs with Battery Diagnostics</title>
+        <meta name="description" content="Buy certified pre-owned EVs with complete battery diagnostics, transparent vehicle data, and trusted marketplace support from EVChamp." />
+        <meta name="keywords" content="buy used EV in India, certified pre-owned EVs, EV battery diagnostics, EV marketplace India" />
+      </Helmet>
+
       {/* Back Button */}
       <div className="static sm:absolute sm:top-24 sm:left-6 z-10 px-4 sm:px-0 pt-4 sm:pt-0">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-lg hover:bg-white/30 transition-all duration-200 shadow-lg text-sm sm:text-base"
+          className="flex items-center space-x-2 text-white px-4 py-2 rounded-lg hover:bg-white/10 transition-all text-sm"
         >
           <BackArrow className="text-lg" />
-          <span className="font-semibold">Back to Home</span>
+          <span className="font-semibold">Back</span>
         </button>
       </div>
       
       {/* Hero Section */}
-      <section className="pt-16 sm:pt-20 pb-10 sm:pb-12 bg-gradient-to-r from-yellow-500 to-orange-600 text-white">
-        <div className="container mx-auto px-4 sm:px-6 text-center">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">Buy Certified Used EVs</h1>
-          <p className="text-base sm:text-xl mb-6 sm:mb-8 max-w-3xl mx-auto">
-            Get the best value on pre-owned electric vehicles. Each car is certified by EVChamp with a comprehensive battery health report.
+      <section className="pt-16 sm:pt-20 pb-10 sm:pb-12 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+        <div className="container mx-auto px-4 sm:px-6 text-center max-w-3xl">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">Buy Certified Pre-Owned EVs</h1>
+          <p className="text-gray-300 text-base sm:text-lg leading-relaxed mb-6">
+            Explore certified pre-owned electric vehicles with detailed battery health insights and condition reports. Make informed decisions with complete transparency.
           </p>
+          <div className="flex flex-wrap justify-center gap-2 text-xs sm:text-sm">
+            <span className="bg-white/10 px-3 py-1.5 rounded-full">✓ Battery Health Assessment</span>
+            <span className="bg-white/10 px-3 py-1.5 rounded-full">✓ Verified Listings</span>
+            <span className="bg-white/10 px-3 py-1.5 rounded-full">✓ Trusted Transactions</span>
+          </div>
         </div>
       </section>
 

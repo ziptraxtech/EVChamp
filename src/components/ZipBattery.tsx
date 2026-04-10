@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaChevronDown } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
+import { FaChevronDown } from 'react-icons/fa';
 
 const ZipBattery: React.FC = () => {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
   const navigate = useNavigate();
-  const BackArrow = FaArrowLeft as React.ElementType;
   const ChevronIcon = FaChevronDown as React.ElementType;
 
   const toggleSection = (section: string) => {
@@ -14,42 +14,25 @@ const ZipBattery: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
-      <section className="py-12 sm:py-16 px-4 sm:px-6 max-w-6xl mx-auto">
-        {/* Back Button */}
-        <Link 
-          to="/" 
-          className="inline-flex items-center text-gray-600 hover:text-orange-700 transition-colors mb-8 font-semibold"
-        >
-          <BackArrow className="mr-2" />
-          Back to Home
-        </Link>
+    <div className="min-h-screen bg-white">
+      <Helmet>
+        <title>ZipBattery | AI Battery Intelligence to Extend EV Battery Lifespan</title>
+        <meta name="description" content="ZipBattery extends Li-ion battery lifespan by up to 40% using AI and IoT. Real-time health monitoring, predictive analytics, and smart diagnostics for EVs." />
+        <meta name="keywords" content="EV battery intelligence, AI battery diagnostics, lithium ion battery lifespan, ZipBattery, EV battery health" />
+      </Helmet>
 
-        {/* Header Section */}
-        <div className="mb-12">
-          <div className="flex items-center space-x-4 mb-6">
-            {/* ZipBattery Logo */}
-            <div className="flex items-center space-x-2">
-              <div className="text-4xl sm:text-5xl font-bold">
-                <span className="text-orange-600">Zip</span>
-                <span className="text-red-500">Battery</span>
-              </div>
-              <div className="text-4xl sm:text-5xl text-yellow-400 -ml-2">⚡</div>
-            </div>
-          </div>
-
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Extend Battery Lifespan with AI Intelligence
-          </h1>
-
-          <p className="text-base sm:text-lg text-gray-700 mb-4 leading-relaxed max-w-3xl">
-            ZipBattery extends the lifespan of Li-ion batteries by combining cutting-edge AI technology with IoT capabilities. Our vision is to provide the world with greener, smarter, and longer-lasting lithium-ion batteries. Our artificial intelligence engine and IoT enabled hardware Lithium ion batteries last for up to 40% longer.
-          </p>
-
-          <p className="text-base sm:text-lg text-gray-600 mb-6">
-            Experience the intelligence layer that powers the entire electric mobility ecosystem.
+      {/* Hero */}
+      <section className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+        <div className="container mx-auto px-4 sm:px-6 py-14 sm:py-18 text-center max-w-3xl">
+          <span className="inline-block text-xs font-bold tracking-wider uppercase text-green-400 mb-3">ZipBattery by EVChamp</span>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-3">AI Battery Intelligence</h1>
+          <p className="text-gray-300 text-base sm:text-lg leading-relaxed">
+            Extend the lifespan of Li-ion batteries by up to 40% with cutting-edge AI technology and IoT capabilities. Greener, smarter, longer-lasting batteries.
           </p>
         </div>
+      </section>
+
+      <section className="py-12 sm:py-16 px-4 sm:px-6 max-w-6xl mx-auto">
 
         {/* Main Content Grid */}
         <div className="grid lg:grid-cols-3 gap-8 mb-12">
