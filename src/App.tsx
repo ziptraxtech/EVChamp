@@ -38,6 +38,21 @@ function HomePage() {
     window.scrollTo({ top: 0, behavior: 'auto' });
   };
 
+  const scrollToTopServices = () => {
+    const section = document.getElementById('top-services');
+    if (section) {
+      const rect = section.getBoundingClientRect();
+      const sectionTop = window.scrollY + rect.top;
+      const centeredTop = sectionTop - (window.innerHeight - rect.height) / 2;
+      const targetTop = Math.max(0, centeredTop - 40);
+
+      window.scrollTo({
+        top: targetTop,
+        behavior: 'smooth',
+      });
+    }
+  };
+
   return (
     <div className="home-page bg-white min-h-screen w-full">
       <Helmet>
@@ -50,7 +65,7 @@ function HomePage() {
       <section
         className="relative overflow-hidden text-white"
         style={{
-          backgroundImage: "url('/Gemini_Generated_Image_6yjib26yjib26yji.png')",
+          backgroundImage: "url('/bg-hero.png')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -67,7 +82,7 @@ function HomePage() {
               From certified pre-owned EVs and battery diagnostics to IoT hardware, software subscriptions, charging access, roadside assistance, and smart EV support — EVChamp brings every part of the EV journey into one connected platform.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
-              <button onClick={() => goTo('/buy-plans')} className="bg-white text-gray-900 font-semibold px-6 py-3 rounded-lg hover:bg-gray-100 transition-all text-sm shadow-sm">
+              <button onClick={scrollToTopServices} className="bg-white text-gray-900 font-semibold px-6 py-3 rounded-lg hover:bg-gray-100 transition-all text-sm shadow-sm">
                 Explore Platform
               </button>
               <button onClick={() => goTo('/sign-up')} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm shadow-sm">
@@ -121,9 +136,11 @@ function HomePage() {
       </section>
 
       {/* Services Showcase — existing tiles */}
-      <ScrollReveal className="home-section-shell" duration={850} threshold={0.15}>
-        <ServicesShowcase />
-      </ScrollReveal>
+      <section id="top-services">
+        <ScrollReveal className="home-section-shell" duration={850} threshold={0.15}>
+          <ServicesShowcase />
+        </ScrollReveal>
+      </section>
 
       {/* Audience Cards — compact */}
       <section className="bg-gray-50">

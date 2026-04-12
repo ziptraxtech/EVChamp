@@ -45,31 +45,33 @@ const ServicesShowcase: React.FC = () => {
 
         <div className="flex flex-col lg:flex-row gap-4">
 
-          {/* ── Large Featured Card: EV Telematics Plans ── */}
+          {/* ── Large Featured Card: Find EV Service Centres ── */}
           <div
-            onClick={() => goTo('/buy-plans')}
+            onClick={() => goTo('/service-centres')}
             style={{ '--tile-delay': '0.05s' } as React.CSSProperties}
-            className="service-tile group lg:w-[32%] bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-2xl p-7 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 min-h-[420px] overflow-hidden"
+            className="service-tile group lg:w-[32%] bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl p-7 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 min-h-[420px] overflow-hidden"
           >
             <div>
               <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight mb-2">
-                Smart EV Telematics &amp; Fleet Plans
+                Find EV Service Centres
               </h3>
-              <p className="text-green-600 font-semibold text-sm mb-1">
-                Real-time GPS. AI diagnostics.
+              <p className="text-purple-600 font-semibold text-sm mb-1">
+                Verified workshops near you.
               </p>
               <p className="text-gray-500 text-sm mb-5">
-                India's most advanced IoT tracking & fleet management platform built for electric vehicles.
+                Locate trusted EV repair, diagnostics, and battery service support across major cities.
               </p>
-              <CheckBadge text="Plans starting at ₹4,999/yr" colorClass="bg-green-100 text-green-700" />
+              <CheckBadge text="Pan-India support network" colorClass="bg-purple-50 text-purple-700" />
             </div>
-            <div className="flex items-end justify-between mt-6">
+            <div className="mt-6">
               <img
-                src={mockupImg}
-                alt="EV Telematics App"
-                className="w-44 sm:w-52 object-contain drop-shadow-xl -mb-2"
+                src={mgzsevImg}
+                alt="Find EV Service Centres"
+                className="w-52 sm:w-60 object-cover rounded-xl drop-shadow-xl mx-auto"
               />
-              <ArrowButton onClick={e => { e.stopPropagation(); goTo('/buy-plans'); }} />
+              <div className="flex justify-end mt-4">
+                <ArrowButton onClick={e => { e.stopPropagation(); goTo('/service-centres'); }} />
+              </div>
             </div>
           </div>
 
@@ -107,27 +109,27 @@ const ServicesShowcase: React.FC = () => {
 
               {/* Find EV Service Centres */}
               <div
-                onClick={() => goTo('/service-centres')}
+                onClick={() => goTo('/buy-plans')}
                 style={{ '--tile-delay': '0.15s' } as React.CSSProperties}
-                className="service-tile group bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl p-6 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden min-h-[200px]"
+                className="service-tile group bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-2xl p-6 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden min-h-[200px]"
               >
                 <div className="flex justify-between items-start gap-3">
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">Find EV Service Centres</h3>
-                    <p className="text-purple-600 font-semibold text-sm mb-2">Verified workshops near you.</p>
+                    <h3 className="text-xl font-bold text-gray-900 mb-1">Smart EV Telematics &amp; Fleet Plans</h3>
+                    <p className="text-green-600 font-semibold text-sm mb-2">Real-time GPS. AI diagnostics.</p>
                     <p className="text-gray-500 text-sm leading-snug">
-                      Locate trusted EV repair, diagnostics, and battery service support across major cities.
+                      India's most advanced IoT tracking & fleet management platform built for electric vehicles.
                     </p>
                   </div>
                   <img
-                    src={mgzsevImg}
-                    alt="Find EV Service Centres"
-                    className="w-28 h-20 object-cover rounded-xl flex-shrink-0"
+                    src={mockupImg}
+                    alt="EV Telematics App"
+                    className="w-28 h-20 object-contain rounded-xl flex-shrink-0 bg-white"
                   />
                 </div>
                 <div className="flex items-center justify-between mt-4">
-                  <CheckBadge text="Pan-India support network" colorClass="bg-purple-50 text-purple-700" />
-                  <ArrowButton onClick={e => { e.stopPropagation(); goTo('/service-centres'); }} />
+                  <CheckBadge text="Plans starting at ₹4,999/yr" colorClass="bg-green-100 text-green-700" />
+                  <ArrowButton onClick={e => { e.stopPropagation(); goTo('/buy-plans'); }} />
                 </div>
               </div>
             </div>
@@ -163,7 +165,7 @@ const ServicesShowcase: React.FC = () => {
 
               {/* EV Charger Franchise */}
               <div
-                onClick={() => goTo('/franchise')}
+                onClick={() => goTo('/charging-network')}
                 style={{ '--tile-delay': '0.25s' } as React.CSSProperties}
                 className="service-tile group bg-gradient-to-br from-yellow-50 to-lime-50 rounded-2xl p-5 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
               >
@@ -180,7 +182,7 @@ const ServicesShowcase: React.FC = () => {
                     alt="EV Charger"
                     className="w-24 h-16 object-cover rounded-lg"
                   />
-                  <ArrowButton onClick={e => { e.stopPropagation(); goTo('/franchise'); }} />
+                  <ArrowButton onClick={e => { e.stopPropagation(); goTo('/charging-network'); }} />
                 </div>
                 <div className="mt-3">
                   <CheckBadge text="Franchise open now" colorClass="bg-yellow-50 text-yellow-700" />

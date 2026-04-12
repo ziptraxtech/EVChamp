@@ -17,6 +17,9 @@ const Investyz: React.FC = () => {
     navigate(route);
     window.scrollTo({ top: 0, behavior: 'auto' });
   };
+  const goToInvestyzWebsite = () => {
+    window.open('https://www.investyz.com', '_blank', 'noopener,noreferrer');
+  };
 
   return (
     <div className="bg-white min-h-screen">
@@ -27,15 +30,24 @@ const Investyz: React.FC = () => {
       </Helmet>
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-        <div className="container mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center max-w-3xl">
+      <section
+        className="relative overflow-hidden text-white"
+        style={{
+          backgroundImage: "url('/investyz.png')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="absolute inset-0 bg-slate-950/55" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/60 via-slate-900/45 to-slate-900/30" />
+        <div className="relative container mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center max-w-3xl">
           <p className="text-green-400 text-sm font-semibold tracking-wider uppercase mb-3">By EVChamp</p>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">Invest in the Infrastructure of Tomorrow</h1>
           <p className="text-gray-300 text-base sm:text-lg leading-relaxed mb-6">
             INVESTYZ is a sustainable infrastructure investment platform built for the next generation of real-world assets. Through decentralized physical infrastructure on Polygon, INVESTYZ gives investors access to sectors powering the future.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <button onClick={() => goTo('/contact')} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
+            <button onClick={goToInvestyzWebsite} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
               Start Investing
             </button>
             <button onClick={() => goTo('/about')} className="border border-white/30 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/10 transition-all text-sm">
@@ -103,11 +115,19 @@ const Investyz: React.FC = () => {
       </section>
 
       {/* CTA */}
-      <section className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-        <div className="container mx-auto px-4 sm:px-6 py-14 text-center max-w-3xl">
+      <section
+        className="relative overflow-hidden text-white"
+        style={{
+          backgroundImage: "url('/investyz.png')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="absolute inset-0 bg-slate-950/60" />
+        <div className="relative container mx-auto px-4 sm:px-6 py-14 text-center max-w-3xl">
           <h2 className="text-2xl font-bold mb-4">Discover a New Way to Invest</h2>
           <p className="text-gray-300 text-sm mb-6">Explore INVESTYZ and invest in sustainable, real-world infrastructure.</p>
-          <button onClick={() => goTo('/contact')} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
+          <button onClick={goToInvestyzWebsite} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
             Get in Touch
           </button>
         </div>

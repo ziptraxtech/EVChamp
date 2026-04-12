@@ -18,6 +18,20 @@ const AboutUs: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'auto' });
   };
 
+  const goToTopServices = () => {
+    navigate('/');
+    setTimeout(() => {
+      const section = document.getElementById('top-services');
+      if (section) {
+        const rect = section.getBoundingClientRect();
+        const sectionTop = window.scrollY + rect.top;
+        const centeredTop = sectionTop - (window.innerHeight - rect.height) / 2;
+        const targetTop = Math.max(0, centeredTop - 40);
+        window.scrollTo({ top: targetTop, behavior: 'smooth' });
+      }
+    }, 100);
+  };
+
   return (
     <div className="bg-white min-h-screen">
       <Helmet>
@@ -100,7 +114,7 @@ const AboutUs: React.FC = () => {
             EVChamp serves EV owners, used EV buyers and sellers, fleet operators, businesses, charging partners, franchise partners, and sustainability-focused investors.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <button onClick={() => goTo('/buy-plans')} className="bg-gray-900 text-white font-medium px-5 py-2.5 rounded-lg hover:bg-gray-800 transition-all text-sm">
+            <button onClick={goToTopServices} className="bg-gray-900 text-white font-medium px-5 py-2.5 rounded-lg hover:bg-gray-800 transition-all text-sm">
               Explore Platform
             </button>
             <button onClick={() => goTo('/contact')} className="border border-gray-200 text-gray-700 font-medium px-5 py-2.5 rounded-lg hover:bg-gray-50 transition-all text-sm">
