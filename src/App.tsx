@@ -26,6 +26,7 @@ import ChargingNetwork from './components/ChargingNetwork';
 import Investyz from './components/Investyz';
 import ContactUs from './components/ContactUs';
 import SmarterEVAssistance from './components/SmarterEVAssistance';
+import Zeflash from './components/Zeflash';
 
 // Add this import for the banner image
 import BannerLogos from './assets/footer_banner.jpeg'; // Update the path if needed
@@ -262,6 +263,7 @@ function App() {
           <Route path="/sell-ev" element={<SellEV />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/charging-network" element={<ChargingNetwork />} />
+          <Route path="/zeflash" element={<Zeflash />} />
           <Route path="/investyz" element={<Investyz />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/ev-assistance" element={<SmarterEVAssistance />} />

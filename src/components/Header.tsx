@@ -46,7 +46,7 @@ const Header: React.FC = () => {
     { label: 'Charging Network', desc: 'Find stations across India', route: '/charging-network' },
     { label: 'Roadside Assistance', desc: 'Emergency EV support', route: '/rsa-plans' },
     { label: 'ZipBattery', desc: 'AI battery intelligence', route: '/zipbattery' },
-    { label: 'Franchise', desc: 'Partnership opportunities', route: '/franchise' },
+    { label: 'Zeflash', desc: 'Rapid AI battery diagnostics', route: '/zeflash' },
     { label: 'INVESTYZ', desc: 'Green infrastructure investment', route: '/investyz' },
   ];
 
@@ -99,10 +99,10 @@ const Header: React.FC = () => {
         {/* Desktop CTAs */}
         <div className="hidden lg:flex items-center space-x-3">
           <button
-            onClick={() => goTo('/sell-ev')}
+            onClick={() => goTo('/charging-network')}
             className="text-gray-700 font-medium px-4 py-2 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all text-sm"
           >
-            Sell Your EV
+            Charging Network
           </button>
           <button
             onClick={() => goTo('/buy-plans')}
@@ -190,8 +190,8 @@ const Header: React.FC = () => {
           <div className="px-4 py-4 space-y-1">
             {/* Primary CTAs */}
             <div className="flex gap-2 pb-3 border-b border-gray-100">
-              <button onClick={() => goTo('/sell-ev')} className="flex-1 text-center border border-gray-200 text-gray-700 font-medium px-3 py-2.5 rounded-lg text-sm hover:bg-gray-50">
-                Sell Your EV
+              <button onClick={() => goTo('/charging-network')} className="flex-1 text-center border border-gray-200 text-gray-700 font-medium px-3 py-2.5 rounded-lg text-sm hover:bg-gray-50">
+                Charging Network
               </button>
               <button onClick={() => goTo('/buy-plans')} className="flex-1 text-center bg-gray-900 text-white font-medium px-3 py-2.5 rounded-lg text-sm">
                 Get Started
