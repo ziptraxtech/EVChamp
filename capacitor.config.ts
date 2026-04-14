@@ -3,9 +3,9 @@ import { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'com.evchamp.app',
   appName: 'EVChamp',
-  webDir: 'build', // Changed back to 'build' for CRA
+  webDir: 'build',
   server: {
-    // url: 'https://evchamp.vercel.app', // Commented out for local development
+    url: 'https://evchamp.vercel.app', // Live URL — app always loads latest deployed version
     cleartext: false,
     allowNavigation: [
       'evchamp.in',
