@@ -28,8 +28,7 @@ import ContactUs from './components/ContactUs';
 import SmarterEVAssistance from './components/SmarterEVAssistance';
 import Zeflash from './components/Zeflash';
 
-// Add this import for the banner image
-import BannerLogos from './assets/footer_banner.jpeg'; // Update the path if needed
+import PartnersCarousel from './components/PartnersCarousel';
 
 function HomePage() {
   const navigate = useNavigate();
@@ -174,13 +173,9 @@ function HomePage() {
 
       {/* Partners Banner */}
       <section className="bg-white border-y border-gray-100">
-        <div className="container mx-auto px-4 sm:px-6 py-10 flex flex-col items-center">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-6">Our Partners</h2>
-          <img
-            src={BannerLogos}
-            alt="EVChamp Partner Logos"
-            className="max-w-4xl w-full rounded-xl object-contain"
-          />
+        <div className="py-10">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-8 text-center">Our Partners</h2>
+          <PartnersCarousel />
         </div>
       </section>
 
