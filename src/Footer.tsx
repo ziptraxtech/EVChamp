@@ -36,7 +36,7 @@ const Footer: React.FC = () => (
             <li><span className="font-medium text-white">ZipBolt Technologies Pvt Ltd</span></li>
             <li>MGF Metropolis Mall, MG Road,<br />Gurgaon, Haryana – 122002</li>
             <li>Phone: <a href="tel:+918368681769" className="hover:text-white transition-colors">+91 83686 81769</a></li>
-            <li>Email: <a href="mailto:contact@zipsureai.com" className="hover:text-white transition-colors">contact@zipsureai.com</a></li>
+            <li>Email: <a href="mailto:info@zipsureai.com" className="hover:text-white transition-colors">info@zipsureai.com</a></li>
           </ul>
         </div>
       </div>

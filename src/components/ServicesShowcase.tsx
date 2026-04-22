@@ -83,27 +83,27 @@ const ServicesShowcase: React.FC = () => {
 
               {/* Sell EV */}
               <div
-                onClick={() => goTo('/sell-ev')}
+                onClick={() => goTo('/zeflash')}
                 style={{ '--tile-delay': '0.10s' } as React.CSSProperties}
-                className="service-tile group bg-gradient-to-br from-blue-50 to-sky-50 rounded-2xl p-6 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden min-h-[200px]"
+                className="service-tile group bg-gradient-to-br from-sky-50 to-blue-50 rounded-2xl p-6 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden min-h-[200px]"
               >
                 <div className="flex justify-between items-start gap-3">
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">Sell Your EV</h3>
-                    <p className="text-blue-600 font-semibold text-sm mb-2">Best price. Fast &amp; verified.</p>
+                    <img src="/zeflash-logo.png" alt="Zeflash" className="h-8 w-auto mb-2 object-contain" />
+                    <p className="text-sky-600 font-semibold text-sm mb-2">Rapid AI battery diagnostics.</p>
                     <p className="text-gray-500 text-sm leading-snug">
-                      List your electric vehicle and reach thousands of genuine buyers instantly.
+                      20-minute field diagnostics with SoP, SoF, and instant health reports during charging.
                     </p>
                   </div>
                   <img
-                    src={nexonImg}
-                    alt="Sell EV"
+                    src={punchImg}
+                    alt="Zeflash"
                     className="w-28 h-20 object-cover rounded-xl flex-shrink-0"
                   />
                 </div>
                 <div className="flex items-center justify-between mt-4">
-                  <CheckBadge text="Zero commission listing" colorClass="bg-blue-50 text-blue-700" />
-                  <ArrowButton onClick={e => { e.stopPropagation(); goTo('/sell-ev'); }} />
+                  <CheckBadge text="Visit zeflash.app" colorClass="bg-sky-50 text-sky-700" />
+                  <ArrowButton onClick={e => { e.stopPropagation(); goTo('/zeflash'); }} />
                 </div>
               </div>
 
@@ -163,29 +163,29 @@ const ServicesShowcase: React.FC = () => {
                 </div>
               </div>
 
-              {/* EV Charger Franchise */}
+              {/* Sell Your EV */}
               <div
-                onClick={() => goTo('/charging-network')}
+                onClick={() => goTo('/sell-ev')}
                 style={{ '--tile-delay': '0.25s' } as React.CSSProperties}
-                className="service-tile group bg-gradient-to-br from-yellow-50 to-lime-50 rounded-2xl p-5 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
+                className="service-tile group bg-gradient-to-br from-blue-50 to-sky-50 rounded-2xl p-5 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
               >
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">EV Charger Network</h3>
-                  <p className="text-yellow-600 font-semibold text-sm mb-2">Own a charging station.</p>
+                  <h3 className="text-lg font-bold text-gray-900 mb-1">Sell Your EV</h3>
+                  <p className="text-blue-600 font-semibold text-sm mb-2">Best price. Fast &amp; verified.</p>
                   <p className="text-gray-500 text-xs leading-snug">
-                    Franchise opportunities to set up EV charging points and earn passively.
+                    List your electric vehicle and reach thousands of genuine buyers instantly.
                   </p>
                 </div>
                 <div className="flex items-end justify-between mt-4">
                   <img
-                    src={punchImg}
-                    alt="EV Charger"
+                    src={nexonImg}
+                    alt="Sell EV"
                     className="w-24 h-16 object-cover rounded-lg"
                   />
-                  <ArrowButton onClick={e => { e.stopPropagation(); goTo('/charging-network'); }} />
+                  <ArrowButton onClick={e => { e.stopPropagation(); goTo('/sell-ev'); }} />
                 </div>
                 <div className="mt-3">
-                  <CheckBadge text="Franchise open now" colorClass="bg-yellow-50 text-yellow-700" />
+                  <CheckBadge text="Zero commission listing" colorClass="bg-blue-50 text-blue-700" />
                 </div>
               </div>
 

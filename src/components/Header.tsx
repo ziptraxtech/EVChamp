@@ -44,6 +44,7 @@ const Header: React.FC = () => {
     { label: 'EV Marketplace', desc: 'Buy & sell certified EVs', route: '/buy-used-ev' },
     { label: 'IoT & Software Plans', desc: 'Hardware + analytics subscriptions', route: '/buy-plans' },
     { label: 'Charging Network', desc: 'Find stations across India', route: '/charging-network' },
+    { label: 'Find EV Service Centres', desc: 'Verified workshops near you', route: '/service-centres' },
     { label: 'Roadside Assistance', desc: 'Emergency EV support', route: '/rsa-plans' },
     { label: 'ZipBattery', desc: 'AI battery intelligence', route: '/zipbattery' },
     { label: 'Zeflash', desc: 'Rapid AI battery diagnostics', route: '/zeflash' },
