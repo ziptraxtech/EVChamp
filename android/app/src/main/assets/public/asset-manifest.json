@@ -1,16 +1,13 @@
 {
   "files": {
-    "main.css": "/static/css/main.9654a3a7.css",
-    "main.js": "/static/js/main.09f72e6f.js",
+    "main.css": "/static/css/main.96c8d88c.css",
+    "main.js": "/static/js/main.6661826b.js",
     "static/js/453.8950d877.chunk.js": "/static/js/453.8950d877.chunk.js",
     "static/media/mockuo.png": "/static/media/mockuo.eea2406289e23bde7b06.png",
     "static/media/header.jpg": "/static/media/header.c14d6fcbc601a1043cee.jpg",
-    "static/media/f24404fa.png": "/static/media/67e56e1e14be488a8ebef8537bfad7c0f24404fa.b25531dbc8c05543906a.png",
     "static/media/EVChampLogo.png": "/static/media/EVChampLogo.f2614e788d8108d5c227.png",
-    "static/media/38aba1a9.png": "/static/media/94ce24dbb3ddc2052b8cac541121ded938aba1a9.afedc7cb3d4f2f78a48f.png",
     "static/media/tigor.png": "/static/media/tigor.3c969a23983515412be5.png",
     "static/media/expresst.png": "/static/media/expresst.09975622b470010ae641.png",
-    "static/media/b7980ad6.png": "/static/media/9569dab8d8880a11d76d38aa48cddabab7980ad6.7c1ff8bcd8b56320042f.png",
     "static/media/verito.png": "/static/media/verito.571302e75759bd6f3a25.png",
     "static/media/punch-ev.jpg": "/static/media/punch-ev.678d5ad502fd954150f3.jpg",
     "static/media/tiagoev.jpg": "/static/media/tiagoev.1e7d14fb6f2806143222.jpg",
@@ -21,12 +18,12 @@
     "static/media/honda-kona-ev.jpg": "/static/media/honda-kona-ev.0f4e4d700478e261df78.jpg",
     "static/media/tata-nexon.jpg": "/static/media/tata-nexon.8636502ff9831a3fb372.jpg",
     "index.html": "/index.html",
-    "main.9654a3a7.css.map": "/static/css/main.9654a3a7.css.map",
-    "main.09f72e6f.js.map": "/static/js/main.09f72e6f.js.map",
+    "main.96c8d88c.css.map": "/static/css/main.96c8d88c.css.map",
+    "main.6661826b.js.map": "/static/js/main.6661826b.js.map",
     "453.8950d877.chunk.js.map": "/static/js/453.8950d877.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.9654a3a7.css",
-    "static/js/main.09f72e6f.js"
+    "static/css/main.96c8d88c.css",
+    "static/js/main.6661826b.js"
   ]
 }

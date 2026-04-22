@@ -65,8 +65,8 @@ function HomePage() {
         className="relative overflow-hidden text-white"
         style={{
           backgroundImage: "url('/bg-hero.png')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundSize: '110%',
+          backgroundPosition: 'center 30%',
         }}
       >
         <div className="absolute inset-0 bg-white/10" />
