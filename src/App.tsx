@@ -29,6 +29,7 @@ import SmarterEVAssistance from './components/SmarterEVAssistance';
 import Zeflash from './components/Zeflash';
 
 import PartnersCarousel from './components/PartnersCarousel';
+import { useSyncUserToDB } from './hooks/useSyncUserToDB';
 
 function HomePage() {
   const navigate = useNavigate();
@@ -65,8 +66,8 @@ function HomePage() {
         className="relative overflow-hidden text-white"
         style={{
           backgroundImage: "url('/bg-hero.png')",
-          backgroundSize: '110%',
-          backgroundPosition: 'center 30%',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 20%',
         }}
       >
         <div className="absolute inset-0 bg-white/10" />
@@ -248,6 +249,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  useSyncUserToDB();
   return (
     <Router>
       <div>
