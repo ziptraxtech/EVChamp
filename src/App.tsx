@@ -29,7 +29,7 @@ import SmarterEVAssistance from './components/SmarterEVAssistance';
 import Zeflash from './components/Zeflash';
 
 import PartnersCarousel from './components/PartnersCarousel';
-import { useSyncUserToDB } from './hooks/useSyncUserToDB';
+import { QRCodeSVG } from 'qrcode.react';
 
 function HomePage() {
   const navigate = useNavigate();
@@ -96,32 +96,44 @@ function HomePage() {
         </div>
       </section>
 
+      {/* Why EVChamp — compact value prop */}
+      <section className="bg-gray-50 border-b border-gray-100">
+        <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 max-w-4xl text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Why EVChamp</h2>
+          <p className="text-gray-600 text-base leading-relaxed">
+            Battery health, maintenance, charging access, fleet uptime, resale value, and infrastructure investment all matter. EVChamp uses AI and IoT to simplify operations, improve transparency, and create better outcomes for individuals and businesses alike.
+          </p>
+        </div>
+      </section>
+
       {/* Get the EVChamp App */}
       <section className="bg-white border-b border-gray-100">
         <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 max-w-5xl">
           <p className="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-2">Mobile App</p>
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Get the EVChamp app</h2>
-          <p className="text-gray-500 text-sm mb-8">Scan the QR code to visit our website. Play Store &amp; APK rollout coming soon.</p>
+          <p className="text-gray-500 text-sm mb-8">Download the Android APK now. Play Store rollout is on the way.</p>
 
           <div className="flex flex-col sm:flex-row gap-8 items-start">
-            {/* QR Code — custom image */}
+            {/* QR Code */}
             <div className="flex-shrink-0 bg-gray-50 border border-gray-200 rounded-2xl p-5 flex flex-col items-center gap-3">
-              <span className="text-xs font-semibold bg-blue-600 text-white px-3 py-1 rounded-full">Scan to Visit</span>
-              <img
-                src="/evchamp-qr.jpg"
-                alt="Scan to visit EVChamp website"
-                className="w-44 h-44 object-contain rounded-xl"
+              <span className="text-xs font-semibold bg-blue-600 text-white px-3 py-1 rounded-full">Quick Access</span>
+              <QRCodeSVG
+                value="https://evchamp.in/EVChamp-v1.3-release.apk"
+                size={180}
+                bgColor="#ffffff"
+                fgColor="#111827"
+                level="M"
               />
             </div>
 
             {/* Right side */}
             <div className="flex-1">
-              <h3 className="text-xl font-bold text-gray-900 mb-1">Scan to Open EVChamp</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-1">Scan to Download Instantly</h3>
               <p className="text-gray-500 text-sm mb-5">
-                Point your phone's camera at the QR code to instantly open the EVChamp website. App Store &amp; direct APK downloads are coming soon!
+                Simply point your phone's camera at the QR code to download and install the EVChamp app in seconds. No app store required!
               </p>
 
-              {/* Buttons — both disabled / coming soon */}
+              {/* Buttons */}
               <div className="flex flex-wrap gap-3 mb-4">
                 <button
                   disabled
@@ -132,24 +144,25 @@ function HomePage() {
                   </svg>
                   Play Store (Coming soon)
                 </button>
-                <button
-                  disabled
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-400 text-sm font-medium cursor-not-allowed bg-gray-50"
+                <a
+                  href="https://evchamp.in/EVChamp-v1.3-release.apk"
+                  download
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-all shadow-sm"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
                   </svg>
-                  Download APK (Coming soon)
-                </button>
+                  Download APK
+                </a>
               </div>
-              <p className="text-xs text-gray-400 mb-6">Both store &amp; APK options will be enabled once available.</p>
+              <p className="text-xs text-gray-400 mb-6">Direct APK download for Android. Enable installs from your browser if prompted.</p>
 
               {/* Feature bullets */}
               <ul className="space-y-3">
                 {[
-                  { title: 'Instant Access', desc: 'Scan once and open the platform right in your browser' },
-                  { title: 'Works on All Devices', desc: 'Compatible with any Android or iOS phone camera' },
-                  { title: 'Always Up-to-Date', desc: 'Website always reflects the latest EVChamp features' },
+                  { title: 'Fast & Easy Installation', desc: 'Direct download, no registration needed' },
+                  { title: 'Works on All Android Devices', desc: 'Compatible with Android 6.0 and above' },
+                  { title: 'Latest Release Version', desc: 'Always up-to-date with newest features' },
                 ].map((f) => (
                   <li key={f.title} className="flex items-start gap-3">
                     <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
@@ -310,7 +323,6 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
-  useSyncUserToDB();
   return (
     <Router>
       <div className="overflow-x-hidden">

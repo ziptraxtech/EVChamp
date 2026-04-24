@@ -1,11 +1,11 @@
 {
-  "buildCommand": "CI=false GENERATE_SOURCEMAP=false npm run build",
+  "buildCommand": "CI=false npm run build",
   "outputDirectory": "build",
   "framework": "create-react-app",
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "/api/index.js"
+      "destination": "http://100.24.9.16:5000/api/:path*"
     },
     {
       "source": "/(.*)",
