@@ -28,7 +28,7 @@ const RefundPolicy: React.FC = () => (
       <li>
         <strong>How to Request</strong>
         <ul className="list-disc pl-6">
-          <li>To request a refund or cancellation, contact support at <a href="mailto:recocycledb@gmail.com" className="text-green-700 underline">recocycledb@gmail.com</a> with your order or subscription ID.</li>
+          <li>To request a refund or cancellation, contact support at <a href="mailto:hello@zip-bolt.com" className="text-green-700 underline">hello@zip-bolt.com</a> with your order or subscription ID.</li>
         </ul>
       </li>
     </ol>

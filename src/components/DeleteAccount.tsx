@@ -119,8 +119,8 @@ const DeleteAccount: React.FC = () => {
             ) : (
               <>Please contact us at </>
             )}
-            <a href="mailto:recocycledb@gmail.com" className="text-green-600 underline">
-              recocycledb@gmail.com
+            <a href="mailto:hello@zip-bolt.com" className="text-green-600 underline">
+              hello@zip-bolt.com
             </a>
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -191,8 +191,8 @@ const DeleteAccount: React.FC = () => {
 
               <p className="text-gray-600 text-sm mb-6">
                 If you'd prefer, you can contact us at{' '}
-                <a href="mailto:recocycledb@gmail.com" className="text-green-600 underline">
-                  recocycledb@gmail.com
+                <a href="mailto:hello@zip-bolt.com" className="text-green-600 underline">
+                  hello@zip-bolt.com
                 </a>{' '}
                 to resolve any issues before deleting.
               </p>
@@ -269,8 +269,8 @@ const DeleteAccount: React.FC = () => {
           <div className="bg-gray-50 px-8 py-4 border-t border-gray-100">
             <p className="text-xs text-gray-500 text-center">
               Need help? Contact{' '}
-              <a href="mailto:recocycledb@gmail.com" className="text-green-600 underline">
-                recocycledb@gmail.com
+              <a href="mailto:hello@zip-bolt.com" className="text-green-600 underline">
+                hello@zip-bolt.com
               </a>
             </p>
           </div>

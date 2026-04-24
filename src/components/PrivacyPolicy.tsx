@@ -47,7 +47,7 @@ const PrivacyPolicy: React.FC = () => (
       <li>
         <strong>Contact Us</strong><br />
         If you have any questions or concerns about this Privacy Policy, please contact us at:<br />
-        <a href="mailto:recocycledb@gmail.com" className="text-green-700 underline">recocycledb@gmail.com</a><br />
+        <a href="mailto:hello@zip-bolt.com" className="text-green-700 underline">hello@zip-bolt.com</a><br />
         ZipBolt Technologies Pvt Ltd, MGF Metropolis Mall, MG Road, Gurgaon, Haryana – 122002
       </li>
     </ol>

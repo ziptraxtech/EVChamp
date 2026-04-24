@@ -117,8 +117,8 @@ const PaymentSuccess: React.FC = () => {
           <div className="mt-8 pt-6 border-t border-gray-200">
             <p className="text-sm text-gray-600">
               Need help? Contact us at{' '}
-              <a href="mailto:recocycledb@gmail.com" className="text-green-600 hover:text-green-700 font-medium">
-                recocycledb@gmail.com
+              <a href="mailto:hello@zip-bolt.com" className="text-green-600 hover:text-green-700 font-medium">
+                hello@zip-bolt.com
               </a>
             </p>
           </div>
