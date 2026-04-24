@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { initDB, saveAudit, getAuditBySerial, getAuditById, getAllAudits, updateCertificate } = require('./db');
+const { initDB, saveAudit, getAuditBySerial, getAuditById, getAllAudits, updateCertificate, upsertUser } = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -11,6 +11,21 @@ app.use(express.json());
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Clerk user sync endpoint
+app.post('/api/users/sync', async (req, res) => {
+  try {
+    const { clerkId, email, firstName, lastName, imageUrl } = req.body;
+    if (!clerkId) {
+      return res.status(400).json({ error: 'clerkId is required' });
+    }
+    const user = await upsertUser({ clerkId, email, firstName, lastName, imageUrl });
+    res.json({ success: true, user });
+  } catch (err) {
+    console.error('❌ User sync failed:', err.message);
+    res.status(500).json({ error: 'Failed to sync user' });
+  }
 });
 
 // In-memory store for batteries (replace with a real DB in production)

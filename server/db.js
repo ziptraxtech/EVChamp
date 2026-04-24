@@ -51,11 +51,45 @@ async function initDB() {
     `;
 
     console.log('✅ Neon DB: cell_audits table ready');
+
+    // Users table for Clerk sign-in sync
+    await sql`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        clerk_id TEXT UNIQUE NOT NULL,
+        email TEXT,
+        first_name TEXT,
+        last_name TEXT,
+        image_url TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        last_sign_in_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_users_clerk_id ON users(clerk_id)
+    `;
+    console.log('✅ Neon DB: users table ready');
+
     return true;
   } catch (err) {
     console.error('❌ Neon DB init failed:', err.message);
     return false;
   }
+}
+
+async function upsertUser({ clerkId, email, firstName, lastName, imageUrl }) {
+  const result = await sql`
+    INSERT INTO users (clerk_id, email, first_name, last_name, image_url, last_sign_in_at)
+    VALUES (${clerkId}, ${email}, ${firstName}, ${lastName}, ${imageUrl}, NOW())
+    ON CONFLICT (clerk_id) DO UPDATE SET
+      email = EXCLUDED.email,
+      first_name = EXCLUDED.first_name,
+      last_name = EXCLUDED.last_name,
+      image_url = EXCLUDED.image_url,
+      last_sign_in_at = NOW()
+    RETURNING *
+  `;
+  return result[0];
 }
 
 async function saveAudit(auditData) {
@@ -129,4 +163,4 @@ async function updateCertificate(auditId, certificateNumber) {
   return result[0] || null;
 }
 
-module.exports = { sql, initDB, saveAudit, getAuditBySerial, getAuditById, getAllAudits, updateCertificate };
+module.exports = { sql, initDB, saveAudit, getAuditBySerial, getAuditById, getAllAudits, updateCertificate, upsertUser };

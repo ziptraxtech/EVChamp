@@ -67,6 +67,21 @@ async function initDB() {
     await getSQL()`CREATE INDEX IF NOT EXISTS idx_cell_audits_serial ON cell_audits(serial_number)`;
     await getSQL()`CREATE INDEX IF NOT EXISTS idx_cell_audits_qr ON cell_audits(qr_raw)`;
     await getSQL()`CREATE INDEX IF NOT EXISTS idx_cell_audits_audit_id ON cell_audits(audit_id)`;
+
+    await getSQL()`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        clerk_id TEXT UNIQUE NOT NULL,
+        email TEXT,
+        first_name TEXT,
+        last_name TEXT,
+        image_url TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        last_sign_in_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `;
+    await getSQL()`CREATE INDEX IF NOT EXISTS idx_users_clerk_id ON users(clerk_id)`;
+
     dbReady = true;
     return true;
   } catch (err) {
@@ -897,6 +912,29 @@ app.patch('/api/audits/:auditId/certificate', async (req, res) => {
   } catch (err) {
     console.error('Update certificate error:', err.message);
     res.status(500).json({ success: false, message: 'Failed to update certificate' });
+  }
+});
+
+// Clerk user sync
+app.post('/api/users/sync', async (req, res) => {
+  try {
+    const { clerkId, email, firstName, lastName, imageUrl } = req.body;
+    if (!clerkId) return res.status(400).json({ error: 'clerkId is required' });
+    const result = await getSQL()`
+      INSERT INTO users (clerk_id, email, first_name, last_name, image_url, last_sign_in_at)
+      VALUES (${clerkId}, ${email}, ${firstName}, ${lastName}, ${imageUrl}, NOW())
+      ON CONFLICT (clerk_id) DO UPDATE SET
+        email = EXCLUDED.email,
+        first_name = EXCLUDED.first_name,
+        last_name = EXCLUDED.last_name,
+        image_url = EXCLUDED.image_url,
+        last_sign_in_at = NOW()
+      RETURNING *
+    `;
+    res.json({ success: true, user: result[0] });
+  } catch (err) {
+    console.error('User sync error:', err.message);
+    res.status(500).json({ error: 'Failed to sync user' });
   }
 });
 

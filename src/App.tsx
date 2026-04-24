@@ -29,6 +29,7 @@ import SmarterEVAssistance from './components/SmarterEVAssistance';
 import Zeflash from './components/Zeflash';
 
 import PartnersCarousel from './components/PartnersCarousel';
+import { useSyncUserToDB } from './hooks/useSyncUserToDB';
 
 function HomePage() {
   const navigate = useNavigate();
@@ -309,6 +310,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  useSyncUserToDB();
   return (
     <Router>
       <div className="overflow-x-hidden">
