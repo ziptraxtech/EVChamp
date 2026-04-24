@@ -49,7 +49,7 @@ const ServicesShowcase: React.FC = () => {
           <div
             onClick={() => goTo('/service-centres')}
             style={{ '--tile-delay': '0.05s' } as React.CSSProperties}
-            className="service-tile group lg:w-[32%] bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl p-7 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 min-h-[420px] overflow-hidden"
+            className="service-tile group lg:w-[32%] bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl p-5 sm:p-7 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 min-h-[320px] sm:min-h-[420px] overflow-hidden"
           >
             <div>
               <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight mb-2">
@@ -85,7 +85,7 @@ const ServicesShowcase: React.FC = () => {
               <div
                 onClick={() => goTo('/zeflash')}
                 style={{ '--tile-delay': '0.10s' } as React.CSSProperties}
-                className="service-tile group bg-gradient-to-br from-sky-50 to-blue-50 rounded-2xl p-6 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden min-h-[200px]"
+                className="service-tile group bg-gradient-to-br from-sky-50 to-blue-50 rounded-2xl p-5 sm:p-6 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden min-h-[180px] sm:min-h-[200px]"
               >
                 <div className="flex justify-between items-start gap-3">
                   <div className="flex-1">
@@ -111,7 +111,7 @@ const ServicesShowcase: React.FC = () => {
               <div
                 onClick={() => goTo('/buy-plans')}
                 style={{ '--tile-delay': '0.15s' } as React.CSSProperties}
-                className="service-tile group bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-2xl p-6 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden min-h-[200px]"
+                className="service-tile group bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-2xl p-5 sm:p-6 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden min-h-[180px] sm:min-h-[200px]"
               >
                 <div className="flex justify-between items-start gap-3">
                   <div className="flex-1">

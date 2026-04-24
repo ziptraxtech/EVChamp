@@ -211,7 +211,7 @@ const BuyPlans: React.FC = () => {
       </div>
     {/* Hero Section */}
       <section className="py-10 sm:py-12 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-        <div className="container mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-stretch justify-between gap-10">
+        <div className="container mx-auto px-4 sm:px-6 flex flex-col lg:flex-row items-stretch justify-between gap-8 sm:gap-10">
           {/* Text Section */}
           <div className="flex-1 max-w-xl flex flex-col justify-center text-center md:text-left">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">

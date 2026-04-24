@@ -52,12 +52,12 @@ const Header: React.FC = () => {
   ];
 
   return (
-    <header className="bg-white/95 backdrop-blur-lg sticky top-0 z-50 border-b border-gray-100">
-      <div className="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+    <header className="bg-white/95 backdrop-blur-lg sticky top-0 z-50 border-b border-gray-100 w-full max-w-[100vw]">
+      <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-3 flex justify-between items-center min-w-0">
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-2 cursor-pointer">
           <img src={EVChampLogo} alt="EVChamp Logo" className="h-7 w-7 sm:h-8 sm:w-8" />
-          <span className="text-xl sm:text-2xl font-bold font-serif text-gray-900">EVChamp</span>
+          <span className="text-lg sm:text-2xl font-bold font-serif text-gray-900 truncate">EVChamp</span>
         </Link>
 
         {/* Desktop Navigation */}

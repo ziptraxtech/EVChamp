@@ -68,7 +68,7 @@ const BuyUsedEV: React.FC = () => {
       <div className="static sm:absolute sm:top-24 sm:left-6 z-10 px-4 sm:px-0 pt-4 sm:pt-0">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center space-x-2 text-white px-4 py-2 rounded-lg hover:bg-white/10 transition-all text-sm"
+          className="flex items-center space-x-2 text-gray-700 bg-white/80 border border-gray-200 px-4 py-2 rounded-lg hover:bg-white transition-all text-sm shadow-sm"
         >
           <BackArrow className="text-lg" />
           <span className="font-semibold">Back</span>

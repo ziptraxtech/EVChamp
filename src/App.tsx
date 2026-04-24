@@ -53,7 +53,7 @@ function HomePage() {
   };
 
   return (
-    <div className="home-page bg-white min-h-screen w-full">
+    <div className="home-page bg-white min-h-screen w-full overflow-x-hidden">
       <Helmet>
         <title>EVChamp | AI &amp; IoT-Driven EV Fleet Management Platform in India</title>
         <meta name="description" content="EVChamp is an AI & IoT-driven EV ecosystem for fleet management, certified pre-owned EVs, battery diagnostics, charging stations, roadside assistance, franchise partnerships, and green infrastructure investment." />
@@ -65,7 +65,7 @@ function HomePage() {
         className="relative overflow-hidden text-white"
         style={{
           backgroundImage: "url('/bg-hero.png')",
-          backgroundSize: '110%',
+          backgroundSize: 'cover',
           backgroundPosition: 'center 30%',
         }}
       >
@@ -95,13 +95,74 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Why EVChamp — compact value prop */}
-      <section className="bg-gray-50 border-b border-gray-100">
-        <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 max-w-4xl text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Why EVChamp</h2>
-          <p className="text-gray-600 text-base leading-relaxed">
-            Battery health, maintenance, charging access, fleet uptime, resale value, and infrastructure investment all matter. EVChamp uses AI and IoT to simplify operations, improve transparency, and create better outcomes for individuals and businesses alike.
-          </p>
+      {/* Get the EVChamp App */}
+      <section className="bg-white border-b border-gray-100">
+        <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 max-w-5xl">
+          <p className="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-2">Mobile App</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Get the EVChamp app</h2>
+          <p className="text-gray-500 text-sm mb-8">Scan the QR code to visit our website. Play Store &amp; APK rollout coming soon.</p>
+
+          <div className="flex flex-col sm:flex-row gap-8 items-start">
+            {/* QR Code — custom image */}
+            <div className="flex-shrink-0 bg-gray-50 border border-gray-200 rounded-2xl p-5 flex flex-col items-center gap-3">
+              <span className="text-xs font-semibold bg-blue-600 text-white px-3 py-1 rounded-full">Scan to Visit</span>
+              <img
+                src="/evchamp-qr.jpg"
+                alt="Scan to visit EVChamp website"
+                className="w-44 h-44 object-contain rounded-xl"
+              />
+            </div>
+
+            {/* Right side */}
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-gray-900 mb-1">Scan to Open EVChamp</h3>
+              <p className="text-gray-500 text-sm mb-5">
+                Point your phone's camera at the QR code to instantly open the EVChamp website. App Store &amp; direct APK downloads are coming soon!
+              </p>
+
+              {/* Buttons — both disabled / coming soon */}
+              <div className="flex flex-wrap gap-3 mb-4">
+                <button
+                  disabled
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-400 text-sm font-medium cursor-not-allowed bg-gray-50"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3.18 23.76A1.52 1.52 0 0 1 2 22.3V1.7A1.52 1.52 0 0 1 3.18.24L13.8 11 3.18 23.76Zm11.67-8.05-2.55-2.71 2.57-2.57 3.04 1.7a1.52 1.52 0 0 1 0 2.64l-3.06 .94ZM4.37 24l9.33-9.33 2.12 2.26L5.16 24.5A1.52 1.52 0 0 1 4.37 24Zm0-24a1.52 1.52 0 0 1 .79.5l10.66 7.07-2.12 2.26L4.37 0Z"/>
+                  </svg>
+                  Play Store (Coming soon)
+                </button>
+                <button
+                  disabled
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-400 text-sm font-medium cursor-not-allowed bg-gray-50"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+                  </svg>
+                  Download APK (Coming soon)
+                </button>
+              </div>
+              <p className="text-xs text-gray-400 mb-6">Both store &amp; APK options will be enabled once available.</p>
+
+              {/* Feature bullets */}
+              <ul className="space-y-3">
+                {[
+                  { title: 'Instant Access', desc: 'Scan once and open the platform right in your browser' },
+                  { title: 'Works on All Devices', desc: 'Compatible with any Android or iOS phone camera' },
+                  { title: 'Always Up-to-Date', desc: 'Website always reflects the latest EVChamp features' },
+                ].map((f) => (
+                  <li key={f.title} className="flex items-start gap-3">
+                    <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-800">{f.title}</p>
+                      <p className="text-xs text-gray-500">{f.desc}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -250,7 +311,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function App() {
   return (
     <Router>
-      <div>
+      <div className="overflow-x-hidden">
         <Header />
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -308,10 +369,11 @@ function App() {
           href="https://wa.me/918368681769?text=Hi%2C%20I%20would%20like%20to%20request%20services."
           target="_blank"
           rel="noopener noreferrer"
-          className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+          className="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-50 flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-green-500 hover:bg-green-600 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+          style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)', marginRight: 'env(safe-area-inset-right, 0px)' }}
           aria-label="Chat on WhatsApp"
         >
-          <svg viewBox="0 0 32 32" className="w-8 h-8 fill-white">
+          <svg viewBox="0 0 32 32" className="w-6 h-6 sm:w-8 sm:h-8 fill-white">
             <path d="M16 0C7.164 0 0 7.163 0 16c0 2.822.737 5.469 2.027 7.77L0 32l8.437-2.01A15.938 15.938 0 0 0 16 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.333a13.27 13.27 0 0 1-6.77-1.853l-.485-.287-5.007 1.194 1.234-4.874-.316-.5A13.226 13.226 0 0 1 2.667 16C2.667 8.636 8.636 2.667 16 2.667S29.333 8.636 29.333 16 23.364 29.333 16 29.333zm7.27-9.878c-.398-.199-2.355-1.162-2.72-1.295-.365-.133-.631-.199-.897.199-.266.398-1.03 1.295-1.262 1.561-.232.266-.465.299-.863.1-.398-.199-1.681-.619-3.201-1.977-1.183-1.057-1.982-2.362-2.214-2.76-.232-.398-.025-.613.174-.811.179-.178.398-.465.597-.698.199-.232.266-.398.398-.664.133-.266.066-.498-.033-.697-.1-.199-.897-2.162-1.229-2.96-.324-.776-.652-.671-.897-.683l-.764-.013c-.266 0-.698.1-1.063.498-.365.398-1.395 1.362-1.395 3.325s1.428 3.857 1.627 4.123c.199.266 2.81 4.29 6.808 6.018.951.411 1.693.656 2.272.84.954.304 1.823.261 2.51.158.765-.114 2.355-.962 2.688-1.892.332-.93.332-1.727.232-1.892-.099-.166-.365-.266-.763-.465z" />
           </svg>
         </a>
