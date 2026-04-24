@@ -97,65 +97,65 @@ function HomePage() {
 
       {/* Get the EVChamp App */}
       <section className="bg-white border-b border-gray-100">
-        <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 max-w-5xl">
-          <p className="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-2">Mobile App</p>
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Get the EVChamp app</h2>
-          <p className="text-gray-500 text-sm mb-8">Scan the QR code to visit our website. Play Store &amp; APK rollout coming soon.</p>
+        <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-5xl">
+          <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">Mobile App</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">Get the EVChamp app</h2>
+          <p className="text-gray-500 text-xs mb-5">Scan the QR code to visit our website. Play Store &amp; APK rollout coming soon.</p>
 
-          <div className="flex flex-col sm:flex-row gap-8 items-start">
+          <div className="flex flex-col sm:flex-row gap-5 items-center">
             {/* QR Code — custom image */}
-            <div className="flex-shrink-0 bg-gray-50 border border-gray-200 rounded-2xl p-5 flex flex-col items-center gap-3">
-              <span className="text-xs font-semibold bg-blue-600 text-white px-3 py-1 rounded-full">Scan to Visit</span>
+            <div className="flex-shrink-0 bg-gray-50 border border-gray-200 rounded-xl p-3 flex flex-col items-center gap-2">
+              <span className="text-xs font-semibold bg-blue-600 text-white px-2.5 py-0.5 rounded-full">Scan to Visit</span>
               <img
                 src="/evchamp-qr.jpg"
                 alt="Scan to visit EVChamp website"
-                className="w-44 h-44 object-contain rounded-xl"
+                className="w-28 h-28 object-contain rounded-lg"
               />
             </div>
 
             {/* Right side */}
             <div className="flex-1">
-              <h3 className="text-xl font-bold text-gray-900 mb-1">Scan to Open EVChamp</h3>
-              <p className="text-gray-500 text-sm mb-5">
+              <h3 className="text-base font-bold text-gray-900 mb-1">Scan to Open EVChamp</h3>
+              <p className="text-gray-500 text-xs mb-3">
                 Point your phone's camera at the QR code to instantly open the EVChamp website. App Store &amp; direct APK downloads are coming soon!
               </p>
 
               {/* Buttons — both disabled / coming soon */}
-              <div className="flex flex-wrap gap-3 mb-4">
+              <div className="flex flex-wrap gap-2 mb-2">
                 <button
                   disabled
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-400 text-sm font-medium cursor-not-allowed bg-gray-50"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-gray-400 text-xs font-medium cursor-not-allowed bg-gray-50"
                 >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M3.18 23.76A1.52 1.52 0 0 1 2 22.3V1.7A1.52 1.52 0 0 1 3.18.24L13.8 11 3.18 23.76Zm11.67-8.05-2.55-2.71 2.57-2.57 3.04 1.7a1.52 1.52 0 0 1 0 2.64l-3.06 .94ZM4.37 24l9.33-9.33 2.12 2.26L5.16 24.5A1.52 1.52 0 0 1 4.37 24Zm0-24a1.52 1.52 0 0 1 .79.5l10.66 7.07-2.12 2.26L4.37 0Z"/>
                   </svg>
                   Play Store (Coming soon)
                 </button>
                 <button
                   disabled
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-400 text-sm font-medium cursor-not-allowed bg-gray-50"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-gray-400 text-xs font-medium cursor-not-allowed bg-gray-50"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
                   </svg>
                   Download APK (Coming soon)
                 </button>
               </div>
-              <p className="text-xs text-gray-400 mb-6">Both store &amp; APK options will be enabled once available.</p>
+              <p className="text-xs text-gray-400 mb-3">Both store &amp; APK options will be enabled once available.</p>
 
               {/* Feature bullets */}
-              <ul className="space-y-3">
+              <ul className="space-y-1.5">
                 {[
                   { title: 'Instant Access', desc: 'Scan once and open the platform right in your browser' },
                   { title: 'Works on All Devices', desc: 'Compatible with any Android or iOS phone camera' },
                   { title: 'Always Up-to-Date', desc: 'Website always reflects the latest EVChamp features' },
                 ].map((f) => (
-                  <li key={f.title} className="flex items-start gap-3">
-                    <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                  <li key={f.title} className="flex items-start gap-2">
+                    <svg className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <div>
-                      <p className="text-sm font-semibold text-gray-800">{f.title}</p>
+                      <p className="text-xs font-semibold text-gray-800">{f.title}</p>
                       <p className="text-xs text-gray-500">{f.desc}</p>
                     </div>
                   </li>
