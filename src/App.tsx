@@ -100,7 +100,7 @@ function HomePage() {
         <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-5xl">
           <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">Mobile App</p>
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">Get the EVChamp app</h2>
-          <p className="text-gray-500 text-xs mb-5">Scan the QR code to visit our website. Play Store &amp; APK rollout coming soon.</p>
+          <p className="text-gray-500 text-xs mb-5">Scan the QR code or click the button below to download the EVChamp app on Play Store.</p>
 
           <div className="flex flex-col sm:flex-row gap-5 items-center">
             {/* QR Code — custom image */}
@@ -120,28 +120,21 @@ function HomePage() {
                 Point your phone's camera at the QR code to instantly open the EVChamp website. App Store &amp; direct APK downloads are coming soon!
               </p>
 
-              {/* Buttons — both disabled / coming soon */}
+              {/* Buttons */}
               <div className="flex flex-wrap gap-2 mb-2">
-                <button
-                  disabled
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-gray-400 text-xs font-medium cursor-not-allowed bg-gray-50"
+                <a
+                  href="https://play.google.com/apps/internaltest/4701215861025087123"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-green-500 text-green-700 text-xs font-medium bg-green-50 hover:bg-green-100 transition-colors"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M3.18 23.76A1.52 1.52 0 0 1 2 22.3V1.7A1.52 1.52 0 0 1 3.18.24L13.8 11 3.18 23.76Zm11.67-8.05-2.55-2.71 2.57-2.57 3.04 1.7a1.52 1.52 0 0 1 0 2.64l-3.06 .94ZM4.37 24l9.33-9.33 2.12 2.26L5.16 24.5A1.52 1.52 0 0 1 4.37 24Zm0-24a1.52 1.52 0 0 1 .79.5l10.66 7.07-2.12 2.26L4.37 0Z"/>
                   </svg>
-                  Play Store (Coming soon)
-                </button>
-                <button
-                  disabled
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-gray-400 text-xs font-medium cursor-not-allowed bg-gray-50"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
-                  </svg>
-                  Download APK (Coming soon)
-                </button>
+                  Download on Play Store
+                </a>
               </div>
-              <p className="text-xs text-gray-400 mb-3">Both store &amp; APK options will be enabled once available.</p>
+              <p className="text-xs text-gray-400 mb-3">Download the EVChamp app via Google Play internal test.</p>
 
               {/* Feature bullets */}
               <ul className="space-y-1.5">
@@ -162,32 +155,6 @@ function HomePage() {
                 ))}
               </ul>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* What EVChamp Offers — button grid instead of long scroll */}
-      <section className="bg-white">
-        <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10">What EVChamp Offers</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
-            {[
-              { icon: '🚗', label: 'EV Marketplace', desc: 'Certified pre-owned EV buying and selling' },
-              { icon: '🔋', label: 'Battery Diagnostics', desc: 'Complete battery health and vehicle insights' },
-              { icon: '📊', label: 'Software Plans', desc: 'Monitoring and optimization subscriptions' },
-              { icon: '🛣️', label: 'Roadside Assistance', desc: 'Emergency EV support across India' },
-              { icon: '⚡', label: 'Charging Network', desc: 'Station access across India' },
-              { icon: '📈', label: 'INVESTYZ', desc: 'Green infrastructure investment' },
-            ].map((item) => (
-              <div
-                key={item.label}
-                className="text-left p-5 rounded-xl border border-gray-100 bg-white cursor-default select-none"
-              >
-                <span className="text-4xl mb-3 block">{item.icon}</span>
-                <h3 className="text-sm font-bold text-gray-900 mb-1">{item.label}</h3>
-                <p className="text-xs text-gray-500 leading-snug">{item.desc}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>
@@ -298,7 +265,17 @@ function UserSettingsPage() {
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-gray-500 text-sm">Loading...</p>
+        </div>
+      </div>
+    );
+  }
   if (!isSignedIn) {
     return <RedirectToSignIn />;
   }
@@ -332,7 +309,11 @@ function App() {
           <Route path="/franchise" element={<Franchise />} />
           <Route path="/sell-ev" element={<SellEV />} />
           <Route path="/about" element={<AboutUs />} />
-          <Route path="/charging-network" element={<ChargingNetwork />} />
+          <Route path="/charging-network" element={
+            <ProtectedRoute>
+              <ChargingNetwork />
+            </ProtectedRoute>
+          } />
           <Route path="/zeflash" element={<Zeflash />} />
           <Route path="/investyz" element={<Investyz />} />
           <Route path="/contact" element={<ContactUs />} />
@@ -348,7 +329,11 @@ function App() {
               <BuyUsedEV />
             </ProtectedRoute>
           } />
-          <Route path="/service-centres" element={<ServiceCentres />} />
+          <Route path="/service-centres" element={
+            <ProtectedRoute>
+              <ServiceCentres />
+            </ProtectedRoute>
+          } />
           <Route path="/delete-account" element={
             <ProtectedRoute>
               <DeleteAccount />
