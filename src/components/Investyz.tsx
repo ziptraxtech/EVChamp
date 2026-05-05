@@ -17,6 +17,9 @@ const Investyz: React.FC = () => {
     navigate(route);
     window.scrollTo({ top: 0, behavior: 'auto' });
   };
+  const goToContact = () => {
+    window.location.href = '/contact';
+  };
   const goToInvestyzWebsite = () => {
     window.open('https://www.investyz.com', '_blank', 'noopener,noreferrer');
   };
@@ -47,7 +50,7 @@ const Investyz: React.FC = () => {
             INVESTYZ is a sustainable infrastructure investment platform built for the next generation of real-world assets. Through decentralized physical infrastructure on Polygon, INVESTYZ gives investors access to sectors powering the future.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <button onClick={goToInvestyzWebsite} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
+            <button onClick={goToContact} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
               Start Investing
             </button>
             <button onClick={() => goTo('/about')} className="border border-white/30 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/10 transition-all text-sm">
@@ -127,7 +130,7 @@ const Investyz: React.FC = () => {
         <div className="relative container mx-auto px-4 sm:px-6 py-14 text-center max-w-3xl">
           <h2 className="text-2xl font-bold mb-4">Discover a New Way to Invest</h2>
           <p className="text-gray-300 text-sm mb-6">Explore INVESTYZ and invest in sustainable, real-world infrastructure.</p>
-          <button onClick={goToInvestyzWebsite} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
+          <button onClick={goToContact} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
             Get in Touch
           </button>
         </div>
