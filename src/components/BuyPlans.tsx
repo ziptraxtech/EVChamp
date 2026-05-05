@@ -360,10 +360,10 @@ const BuyPlans: React.FC = () => {
                   ))}
                 </ul>
                 <button
-                  className={`w-full py-3 rounded-lg font-semibold mt-2 transition-all duration-200 bg-gray-900 text-white hover:bg-gray-800 text-sm sm:text-base ${selectedPlans.some(p => p.id === plan.id && p.type === 'hardware') ? 'opacity-80' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); handleHardwareSelect(plan); }}
+                  className="w-full py-3 rounded-lg font-semibold mt-2 transition-all duration-200 bg-gray-900 text-white hover:bg-gray-800 text-sm sm:text-base"
+                  onClick={() => { window.location.href = '/contact'; }}
                 >
-                  {selectedPlans.some(p => p.id === plan.id && p.type === 'hardware') ? 'Deselect' : 'Select Hardware Plan'}
+                  Order In Bulk
                 </button>
               </div>
             ))}
