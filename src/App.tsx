@@ -277,7 +277,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
   if (!isSignedIn) {
-    return <RedirectToSignIn />;
+    return <RedirectToSignIn forceRedirectUrl={window.location.pathname} fallbackRedirectUrl="/" />;
   }
   return <>{children}</>;
 }
@@ -289,8 +289,8 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/sign-in" element={<SignIn routing="path" path="/sign-in" />} />
-          <Route path="/sign-up" element={<SignUp routing="path" path="/sign-up" />} />
+          <Route path="/sign-in" element={<SignIn routing="path" path="/sign-in" forceRedirectUrl="/" fallbackRedirectUrl="/" />} />
+          <Route path="/sign-up" element={<SignUp routing="path" path="/sign-up" forceRedirectUrl="/" fallbackRedirectUrl="/" />} />
           <Route path="/user" element={<UserSettingsPage />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/buy-plans" element={
