@@ -277,7 +277,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
   if (!isSignedIn) {
-    return <RedirectToSignIn forceRedirectUrl={window.location.pathname} fallbackRedirectUrl="/" />;
+    return <RedirectToSignIn redirectUrl={window.location.pathname} />;
   }
   return <>{children}</>;
 }
