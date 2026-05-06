@@ -1,6 +1,7 @@
 ﻿const express = require('express');
 const cors = require('cors');
 const { neon } = require('@neondatabase/serverless');
+const nodemailer = require('nodemailer');
 
 const app = express();
 
@@ -912,6 +913,46 @@ app.patch('/api/audits/:auditId/certificate', async (req, res) => {
   } catch (err) {
     console.error('Update certificate error:', err.message);
     res.status(500).json({ success: false, message: 'Failed to update certificate' });
+  }
+});
+
+// Contact enquiry — sends email to Ai.evchamp@gmail.com
+app.post('/api/contact', async (req, res) => {
+  try {
+    const { name, email, company, inquiryType, message } = req.body;
+    if (!name || !email || !message) {
+      return res.status(400).json({ error: 'name, email and message are required' });
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD,
+      },
+    });
+
+    await transporter.sendMail({
+      from: `"EVChamp Enquiry" <${process.env.GMAIL_USER}>`,
+      to: 'Ai.evchamp@gmail.com',
+      replyTo: email,
+      subject: `New Enquiry: ${inquiryType || 'General'} — ${name}`,
+      html: `
+        <h2>New Contact Enquiry</h2>
+        <table cellpadding="8" style="border-collapse:collapse;font-family:sans-serif;font-size:14px">
+          <tr><td><b>Name</b></td><td>${name}</td></tr>
+          <tr><td><b>Email</b></td><td>${email}</td></tr>
+          <tr><td><b>Company</b></td><td>${company || '—'}</td></tr>
+          <tr><td><b>Inquiry Type</b></td><td>${inquiryType || '—'}</td></tr>
+          <tr><td><b>Message</b></td><td style="white-space:pre-wrap">${message}</td></tr>
+        </table>
+      `,
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Contact email failed:', err.message);
+    res.status(500).json({ error: 'Failed to send message' });
   }
 });
 

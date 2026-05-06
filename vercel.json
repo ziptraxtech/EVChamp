@@ -4,6 +4,14 @@
   "framework": "create-react-app",
   "rewrites": [
     {
+      "source": "/api/users/sync",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/api/contact",
+      "destination": "/api/index.js"
+    },
+    {
       "source": "/api/:path*",
       "destination": "http://100.24.9.16:5000/api/:path*"
     },

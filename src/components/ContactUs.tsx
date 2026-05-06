@@ -23,16 +23,31 @@ const ContactUs: React.FC = () => {
     message: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Contact form submission:', formData);
-    setSubmitted(true);
-    setFormData({ name: '', email: '', company: '', inquiryType: '', message: '' });
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      if (!res.ok) throw new Error('Failed to send');
+      setSubmitted(true);
+      setFormData({ name: '', email: '', company: '', inquiryType: '', message: '' });
+    } catch {
+      setError('Something went wrong. Please try again or email us directly.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -95,9 +110,10 @@ const ContactUs: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Message *</label>
                     <textarea name="message" value={formData.message} onChange={handleChange} required rows={4} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm" placeholder="Tell us how we can help..." />
                   </div>
-                  <button type="submit" className="w-full bg-gray-900 text-white font-medium py-3 rounded-lg hover:bg-gray-800 transition-all text-sm">
-                    Send Message
+                  <button type="submit" disabled={loading} className="w-full bg-gray-900 text-white font-medium py-3 rounded-lg hover:bg-gray-800 transition-all text-sm disabled:opacity-60">
+                    {loading ? 'Sending...' : 'Send Message'}
                   </button>
+                  {error && <p className="text-red-500 text-sm text-center">{error}</p>}
                 </form>
               )}
             </div>
