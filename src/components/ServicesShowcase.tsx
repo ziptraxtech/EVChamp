@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '@clerk/clerk-react';
 import mockupImg from '../assets/mockuo.png';
 import nexonImg from '../assets/tata-nexon.jpg';
 import mgzsevImg from '../assets/mgzsev.jpg';
@@ -30,8 +31,19 @@ const CheckBadge: React.FC<{ text: string; colorClass?: string }> = ({ text, col
 
 const ServicesShowcase: React.FC = () => {
   const navigate = useNavigate();
+  const { isSignedIn } = useUser();
+
+  const protectedRoutes = [
+    '/charging-network', '/service-centres', '/buy-plans', '/buy-used-ev',
+    '/rsa-plans', '/sell-ev', '/rent-ev', '/advance-analysis',
+  ];
 
   const goTo = (route: string) => {
+    if (protectedRoutes.includes(route) && !isSignedIn) {
+      navigate('/sign-in');
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      return;
+    }
     navigate(route);
     window.scrollTo({ top: 0, behavior: 'auto' });
   };

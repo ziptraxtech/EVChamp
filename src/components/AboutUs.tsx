@@ -90,6 +90,32 @@ const AboutUs: React.FC = () => {
         </div>
       </section>
 
+      {/* What EVChamp Offers */}
+      <section className="bg-gray-50">
+        <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16">
+          <h2 className="text-2xl font-bold text-gray-900 text-center mb-10">What EVChamp Offers</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
+            {[
+              { icon: '🚗', label: 'EV Marketplace', desc: 'Certified pre-owned EV buying and selling' },
+              { icon: '🔋', label: 'Battery Diagnostics', desc: 'Complete battery health and vehicle insights' },
+              { icon: '📊', label: 'Software Plans', desc: 'Monitoring and optimization subscriptions' },
+              { icon: '🛣️', label: 'Roadside Assistance', desc: 'Emergency EV support across India' },
+              { icon: '⚡', label: 'Charging Network', desc: 'Station access across India' },
+              { icon: '📈', label: 'INVESTYZ', desc: 'Green infrastructure investment' },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="text-left p-5 rounded-xl border border-gray-100 bg-white cursor-default select-none"
+              >
+                <span className="text-4xl mb-3 block">{item.icon}</span>
+                <h3 className="text-sm font-bold text-gray-900 mb-1">{item.label}</h3>
+                <p className="text-xs text-gray-500 leading-snug">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Core Values */}
       <section className="bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 max-w-4xl">

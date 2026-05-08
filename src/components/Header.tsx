@@ -33,7 +33,19 @@ const Header: React.FC = () => {
 
   const { isSignedIn, user } = useUser();
 
+  const protectedRoutes = [
+    '/charging-network', '/service-centres', '/buy-plans', '/buy-used-ev',
+    '/rsa-plans', '/sell-ev', '/rent-ev', '/advance-analysis', '/delete-account',
+  ];
+
   const goTo = (route: string) => {
+    if (protectedRoutes.includes(route) && !isSignedIn) {
+      navigate('/sign-in');
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      setIsMobileMenuOpen(false);
+      setIsPlatformOpen(false);
+      return;
+    }
     navigate(route);
     window.scrollTo({ top: 0, behavior: 'auto' });
     setIsMobileMenuOpen(false);

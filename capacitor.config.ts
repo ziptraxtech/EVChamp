@@ -5,13 +5,19 @@ const config: CapacitorConfig = {
   appName: 'EVChamp',
   webDir: 'build',
   server: {
-    url: 'https://evchamp.vercel.app', // Live URL — app always loads latest deployed version
+    url: 'https://evchamp.vercel.app',
     cleartext: false,
     allowNavigation: [
       'evchamp.in',
+      'evchamp.vercel.app',
       '*.vercel.app',
       '*.clerk.accounts.dev',
-      'clerk.accounts.dev'
+      'clerk.accounts.dev',
+      'accounts.clerk.dev',
+      '*.clerk.dev',
+      'clerk.dev',
+      '*.clerk.com',
+      'clerk.com',
     ],
   },
   plugins: {

@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.96c8d88c.css",
-    "main.js": "/static/js/main.6661826b.js",
+    "main.css": "/static/css/main.b8038eb4.css",
+    "main.js": "/static/js/main.5a9f4cbd.js",
     "static/js/453.8950d877.chunk.js": "/static/js/453.8950d877.chunk.js",
     "static/media/mockuo.png": "/static/media/mockuo.eea2406289e23bde7b06.png",
     "static/media/header.jpg": "/static/media/header.c14d6fcbc601a1043cee.jpg",
@@ -9,21 +9,27 @@
     "static/media/tigor.png": "/static/media/tigor.3c969a23983515412be5.png",
     "static/media/expresst.png": "/static/media/expresst.09975622b470010ae641.png",
     "static/media/verito.png": "/static/media/verito.571302e75759bd6f3a25.png",
+    "static/media/partner5.jpg": "/static/media/partner5.59105ba628937eda3cdf.jpg",
     "static/media/punch-ev.jpg": "/static/media/punch-ev.678d5ad502fd954150f3.jpg",
+    "static/media/partner8.png": "/static/media/partner8.5b599780eaa357da4758.png",
+    "static/media/partner4.png": "/static/media/partner4.127e1d3cae40159a7501.png",
+    "static/media/partner3.jpg": "/static/media/partner3.fca6bdc02d36d21ee57e.jpg",
     "static/media/tiagoev.jpg": "/static/media/tiagoev.1e7d14fb6f2806143222.jpg",
     "static/media/citroen.jpg": "/static/media/citroen.721efd9a07bdda007a9a.jpg",
-    "static/media/footer_banner.jpeg": "/static/media/footer_banner.2dbfaeaf8ff31f5cb3da.jpeg",
     "static/media/cometev.jpg": "/static/media/cometev.95f6d8ef3675c4c8d0f7.jpg",
     "static/media/mgzsev.jpg": "/static/media/mgzsev.97b3594a9b0495cbec91.jpg",
     "static/media/honda-kona-ev.jpg": "/static/media/honda-kona-ev.0f4e4d700478e261df78.jpg",
+    "static/media/partner2.png": "/static/media/partner2.b3c1b7380675b6ef2ca1.png",
     "static/media/tata-nexon.jpg": "/static/media/tata-nexon.8636502ff9831a3fb372.jpg",
+    "static/media/partner6.png": "/static/media/partner6.18bb71effd41a27f3a39.png",
+    "static/media/partner1.jpg": "/static/media/partner1.b533753459ee5bf9b019.jpg",
     "index.html": "/index.html",
-    "main.96c8d88c.css.map": "/static/css/main.96c8d88c.css.map",
-    "main.6661826b.js.map": "/static/js/main.6661826b.js.map",
+    "main.b8038eb4.css.map": "/static/css/main.b8038eb4.css.map",
+    "main.5a9f4cbd.js.map": "/static/js/main.5a9f4cbd.js.map",
     "453.8950d877.chunk.js.map": "/static/js/453.8950d877.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.96c8d88c.css",
-    "static/js/main.6661826b.js"
+    "static/css/main.b8038eb4.css",
+    "static/js/main.5a9f4cbd.js"
   ]
 }
