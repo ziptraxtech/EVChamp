@@ -217,11 +217,9 @@ const ChargingNetwork: React.FC = () => {
       <section className="bg-white">
         <div className="container mx-auto px-4 sm:px-6 py-12 max-w-4xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <a
-              href="https://www.zeflash.app"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group rounded-2xl p-6 border border-green-100 bg-gradient-to-br from-green-50 via-white to-emerald-50 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+            <div
+              onClick={() => navigate('/zeflash')}
+              className="group rounded-2xl p-6 border border-green-100 bg-gradient-to-br from-green-50 via-white to-emerald-50 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer"
             >
               <div className="flex items-start justify-between gap-3 mb-4">
                 <h3 className="text-xl font-bold text-gray-900">For EV Drivers</h3>
@@ -234,13 +232,11 @@ const ChargingNetwork: React.FC = () => {
                 <img src="/zeflash-logo.png" alt="Zeflash" className="h-10 w-auto object-contain" />
                 <span className="text-sm font-semibold text-green-700 group-hover:text-green-800 transition-colors">Open Zeflash →</span>
               </div>
-            </a>
+            </div>
 
-            <a
-              href="https://zip-sure-aidash-rag.vercel.app/dashboard"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group rounded-2xl p-6 border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-sky-50 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+            <div
+              onClick={() => navigate('/contact')}
+              className="group rounded-2xl p-6 border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-sky-50 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer"
             >
               <div className="flex items-start justify-between gap-3 mb-4">
                 <h3 className="text-xl font-bold text-gray-900">For Businesses & Partners</h3>
@@ -253,7 +249,7 @@ const ChargingNetwork: React.FC = () => {
                 <img src="/ZipsureAI Logo.png" alt="ZipsureAI" className="h-10 w-auto object-contain" />
                 <span className="text-sm font-semibold text-blue-700 group-hover:text-blue-800 transition-colors">Open ZipSureAI →</span>
               </div>
-            </a>
+            </div>
           </div>
         </div>
       </section>
