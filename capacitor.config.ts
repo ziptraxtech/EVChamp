@@ -10,6 +10,8 @@ const config: CapacitorConfig = {
     allowNavigation: [
       'evchamp.in',
       'evchamp.vercel.app',
+      'zeflash.app',
+      '*.zeflash.app',
       '*.vercel.app',
       '*.clerk.accounts.dev',
       'clerk.accounts.dev',

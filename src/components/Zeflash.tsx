@@ -65,14 +65,26 @@ const Zeflash: React.FC = () => {
             Quick 20-minute EV and battery diagnostics during charging. Zeflash combines fast charger testing with
             battery physics-driven AI to reveal real performance, aging behavior, and safety condition on the spot.
           </p>
-          <a
-            href="https://zeflash.app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all"
-          >
-            Visit Zeflash Website
-          </a>
+        </div>
+      </section>
+
+      {/* Embedded Zeflash Website */}
+      <section className="bg-white">
+        <div className="container mx-auto px-4 sm:px-6 py-10 max-w-6xl">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-4">
+            Explore Zeflash
+          </h2>
+          <p className="text-gray-500 text-center text-sm mb-6">Browse the full Zeflash platform below.</p>
+          <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-lg w-full" style={{ height: '80vh', minHeight: '500px' }}>
+            <iframe
+              src="https://zeflash.app"
+              title="Zeflash Website"
+              className="w-full h-full"
+              style={{ border: 'none', width: '100%', height: '100%' }}
+              allow="fullscreen"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
+            />
+          </div>
         </div>
       </section>
 
