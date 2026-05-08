@@ -2,6 +2,7 @@
 const cors = require('cors');
 const { neon } = require('@neondatabase/serverless');
 const nodemailer = require('nodemailer');
+const { verifyToken, createClerkClient } = require('@clerk/backend');
 
 const app = express();
 
@@ -976,6 +977,70 @@ app.post('/api/users/sync', async (req, res) => {
   } catch (err) {
     console.error('User sync error:', err.message);
     res.status(500).json({ error: 'Failed to sync user' });
+  }
+});
+
+// ============ ZeVault Credits ============
+// Reads shared credits from the Zeflash Neon DB by user email.
+// Both EVChamp and Zeflash share the same ZeVault credit balance.
+let zeflashSql = null;
+function getZeflashSQL() {
+  if (!zeflashSql) {
+    const url = process.env.ZEFLASH_DATABASE_URL;
+    if (!url) throw new Error('ZEFLASH_DATABASE_URL is not configured');
+    zeflashSql = neon(url);
+  }
+  return zeflashSql;
+}
+
+app.get('/api/zevault-credits', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Missing Authorization header' });
+    }
+    const token = authHeader.split(' ')[1];
+
+    // Verify Clerk JWT using evchamp's Clerk secret key
+    const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+    if (!clerkSecretKey) {
+      return res.status(500).json({ error: 'Server auth not configured' });
+    }
+
+    const payload = await verifyToken(token, { secretKey: clerkSecretKey });
+    const clerkUserId = payload.sub;
+
+    // Resolve user email from Clerk
+    const clerkClient = createClerkClient({ secretKey: clerkSecretKey });
+    const clerkUser = await clerkClient.users.getUser(clerkUserId);
+    const email = clerkUser.emailAddresses?.[0]?.emailAddress;
+    if (!email) {
+      return res.status(400).json({ error: 'No email associated with this account' });
+    }
+
+    // Look up credits in zeflash Neon DB by email
+    const zsql = getZeflashSQL();
+    const rows = await zsql`
+      SELECT c.remaining, c.total, c.used
+      FROM "Credit" c
+      JOIN "User" u ON u.id = c."userId"
+      WHERE u.email = ${email}
+      LIMIT 1
+    `;
+
+    if (rows.length === 0) {
+      // User has no credits record yet in zeflash (hasn't used the service)
+      return res.json({ remaining: 0, total: 0, used: 0 });
+    }
+
+    return res.json({
+      remaining: rows[0].remaining,
+      total: rows[0].total,
+      used: rows[0].used,
+    });
+  } catch (err) {
+    console.error('[ZeVault Credits Error]', err.message);
+    return res.status(500).json({ error: 'Unable to load your credits right now.' });
   }
 });
 

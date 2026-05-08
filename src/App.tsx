@@ -27,6 +27,7 @@ import Investyz from './components/Investyz';
 import ContactUs from './components/ContactUs';
 import SmarterEVAssistance from './components/SmarterEVAssistance';
 import Zeflash from './components/Zeflash';
+import ZeVaultPage from './components/ZeVaultPage';
 
 import PartnersCarousel from './components/PartnersCarousel';
 
@@ -315,6 +316,7 @@ function App() {
             </ProtectedRoute>
           } />
           <Route path="/zeflash" element={<Zeflash />} />
+          <Route path="/zevault" element={<ZeVaultPage />} />
           <Route path="/investyz" element={<Investyz />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/ev-assistance" element={<SmarterEVAssistance />} />

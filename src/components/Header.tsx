@@ -117,6 +117,17 @@ const Header: React.FC = () => {
           >
             Charging Network
           </button>
+          {isSignedIn && (
+            <button
+              onClick={() => goTo('/zevault')}
+              className="inline-flex items-center gap-1.5 font-medium px-4 py-2 rounded-lg text-sm text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 shadow-sm transition-all"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              </svg>
+              ZeVault
+            </button>
+          )}
           <button
             onClick={() => goTo('/buy-plans')}
             className="bg-gray-900 text-white font-medium px-5 py-2 rounded-lg hover:bg-gray-800 transition-all text-sm shadow-sm"
@@ -154,6 +165,12 @@ const Header: React.FC = () => {
                   <p className="text-sm font-semibold text-gray-900">{user?.firstName} {user?.lastName}</p>
                   <p className="text-xs text-gray-400 truncate">{user?.primaryEmailAddress?.emailAddress}</p>
                 </div>
+                <button onClick={() => { goTo('/zevault'); setIsDropdownOpen(false); }} className="flex items-center w-full px-4 py-2.5 text-sm text-violet-700 hover:bg-violet-50 transition-colors">
+                  <svg className="w-4 h-4 mr-3 text-violet-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                  </svg>
+                  ZeVault Credits
+                </button>
                 <button onClick={() => { goTo('/user'); setIsDropdownOpen(false); }} className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                   <svg className="w-4 h-4 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -240,6 +257,12 @@ const Header: React.FC = () => {
                     <p className="text-sm font-semibold text-gray-900">{user?.firstName} {user?.lastName}</p>
                     <p className="text-xs text-gray-400 truncate">{user?.primaryEmailAddress?.emailAddress}</p>
                   </div>
+                  <button onClick={() => goTo('/zevault')} className="w-full text-left px-2 py-2.5 text-sm font-medium text-violet-700 hover:bg-violet-50 rounded-lg flex items-center gap-2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                    </svg>
+                    ZeVault Credits
+                  </button>
                   <button onClick={() => goTo('/user')} className="w-full text-left px-2 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
                     Profile Settings
                   </button>
