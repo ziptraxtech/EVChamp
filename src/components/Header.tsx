@@ -60,6 +60,7 @@ const Header: React.FC = () => {
     { label: 'Roadside Assistance', desc: 'Emergency EV support', route: '/rsa-plans' },
     { label: 'ZipBattery', desc: 'AI battery intelligence', route: '/zipbattery' },
     { label: 'Zeflash', desc: 'Rapid AI battery diagnostics', route: '/zeflash' },
+    { label: 'ZeVault', desc: 'Your diagnostic credits wallet', route: '/zevault' },
     { label: 'INVESTYZ', desc: 'Green infrastructure investment', route: '/investyz' },
   ];
 
