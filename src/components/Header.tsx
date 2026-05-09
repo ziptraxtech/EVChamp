@@ -53,14 +53,13 @@ const Header: React.FC = () => {
   };
 
   const platformLinks = [
-    { label: 'EV Marketplace', desc: 'Buy & sell certified EVs', route: '/buy-used-ev' },
-    { label: 'IoT & Software Plans', desc: 'Hardware + analytics subscriptions', route: '/buy-plans' },
-    { label: 'Charging Network', desc: 'Find stations across India', route: '/charging-network' },
-    { label: 'Find EV Service Centres', desc: 'Verified workshops near you', route: '/service-centres' },
-    { label: 'Roadside Assistance', desc: 'Emergency EV support', route: '/rsa-plans' },
+    { label: 'ZeVault', desc: 'Your diagnostic credits wallet', route: '/zevault' },
     { label: 'ZipBattery', desc: 'AI battery intelligence', route: '/zipbattery' },
     { label: 'Zeflash', desc: 'Rapid AI battery diagnostics', route: '/zeflash' },
-    { label: 'ZeVault', desc: 'Your diagnostic credits wallet', route: '/zevault' },
+    { label: 'Roadside Assistance', desc: 'Emergency EV support', route: '/rsa-plans' },
+    { label: 'Find EV Service Centres', desc: 'Verified workshops near you', route: '/service-centres' },
+    { label: 'EV Marketplace', desc: 'Buy & sell certified EVs', route: '/buy-used-ev' },
+    { label: 'IoT & Software Plans', desc: 'Hardware + analytics subscriptions', route: '/buy-plans' },
     { label: 'INVESTYZ', desc: 'Green infrastructure investment', route: '/investyz' },
   ];
 
@@ -112,12 +111,6 @@ const Header: React.FC = () => {
 
         {/* Desktop CTAs */}
         <div className="hidden lg:flex items-center space-x-3">
-          <button
-            onClick={() => goTo('/charging-network')}
-            className="text-gray-700 font-medium px-4 py-2 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all text-sm"
-          >
-            Charging Network
-          </button>
           {isSignedIn && (
             <button
               onClick={() => goTo('/zevault')}
@@ -221,9 +214,6 @@ const Header: React.FC = () => {
           <div className="px-4 py-4 space-y-1">
             {/* Primary CTAs */}
             <div className="flex gap-2 pb-3 border-b border-gray-100">
-              <button onClick={() => goTo('/charging-network')} className="flex-1 text-center border border-gray-200 text-gray-700 font-medium px-3 py-2.5 rounded-lg text-sm hover:bg-gray-50">
-                Charging Network
-              </button>
               <button onClick={() => goTo('/buy-plans')} className="flex-1 text-center bg-gray-900 text-white font-medium px-3 py-2.5 rounded-lg text-sm">
                 Get Started
               </button>
