@@ -5,6 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { ClerkProvider } from '@clerk/clerk-react';
 import { HelmetProvider } from 'react-helmet-async';
+import { Analytics } from '@vercel/analytics/react';
 
 const clerkPubKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
 
@@ -20,6 +21,7 @@ root.render(
     <HelmetProvider>
       <ClerkProvider publishableKey={clerkPubKey}>
         <App />
+        <Analytics />
       </ClerkProvider>
     </HelmetProvider>
   </React.StrictMode>
