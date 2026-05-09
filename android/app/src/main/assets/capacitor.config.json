@@ -7,9 +7,17 @@
 		"cleartext": false,
 		"allowNavigation": [
 			"evchamp.in",
+			"evchamp.vercel.app",
+			"zeflash.app",
+			"*.zeflash.app",
 			"*.vercel.app",
 			"*.clerk.accounts.dev",
-			"clerk.accounts.dev"
+			"clerk.accounts.dev",
+			"accounts.clerk.dev",
+			"*.clerk.dev",
+			"clerk.dev",
+			"*.clerk.com",
+			"clerk.com"
 		]
 	},
 	"plugins": {
