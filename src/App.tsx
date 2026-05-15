@@ -286,7 +286,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function App() {
   return (
     <Router>
-      <div className="overflow-x-hidden">
+      <div className="min-w-0 w-full">
         <Header />
         <Routes>
           <Route path="/" element={<HomePage />} />

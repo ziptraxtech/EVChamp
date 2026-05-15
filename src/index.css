@@ -3,9 +3,13 @@
 @tailwind utilities;
 
 /* ── Global mobile safety ── */
-html, body, #root {
-  overflow-x: hidden;
+html, body {
+  overflow-x: clip;
   max-width: 100vw;
+}
+
+#root {
+  overflow-x: clip;
 }
 
 body {
