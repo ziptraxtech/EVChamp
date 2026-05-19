@@ -10,7 +10,8 @@ import TermsOfUse from './components/TermsOfUse';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import RefundPolicy from './components/RefundPolicy';
 import PaymentSuccess from './components/PaymentSuccess';
-import { SignIn, SignUp, UserProfile, RedirectToSignIn, useUser } from '@clerk/clerk-react';
+import { SignUp, UserProfile, RedirectToSignIn, useUser } from '@clerk/clerk-react';
+import SmartSignIn from './components/SmartSignIn';
 import Franchise from './components/Franchise';
 import BuyUsedEV from './components/BuyUsedEV';
 import ServiceCentres from './components/ServiceCentres';
@@ -290,7 +291,7 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/sign-in" element={<SignIn routing="path" path="/sign-in" forceRedirectUrl="/" fallbackRedirectUrl="/" />} />
+          <Route path="/sign-in" element={<SmartSignIn />} />
           <Route path="/sign-up" element={<SignUp routing="path" path="/sign-up" forceRedirectUrl="/" fallbackRedirectUrl="/" />} />
           <Route path="/user" element={<UserSettingsPage />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
