@@ -53,6 +53,7 @@ const Header: React.FC = () => {
   };
 
   const platformLinks = [
+    { label: 'Rent EV', desc: 'Rent electric vehicles near you', route: '/rent-ev' },
     { label: 'ZeVault', desc: 'Your diagnostic credits wallet', route: '/zevault' },
     { label: 'ZipBattery', desc: 'AI battery intelligence', route: '/zipbattery' },
     { label: 'Zeflash', desc: 'Rapid AI battery diagnostics', route: '/zeflash' },
