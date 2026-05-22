@@ -6,8 +6,11 @@ interface ChatMessage {
   timestamp: string;
 }
 
+// In production we serve the chatbot from the same origin under /api/v1
+// (see vercel.json rewrites → api/chat.py). For local dev set
+// REACT_APP_CHATBOT_API_URL=http://localhost:8000/api/v1 in .env.
 const CHATBOT_API_URL =
-  process.env.REACT_APP_CHATBOT_API_URL || 'http://localhost:8000/api/v1';
+  process.env.REACT_APP_CHATBOT_API_URL || '/api/v1';
 
 const STORAGE_KEY = 'evchamp_chat_history_v1';
 
