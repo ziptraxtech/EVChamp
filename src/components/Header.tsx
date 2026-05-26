@@ -53,15 +53,15 @@ const Header: React.FC = () => {
   };
 
   const platformLinks = [
-    { label: 'Rent EV', desc: 'Rent electric vehicles near you', route: '/rent-ev' },
-    { label: 'ZeVault', desc: 'Your diagnostic credits wallet', route: '/zevault' },
-    { label: 'ZipBattery', desc: 'AI battery intelligence', route: '/zipbattery' },
-    { label: 'Zeflash', desc: 'Rapid AI battery diagnostics', route: '/zeflash' },
-    { label: 'Roadside Assistance', desc: 'Emergency EV support', route: '/rsa-plans' },
-    { label: 'Find EV Service Centres', desc: 'Verified workshops near you', route: '/service-centres' },
     { label: 'EV Marketplace', desc: 'Buy & sell certified EVs', route: '/buy-used-ev' },
-    { label: 'IoT & Software Plans', desc: 'Hardware + analytics subscriptions', route: '/buy-plans' },
+    { label: 'Find EV Service Centres', desc: 'Verified workshops near you', route: '/service-centres' },
     { label: 'INVESTYZ', desc: 'Green infrastructure investment', route: '/investyz' },
+    { label: 'IoT & Software Plans', desc: 'Hardware + analytics subscriptions', route: '/buy-plans' },
+    { label: 'Rent EV', desc: 'Rent electric vehicles near you', route: '/rent-ev' },
+    { label: 'Roadside Assistance', desc: 'Emergency EV support', route: '/rsa-plans' },
+    { label: 'ZeVault', desc: 'Your diagnostic credits wallet', route: '/zevault' },
+    { label: 'Zeflash', desc: 'Rapid AI battery diagnostics', route: '/zeflash' },
+    { label: 'ZipBattery', desc: 'AI battery intelligence', route: '/zipbattery' },
   ];
 
   return (
@@ -107,6 +107,9 @@ const Header: React.FC = () => {
           </button>
           <button onClick={() => goTo('/contact')} className="text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 rounded-lg hover:bg-gray-50 text-sm font-medium">
             Contact
+          </button>
+          <button onClick={() => goTo('/blog')} className="text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 rounded-lg hover:bg-gray-50 text-sm font-medium">
+            Blog
           </button>
         </nav>
 
@@ -239,6 +242,7 @@ const Header: React.FC = () => {
             <div className="border-t border-gray-100 pt-2 space-y-1">
               <button onClick={() => goTo('/about')} className="w-full text-left px-2 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">About</button>
               <button onClick={() => goTo('/contact')} className="w-full text-left px-2 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">Contact</button>
+              <button onClick={() => goTo('/blog')} className="w-full text-left px-2 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">Blog</button>
             </div>
 
             {/* Account */}

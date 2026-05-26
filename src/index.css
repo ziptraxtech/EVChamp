@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Leaflet z-index fix: prevent map controls from overlapping sticky header ── */
+.leaflet-top,
+.leaflet-bottom,
+.leaflet-control,
+.leaflet-pane,
+.leaflet-popup-pane,
+.leaflet-tooltip-pane {
+  z-index: 10 !important;
+}
+.leaflet-map-pane {
+  z-index: 4 !important;
+}
+
+/* ── Hide leaflet-routing-machine instruction panel ── */
+.leaflet-routing-container {
+  display: none !important;
+}
+
 /* ── Global mobile safety ── */
 html, body {
   overflow-x: clip;

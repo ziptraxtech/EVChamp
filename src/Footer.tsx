@@ -15,7 +15,6 @@ const Footer: React.FC = () => (
             <li><a href="/" className="text-gray-400 hover:text-white transition-colors">Home</a></li>
             <li><a href="/buy-used-ev" className="text-gray-400 hover:text-white transition-colors">EV Marketplace</a></li>
             <li><a href="/buy-plans" className="text-gray-400 hover:text-white transition-colors">IoT & Software Plans</a></li>
-            <li><a href="/charging-network" className="text-gray-400 hover:text-white transition-colors">Charging Network</a></li>
             <li><a href="/zipbattery" className="text-gray-400 hover:text-white transition-colors">ZipBattery</a></li>
             <li><a href="/franchise" className="text-gray-400 hover:text-white transition-colors">Franchise</a></li>
             <li><a href="/investyz" className="text-gray-400 hover:text-white transition-colors">INVESTYZ</a></li>

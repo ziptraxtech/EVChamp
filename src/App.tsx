@@ -29,6 +29,7 @@ import ContactUs from './components/ContactUs';
 import SmarterEVAssistance from './components/SmarterEVAssistance';
 import Zeflash from './components/Zeflash';
 import ZeVaultPage from './components/ZeVaultPage';
+import Blog from './components/Blog';
 
 import PartnersCarousel from './components/PartnersCarousel';
 import ChatbotPopup from './components/ChatbotPopup';
@@ -90,7 +91,7 @@ function HomePage() {
               <button onClick={() => goTo('/sign-up')} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm shadow-sm">
                 Get Started
               </button>
-              <button onClick={() => goTo('/contact')} className="border border-white/50 bg-white/10 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/15 transition-all text-sm backdrop-blur-sm">
+              <button onClick={() => goTo('https://play.google.com/apps/internaltest/4701215861025087123')} className="border border-white/50 bg-white/10 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/15 transition-all text-sm backdrop-blur-sm">
                 Talk to Our Team
               </button>
             </div>
@@ -103,7 +104,7 @@ function HomePage() {
         <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-5xl">
           <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">Mobile App</p>
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">Get the EVChamp app</h2>
-          <p className="text-gray-500 text-xs mb-5">Scan the QR code or click the button below to download the EVChamp app on Play Store.</p>
+          <p className="text-gray-500 text-xs mb-5">Explore EVChamp services, charging support, and EV assistance from one place.</p>
 
           <div className="flex flex-col sm:flex-row gap-5 items-center">
             {/* QR Code — custom image */}
@@ -221,14 +222,17 @@ function HomePage() {
             <button onClick={() => goTo('/sign-up')} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
               Get Started Free
             </button>
-            <button onClick={() => goTo('/contact')} className="border border-white/30 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/10 transition-all text-sm">
+            <button onClick={() => goTo('https://play.google.com/apps/internaltest/4701215861025087123')} className="border border-white/30 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/10 transition-all text-sm">
               Contact Us
             </button>
           </div>
         </div>
       </section>
 
-      <Footer />
+      
+
+
+<Footer />
     </div>
   );
 }
@@ -320,7 +324,8 @@ function App() {
           <Route path="/zeflash" element={<Zeflash />} />
           <Route path="/zevault" element={<ZeVaultPage />} />
           <Route path="/investyz" element={<Investyz />} />
-          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="https://play.google.com/apps/internaltest/4701215861025087123" element={<ContactUs />} />
           <Route path="/ev-assistance" element={<SmarterEVAssistance />} />
           <Route path="/zipbattery" element={<ZipBattery />} />
           <Route path="/advance-analysis" element={
