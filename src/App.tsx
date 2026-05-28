@@ -127,7 +127,7 @@ function HomePage() {
               {/* Buttons */}
               <div className="flex flex-wrap gap-2 mb-2">
                 <a
-                  href="https://play.google.com/apps/internaltest/4701215861025087123"
+                  href="https://play.google.com/store/apps/details?id=com.evchamp.app"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 px-4 py-2 rounded-lg border border-green-500 text-green-700 text-xs font-medium bg-green-50 hover:bg-green-100 transition-colors"
