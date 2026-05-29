@@ -10,16 +10,13 @@ import logging
 import os
 
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_google_genai import (
-    ChatGoogleGenerativeAI,
-    GoogleGenerativeAIEmbeddings,
-)
 from langchain.chains.retrieval import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_pinecone import PineconeVectorStore
 from pinecone import Pinecone
 
 from app.core.config import settings
+from app.services.gemini import GeminiChatModel, GeminiEmbeddings
 
 logger = logging.getLogger(__name__)
 
@@ -92,18 +89,19 @@ SYSTEM_PROMPT = (
 
 # ────────────────────────────────────────────────────────────── factories ────
 
-def _make_llm() -> ChatGoogleGenerativeAI:
-    return ChatGoogleGenerativeAI(
+def _make_llm() -> GeminiChatModel:
+    return GeminiChatModel(
+        api_key=settings.GEMINI_API_KEY,
         model=settings.GEMINI_CHAT_MODEL,
-        google_api_key=settings.GEMINI_API_KEY,
         temperature=0.7,
     )
 
 
-def _make_embeddings() -> GoogleGenerativeAIEmbeddings:
-    return GoogleGenerativeAIEmbeddings(
+def _make_embeddings() -> GeminiEmbeddings:
+    return GeminiEmbeddings(
+        api_key=settings.GEMINI_API_KEY,
         model=settings.GEMINI_EMBEDDING_MODEL,
-        google_api_key=settings.GEMINI_API_KEY,
+        output_dim=settings.GEMINI_EMBEDDING_DIM,
     )
 
 
