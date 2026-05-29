@@ -1,19 +1,25 @@
-"""Stateless chat schemas — history is provided by the client per request."""
-from typing import List
-from pydantic import BaseModel
+"""Request / response schemas — match ZipsureAI's contract.
+
+GET  /python_api/chatbot  -> ChatbotResponse { session_id }
+POST /python_api/ask      -> AskResponse    { session_id, question, response }
+"""
+from typing import Optional
+from pydantic import BaseModel, Field
 
 
-class HistoryMessage(BaseModel):
-    """One turn of conversation as provided by the client."""
-    is_user: bool
-    content: str
+class ChatbotResponse(BaseModel):
+    session_id: str
 
 
-class ChatMessageRequest(BaseModel):
-    content: str
-    history: List[HistoryMessage] = []
-    rag_enabled: bool = True
+class AskRequest(BaseModel):
+    question: str = Field(..., description="The user's question")
+    session_id: Optional[str] = Field(
+        default=None,
+        description="Existing session id; if absent a new one is created.",
+    )
 
 
-class ChatMessageResponse(BaseModel):
-    reply: str
+class AskResponse(BaseModel):
+    session_id: str
+    question: str
+    response: str

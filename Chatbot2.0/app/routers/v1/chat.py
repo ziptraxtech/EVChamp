@@ -1,64 +1,139 @@
-"""Stateless chat router.
-
-The frontend keeps conversation history in sessionStorage and sends it with
-every request. The backend just answers — it never touches a database.
+"""Chatbot router — mirrors ZipsureAI's session-based API.
 
 Endpoints:
-  POST /api/v1/chat/message    -> generate a bot reply from {content, history, rag_enabled}
-  GET  /api/v1/chat/health/llm -> diagnostics
+  GET  /chatbot          -> create a session and return its id
+  POST /ask              -> answer a question using RAG + per-session memory
+  GET  /health/llm       -> diagnostics
+
+Server-side session memory lives in `_session_cache` with a 1h TTL — exactly
+like ZipboltDash/backend/main.py. On Vercel serverless, instances are reused
+opportunistically (Fluid Compute) so this is best-effort; clients should
+persist their `session_id` and resend it on every /ask to maximize hit rate.
 """
+from __future__ import annotations
+
+import logging
+import time
+import traceback
+from uuid import uuid4
+
 from fastapi import APIRouter, HTTPException
 
-from app.schemas.chat import ChatMessageRequest, ChatMessageResponse
-from app.services.llm_service import LLMService
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_core.runnables.history import RunnableWithMessageHistory
 
+from app.core.config import settings
+from app.schemas.chat import AskRequest, AskResponse, ChatbotResponse
+from app.services.rag_service import build_rag_chain, health_check
+
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
-_llm_service: LLMService | None = None
+
+# ─────────────────────────────────────────────────────── module-level caches
+
+_rag_chain = None  # built lazily on first /ask, then reused
+_session_cache: dict[str, dict] = {}  # session_id -> {history, last_access}
 
 
-def get_llm_service() -> LLMService:
-    global _llm_service
-    if _llm_service is None:
-        try:
-            _llm_service = LLMService()
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"LLM init failed: {e}")
-    return _llm_service
+def _get_chain():
+    global _rag_chain
+    if _rag_chain is None:
+        _rag_chain = build_rag_chain()
+    return _rag_chain
 
 
-@router.post("/message", response_model=ChatMessageResponse)
-async def send_message(req: ChatMessageRequest):
-    if not req.content.strip():
-        raise HTTPException(status_code=400, detail="content cannot be empty")
+def get_or_create_history(session_id: str) -> ChatMessageHistory:
+    now = time.time()
+    if session_id in _session_cache:
+        _session_cache[session_id]["last_access"] = now
+        return _session_cache[session_id]["history"]
+    history = ChatMessageHistory()
+    _session_cache[session_id] = {"history": history, "last_access": now}
+    return history
 
-    # Build a history list that includes the new turn so the LLM sees it last.
-    history = list(req.history) + [type(req.history[0] if req.history else None) if False else None]
-    # Simpler: just pass history as-is; LLM service drops the last user msg before sending.
-    # We'll append the current user turn so generate_response can see it consistently.
-    from app.schemas.chat import HistoryMessage
-    full_history = list(req.history) + [HistoryMessage(is_user=True, content=req.content)]
+
+def evict_expired_sessions() -> None:
+    cutoff = time.time() - settings.SESSION_TTL_SECONDS
+    expired = [sid for sid, v in _session_cache.items() if v["last_access"] < cutoff]
+    for sid in expired:
+        del _session_cache[sid]
+    if expired:
+        logger.info("Evicted %d expired session(s)", len(expired))
+
+
+# ───────────────────────────────────────────────────────────────── routes
+
+@router.get("/chatbot", response_model=ChatbotResponse)
+@router.get("/chatbot/", response_model=ChatbotResponse)
+async def create_session():
+    """Create a new conversational session and return its id."""
+    try:
+        session_id = str(uuid4())
+        get_or_create_history(session_id)
+        logger.info("Created session %s", session_id)
+        return ChatbotResponse(session_id=session_id)
+    except Exception as e:
+        logger.exception("Failed to create session")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/ask", response_model=AskResponse)
+async def ask_question(req: AskRequest):
+    """Answer a question with RAG + session memory (mirrors ZipsureAI /ask)."""
+    evict_expired_sessions()
+
+    question = req.question.strip()
+    if not question:
+        raise HTTPException(status_code=400, detail="question required")
+
+    session_id = req.session_id or str(uuid4())
 
     try:
-        llm = get_llm_service()
-        reply = await llm.generate_response(
-            query=req.content,
-            chat_history=full_history,
-            rag_enabled=req.rag_enabled,
+        chain = _get_chain()
+    except Exception:
+        logger.exception("RAG chain init failed")
+        raise HTTPException(status_code=500, detail="Failed to initialize AI context.")
+
+    history = get_or_create_history(session_id)
+
+    conversational_chain = RunnableWithMessageHistory(
+        chain,
+        lambda _sid: history,
+        input_messages_key="input",
+        history_messages_key="chat_history",
+        output_messages_key="answer",
+    )
+
+    try:
+        response = conversational_chain.invoke(
+            {"input": question},
+            {"configurable": {"session_id": session_id}},
+        )
+        answer = response.get("answer", "No response available.")
+        return AskResponse(
+            session_id=session_id,
+            question=question,
+            response=answer,
         )
     except Exception as e:
-        reply = (
-            "I'm sorry — I'm having trouble responding right now. "
-            f"Please try again in a moment. (error: {str(e)[:80]})"
-        )
-
-    return ChatMessageResponse(reply=reply)
+        logger.exception("Chain invoke failed")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/health/llm")
 async def check_llm_health():
+    """Cheap health endpoint — doesn't build the chain."""
     try:
-        llm = get_llm_service()
-        return {"status": "healthy" if llm.is_healthy() else "unhealthy", **llm.get_status()}
+        h = health_check()
+        h["chain_built"] = _rag_chain is not None
+        h["active_sessions"] = len(_session_cache)
+        h["status"] = (
+            "healthy"
+            if h.get("gemini_configured") and h.get("pinecone_ok")
+            else "degraded"
+        )
+        return h
     except Exception as e:
         return {"status": "unhealthy", "error": str(e)}

@@ -10,7 +10,7 @@
   },
   "rewrites": [
     {
-      "source": "/api/v1/chat/:path*",
+      "source": "/python_api/:path*",
       "destination": "/api/chat"
     },
     {
