@@ -1009,7 +1009,8 @@ app.get('/api/zevault-credits', async (req, res) => {
       return res.status(500).json({ error: 'Server auth not configured' });
     }
 
-    const payload = await verifyToken(token, { secretKey: clerkSecretKey });
+    const clerkClient = createClerkClient({ secretKey: clerkSecretKey });
+    const payload = await clerkClient.verifyToken(token);
     const clerkUserId = payload.sub;
 
     // Look up credits directly by clerkUserId
@@ -1048,7 +1049,8 @@ app.post('/api/zeflash-add-credits', async (req, res) => {
     const clerkSecretKey = process.env.CLERK_SECRET_KEY;
     if (!clerkSecretKey) return res.status(500).json({ error: 'Server auth not configured' });
 
-    const payload = await verifyToken(token, { secretKey: clerkSecretKey });
+    const clerkClient = createClerkClient({ secretKey: clerkSecretKey });
+    const payload = await clerkClient.verifyToken(token);
     const clerkUserId = payload.sub;
 
     const { credits, planName, paymentId, razorpayOrderId, razorpaySignature } = req.body;
