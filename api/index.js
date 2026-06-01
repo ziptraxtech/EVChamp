@@ -1035,7 +1035,7 @@ app.get('/api/zevault-credits', async (req, res) => {
     });
   } catch (err) {
     console.error('[ZeVault Credits Error]', err.message);
-    return res.status(500).json({ error: 'Unable to load your credits right now.' });
+    return res.status(500).json({ error: 'Unable to load your credits right now.', detail: err.message });
   }
 });
 
