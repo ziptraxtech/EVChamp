@@ -1011,15 +1011,20 @@ app.get('/api/zevault-credits', async (req, res) => {
 
     const clerkClient = createClerkClient({ secretKey: clerkSecretKey });
     const payload = await clerkClient.verifyToken(token);
-    const clerkUserId = payload.sub;
+    const evchampUserId = payload.sub;
 
-    // Look up credits directly by clerkUserId
+    // Get email from EVChamp's Clerk — email is the shared key across both Clerk instances
+    const evchampUser = await clerkClient.users.getUser(evchampUserId);
+    const userEmail = evchampUser.emailAddresses?.[0]?.emailAddress;
+    if (!userEmail) return res.json({ remaining: 0, total: 0, used: 0 });
+
+    // Look up ZeFlash credits by email
     const zsql = getZeflashSQL();
     const rows = await zsql`
       SELECT c.remaining, c.total, c.used
       FROM "Credit" c
       JOIN "User" u ON u.id = c."userId"
-      WHERE u."clerkUserId" = ${clerkUserId}
+      WHERE LOWER(u.email) = LOWER(${userEmail})
       LIMIT 1
     `;
 
@@ -1051,7 +1056,12 @@ app.post('/api/zeflash-add-credits', async (req, res) => {
 
     const clerkClient = createClerkClient({ secretKey: clerkSecretKey });
     const payload = await clerkClient.verifyToken(token);
-    const clerkUserId = payload.sub;
+    const evchampUserId = payload.sub;
+
+    // Get email from EVChamp's Clerk — shared key across both Clerk instances
+    const evchampUser = await clerkClient.users.getUser(evchampUserId);
+    const userEmail = evchampUser.emailAddresses?.[0]?.emailAddress;
+    if (!userEmail) return res.status(400).json({ error: 'Could not determine user email' });
 
     const { credits, planName, paymentId, razorpayOrderId, razorpaySignature } = req.body;
     if (!credits || credits <= 0) return res.status(400).json({ error: 'Invalid credits' });
@@ -1072,15 +1082,12 @@ app.post('/api/zeflash-add-credits', async (req, res) => {
 
     const zsql = getZeflashSQL();
 
-    // Find or create user in ZeFlash DB
-    let userRows = await zsql`SELECT id FROM "User" WHERE "clerkUserId" = ${clerkUserId} LIMIT 1`;
+    // Find or create user in ZeFlash DB by email (shared key across both Clerk instances)
+    let userRows = await zsql`SELECT id FROM "User" WHERE LOWER(email) = LOWER(${userEmail}) LIMIT 1`;
     let userId;
     if (userRows.length === 0) {
       userId = generateZeflashId();
-      const clerkClient = createClerkClient({ secretKey: clerkSecretKey });
-      const clerkUser = await clerkClient.users.getUser(clerkUserId);
-      const email = clerkUser.emailAddresses?.[0]?.emailAddress || `${clerkUserId}@placeholder.zeflash.app`;
-      await zsql`INSERT INTO "User" (id, "clerkUserId", email, "createdAt") VALUES (${userId}, ${clerkUserId}, ${email}, NOW())`;
+      await zsql`INSERT INTO "User" (id, "clerkUserId", email, "createdAt") VALUES (${userId}, ${evchampUserId}, ${userEmail}, NOW())`;
     } else {
       userId = userRows[0].id;
     }
@@ -1094,7 +1101,7 @@ app.post('/api/zeflash-add-credits', async (req, res) => {
       await zsql`UPDATE "Credit" SET total = total + ${credits}, remaining = remaining + ${credits} WHERE "userId" = ${userId}`;
     }
 
-    console.log(`[ZeVault] +${credits} credits for ${clerkUserId} (${planName}, payment: ${paymentId})`);
+    console.log(`[ZeVault] +${credits} credits for ${userEmail} (${planName}, payment: ${paymentId})`);  
     return res.json({ success: true, creditsAdded: credits });
   } catch (err) {
     console.error('[ZeFlash Add Credits Error]', err.message);
