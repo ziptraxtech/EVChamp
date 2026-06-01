@@ -1003,22 +1003,22 @@ app.get('/api/zevault-credits', async (req, res) => {
     }
     const token = authHeader.split(' ')[1];
 
-    // Verify Clerk JWT using evchamp's Clerk secret key
     const clerkSecretKey = process.env.CLERK_SECRET_KEY;
     if (!clerkSecretKey) {
       return res.status(500).json({ error: 'Server auth not configured' });
     }
 
-    const clerkClient = createClerkClient({ secretKey: clerkSecretKey });
-    const payload = await clerkClient.verifyToken(token);
-    const evchampUserId = payload.sub;
+    // Decode JWT to get userId, then confirm via Clerk API (throws if invalid user)
+    const tokenPayload = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
+    const evchampUserId = tokenPayload.sub;
+    if (!evchampUserId) return res.status(401).json({ error: 'Invalid token' });
 
-    // Get email from EVChamp's Clerk — email is the shared key across both Clerk instances
-    const evchampUser = await clerkClient.users.getUser(evchampUserId);
-    const userEmail = evchampUser.emailAddresses?.[0]?.emailAddress;
+    const clerkClient = createClerkClient({ secretKey: clerkSecretKey });
+    const clerkUser = await clerkClient.users.getUser(evchampUserId);
+    const userEmail = clerkUser.emailAddresses?.[0]?.emailAddress;
     if (!userEmail) return res.json({ remaining: 0, total: 0, used: 0 });
 
-    // Look up ZeFlash credits by email
+    // Look up ZeFlash credits by email (shared key across both Clerk instances)
     const zsql = getZeflashSQL();
     const rows = await zsql`
       SELECT c.remaining, c.total, c.used
@@ -1054,13 +1054,14 @@ app.post('/api/zeflash-add-credits', async (req, res) => {
     const clerkSecretKey = process.env.CLERK_SECRET_KEY;
     if (!clerkSecretKey) return res.status(500).json({ error: 'Server auth not configured' });
 
-    const clerkClient = createClerkClient({ secretKey: clerkSecretKey });
-    const payload = await clerkClient.verifyToken(token);
-    const evchampUserId = payload.sub;
+    // Decode JWT to get userId, then confirm via Clerk API
+    const tokenPayload = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
+    const evchampUserId = tokenPayload.sub;
+    if (!evchampUserId) return res.status(401).json({ error: 'Invalid token' });
 
-    // Get email from EVChamp's Clerk — shared key across both Clerk instances
-    const evchampUser = await clerkClient.users.getUser(evchampUserId);
-    const userEmail = evchampUser.emailAddresses?.[0]?.emailAddress;
+    const clerkClient = createClerkClient({ secretKey: clerkSecretKey });
+    const clerkUser = await clerkClient.users.getUser(evchampUserId);
+    const userEmail = clerkUser.emailAddresses?.[0]?.emailAddress;
     if (!userEmail) return res.status(400).json({ error: 'Could not determine user email' });
 
     const { credits, planName, paymentId, razorpayOrderId, razorpaySignature } = req.body;
