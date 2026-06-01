@@ -30,6 +30,7 @@ import SmarterEVAssistance from './components/SmarterEVAssistance';
 import Zeflash from './components/Zeflash';
 import ZeVaultPage from './components/ZeVaultPage';
 import Blog from './components/Blog';
+import ZeflashPlans from './components/ZeflashPlans';
 
 import PartnersCarousel from './components/PartnersCarousel';
 import ChatbotPopup from './components/ChatbotPopup';
@@ -91,8 +92,8 @@ function HomePage() {
               <button onClick={() => goTo('/sign-up')} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm shadow-sm">
                 Get Started
               </button>
-              <button onClick={() => goTo('https://play.google.com/apps/internaltest/4701215861025087123')} className="border border-white/50 bg-white/10 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/15 transition-all text-sm backdrop-blur-sm">
-                Talk to Our Team
+              <button onClick={() => goTo('/zeflash-plans')} className="border border-white/50 bg-white/10 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/15 transition-all text-sm backdrop-blur-sm">
+                Flexible Testing Plans
               </button>
             </div>
           </div>
@@ -325,6 +326,7 @@ function App() {
           <Route path="/zevault" element={<ZeVaultPage />} />
           <Route path="/investyz" element={<Investyz />} />
           <Route path="/blog" element={<Blog />} />
+          <Route path="/zeflash-plans" element={<ZeflashPlans />} />
           <Route path="https://play.google.com/apps/internaltest/4701215861025087123" element={<ContactUs />} />
           <Route path="/ev-assistance" element={<SmarterEVAssistance />} />
           <Route path="/zipbattery" element={<ZipBattery />} />
