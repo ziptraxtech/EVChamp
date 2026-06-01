@@ -3,6 +3,7 @@ const cors = require('cors');
 const { neon } = require('@neondatabase/serverless');
 const nodemailer = require('nodemailer');
 const { verifyToken, createClerkClient } = require('@clerk/backend');
+const crypto = require('crypto');
 
 const app = express();
 
@@ -981,9 +982,6 @@ app.post('/api/users/sync', async (req, res) => {
 });
 
 // ============ ZeVault Credits ============
-const { verifyToken, createClerkClient } = require('@clerk/backend');
-const crypto = require('crypto');
-
 function generateZeflashId() {
   return 'c' + Date.now().toString(36) + Math.random().toString(36).substr(2, 10);
 }
