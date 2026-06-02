@@ -10,7 +10,7 @@
   },
   "rewrites": [
     {
-      "source": "/api/v1/chat/:path*",
+      "source": "/python_api/:path*",
       "destination": "/api/chat"
     },
     {
@@ -23,6 +23,10 @@
     },
     {
       "source": "/api/zevault-credits",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/api/zeflash-add-credits",
       "destination": "/api/index.js"
     },
     {

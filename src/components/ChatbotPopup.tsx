@@ -6,13 +6,13 @@ interface ChatMessage {
   timestamp: string;
 }
 
-// In production we serve the chatbot from the same origin under /api/v1
-// (see vercel.json rewrites → api/chat.py). For local dev set
-// REACT_APP_CHATBOT_API_URL=http://localhost:8000/api/v1 in .env.
+// For local dev set REACT_APP_CHATBOT_API_URL=http://localhost:8000/python_api
+// in .env.
 const CHATBOT_API_URL =
-  process.env.REACT_APP_CHATBOT_API_URL || '/api/v1';
+  process.env.REACT_APP_CHATBOT_API_URL || '/python_api';
 
 const STORAGE_KEY = 'evchamp_chat_history_v1';
+const SESSION_KEY = 'evchamp_chat_session_id_v1';
 
 const WELCOME_MESSAGE: ChatMessage = {
   content:
@@ -21,19 +21,106 @@ const WELCOME_MESSAGE: ChatMessage = {
   timestamp: new Date().toISOString(),
 };
 
-// Render **bold** markdown inline
-const renderInline = (text: string) => {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith('**') && part.endsWith('**')) {
-      return (
-        <strong key={i} className="font-semibold">
-          {part.slice(2, -2)}
+// Inline markdown: **bold**, *italic*, [text](url). Order matters — links
+// first so their inner [text] isn't mistaken for italics.
+const INLINE_RE =
+  /(\[[^\]]+\]\(https?:\/\/[^\s)]+\))|(\*\*[^*]+\*\*)|(\*[^*\n]+\*)/g;
+
+const renderInline = (text: string): React.ReactNode[] => {
+  const out: React.ReactNode[] = [];
+  let last = 0;
+  let i = 0;
+  text.replace(INLINE_RE, (match, link, bold, italic, offset: number) => {
+    if (offset > last) out.push(text.slice(last, offset));
+    if (link) {
+      const m = link.match(/^\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)$/);
+      if (m) {
+        out.push(
+          <a
+            key={`l-${i++}`}
+            href={m[2]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline hover:text-blue-800 break-all"
+          >
+            {m[1]}
+          </a>
+        );
+      } else {
+        out.push(link);
+      }
+    } else if (bold) {
+      out.push(
+        <strong key={`b-${i++}`} className="font-semibold">
+          {bold.slice(2, -2)}
         </strong>
       );
+    } else if (italic) {
+      out.push(
+        <em key={`i-${i++}`} className="italic">
+          {italic.slice(1, -1)}
+        </em>
+      );
     }
-    return <React.Fragment key={i}>{part}</React.Fragment>;
+    last = offset + match.length;
+    return match;
   });
+  if (last < text.length) out.push(text.slice(last));
+  return out;
+};
+
+// Block-level renderer: paragraphs, bullet lists (`- ` or `* `), and
+// numbered lists (`1. `). Keeps things lightweight — no react-markdown dep.
+const renderMarkdown = (text: string): React.ReactNode => {
+  const lines = text.split('\n');
+  const blocks: React.ReactNode[] = [];
+  let listType: 'ul' | 'ol' | null = null;
+  let listItems: React.ReactNode[] = [];
+  let key = 0;
+
+  const flushList = () => {
+    if (!listType) return;
+    const ListTag = listType;
+    blocks.push(
+      <ListTag
+        key={`list-${key++}`}
+        className={
+          listType === 'ul'
+            ? 'list-disc pl-5 my-1 space-y-0.5'
+            : 'list-decimal pl-5 my-1 space-y-0.5'
+        }
+      >
+        {listItems}
+      </ListTag>
+    );
+    listType = null;
+    listItems = [];
+  };
+
+  for (const raw of lines) {
+    const line = raw.trimEnd();
+    const bullet = line.match(/^\s*[-*]\s+(.*)$/);
+    const numbered = line.match(/^\s*\d+\.\s+(.*)$/);
+
+    if (bullet) {
+      if (listType !== 'ul') flushList();
+      listType = 'ul';
+      listItems.push(<li key={`li-${key++}`}>{renderInline(bullet[1])}</li>);
+    } else if (numbered) {
+      if (listType !== 'ol') flushList();
+      listType = 'ol';
+      listItems.push(<li key={`li-${key++}`}>{renderInline(numbered[1])}</li>);
+    } else if (line.trim() === '') {
+      flushList();
+      // blank line — preserve paragraph break
+      blocks.push(<div key={`sp-${key++}`} className="h-2" />);
+    } else {
+      flushList();
+      blocks.push(<div key={`p-${key++}`}>{renderInline(line)}</div>);
+    }
+  }
+  flushList();
+  return blocks;
 };
 
 const loadHistory = (): ChatMessage[] => {
@@ -54,9 +141,37 @@ const ChatbotPopup: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>(loadHistory);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  // Server-side session id (mirrors ZipsureAI). Kept in sessionStorage so
+  // a page refresh keeps the same backend conversation while it's still
+  // warm in the function's _session_cache.
+  const [sessionId, setSessionId] = useState<string | null>(
+    () => sessionStorage.getItem(SESSION_KEY)
+  );
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Lazily fetch a session_id on first open. Same pattern as ZipsureAI's
+  // GET /python_api/chatbot.
+  useEffect(() => {
+    if (!isOpen || sessionId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await fetch(`${CHATBOT_API_URL}/chatbot`);
+        if (!r.ok) return;
+        const data = await r.json();
+        if (cancelled || !data.session_id) return;
+        sessionStorage.setItem(SESSION_KEY, data.session_id);
+        setSessionId(data.session_id);
+      } catch {
+        // Fine — /ask will create one on its own if absent.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, sessionId]);
 
   // Persist to sessionStorage on every message change
   useEffect(() => {
@@ -82,13 +197,6 @@ const ChatbotPopup: React.FC = () => {
     const trimmed = input.trim();
     if (!trimmed || isLoading) return;
 
-    // Snapshot prior history (excluding the welcome bot turn? Keep it — gives the
-    // model context for greetings). Drop the synthetic welcome only if it's the
-    // very first turn and bare.
-    const priorHistory = messages.filter(
-      (m, i) => !(i === 0 && m === WELCOME_MESSAGE)
-    );
-
     const userMessage: ChatMessage = {
       content: trimmed,
       isUser: true,
@@ -99,16 +207,13 @@ const ChatbotPopup: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${CHATBOT_API_URL}/chat/message`, {
+      // POST /python_api/ask  { question, session_id? }
+      const response = await fetch(`${CHATBOT_API_URL}/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          content: trimmed,
-          rag_enabled: true,
-          history: priorHistory.map((m) => ({
-            is_user: m.isUser,
-            content: m.content,
-          })),
+          question: trimmed,
+          session_id: sessionId,
         }),
       });
 
@@ -118,7 +223,13 @@ const ChatbotPopup: React.FC = () => {
       }
 
       const data = await response.json();
-      const botContent = data.reply || "Sorry, I didn't get that.";
+      // Server owns the conversation memory; persist its session_id so
+      // subsequent /ask calls land on the same backend history.
+      if (data.session_id && data.session_id !== sessionId) {
+        sessionStorage.setItem(SESSION_KEY, data.session_id);
+        setSessionId(data.session_id);
+      }
+      const botContent = data.response || "Sorry, I didn't get that.";
 
       setMessages((prev) => [
         ...prev,
@@ -146,8 +257,10 @@ const ChatbotPopup: React.FC = () => {
 
   const handleClearHistory = () => {
     setMessages([WELCOME_MESSAGE]);
+    setSessionId(null);
     try {
       sessionStorage.removeItem(STORAGE_KEY);
+      sessionStorage.removeItem(SESSION_KEY);
     } catch {
       // ignore
     }
@@ -326,10 +439,8 @@ const ChatbotPopup: React.FC = () => {
                       : 'bg-white text-gray-800 border border-gray-100 rounded-bl-sm'
                   }`}
                 >
-                  <div className="whitespace-pre-wrap break-words leading-relaxed">
-                    {msg.content.split('\n').map((line, i) => (
-                      <div key={i}>{renderInline(line)}</div>
-                    ))}
+                  <div className="break-words leading-relaxed text-sm">
+                    {renderMarkdown(msg.content)}
                   </div>
                   <p
                     className={`text-[10px] mt-1 ${

@@ -21,7 +21,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(chat.router, prefix=f"{settings.API_V1_STR}/chat", tags=["chat"])
+# Mount under /python_api to mirror ZipsureAI route layout:
+#   GET  /python_api/chatbot
+#   POST /python_api/ask
+#   GET  /python_api/health/llm
+app.include_router(chat.router, prefix=settings.API_V1_STR, tags=["chat"])
 
 
 @app.get("/")

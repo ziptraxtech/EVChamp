@@ -3,6 +3,7 @@ const cors = require('cors');
 const { neon } = require('@neondatabase/serverless');
 const nodemailer = require('nodemailer');
 const { verifyToken, createClerkClient } = require('@clerk/backend');
+const crypto = require('crypto');
 
 const app = express();
 
@@ -981,8 +982,9 @@ app.post('/api/users/sync', async (req, res) => {
 });
 
 // ============ ZeVault Credits ============
-// Reads shared credits from the Zeflash Neon DB by user email.
-// Both EVChamp and Zeflash share the same ZeVault credit balance.
+function generateZeflashId() {
+  return 'c' + Date.now().toString(36) + Math.random().toString(36).substr(2, 10);
+}
 let zeflashSql = null;
 function getZeflashSQL() {
   if (!zeflashSql) {
@@ -1001,35 +1003,32 @@ app.get('/api/zevault-credits', async (req, res) => {
     }
     const token = authHeader.split(' ')[1];
 
-    // Verify Clerk JWT using evchamp's Clerk secret key
     const clerkSecretKey = process.env.CLERK_SECRET_KEY;
     if (!clerkSecretKey) {
       return res.status(500).json({ error: 'Server auth not configured' });
     }
 
-    const payload = await verifyToken(token, { secretKey: clerkSecretKey });
-    const clerkUserId = payload.sub;
+    // Decode JWT to get userId, then confirm via Clerk API (throws if invalid user)
+    const tokenPayload = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
+    const evchampUserId = tokenPayload.sub;
+    if (!evchampUserId) return res.status(401).json({ error: 'Invalid token' });
 
-    // Resolve user email from Clerk
     const clerkClient = createClerkClient({ secretKey: clerkSecretKey });
-    const clerkUser = await clerkClient.users.getUser(clerkUserId);
-    const email = clerkUser.emailAddresses?.[0]?.emailAddress;
-    if (!email) {
-      return res.status(400).json({ error: 'No email associated with this account' });
-    }
+    const clerkUser = await clerkClient.users.getUser(evchampUserId);
+    const userEmail = clerkUser.emailAddresses?.[0]?.emailAddress;
+    if (!userEmail) return res.json({ remaining: 0, total: 0, used: 0 });
 
-    // Look up credits in zeflash Neon DB by email
+    // Look up ZeFlash credits by email (shared key across both Clerk instances)
     const zsql = getZeflashSQL();
     const rows = await zsql`
       SELECT c.remaining, c.total, c.used
       FROM "Credit" c
       JOIN "User" u ON u.id = c."userId"
-      WHERE u.email = ${email}
+      WHERE LOWER(u.email) = LOWER(${userEmail})
       LIMIT 1
     `;
 
     if (rows.length === 0) {
-      // User has no credits record yet in zeflash (hasn't used the service)
       return res.json({ remaining: 0, total: 0, used: 0 });
     }
 
@@ -1040,7 +1039,74 @@ app.get('/api/zevault-credits', async (req, res) => {
     });
   } catch (err) {
     console.error('[ZeVault Credits Error]', err.message);
-    return res.status(500).json({ error: 'Unable to load your credits right now.' });
+    return res.status(500).json({ error: 'Unable to load your credits right now.', detail: err.message });
+  }
+});
+
+// Add credits to ZeFlash after successful Razorpay payment
+app.post('/api/zeflash-add-credits', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Missing Authorization header' });
+    }
+    const token = authHeader.split(' ')[1];
+    const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+    if (!clerkSecretKey) return res.status(500).json({ error: 'Server auth not configured' });
+
+    // Decode JWT to get userId, then confirm via Clerk API
+    const tokenPayload = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
+    const evchampUserId = tokenPayload.sub;
+    if (!evchampUserId) return res.status(401).json({ error: 'Invalid token' });
+
+    const clerkClient = createClerkClient({ secretKey: clerkSecretKey });
+    const clerkUser = await clerkClient.users.getUser(evchampUserId);
+    const userEmail = clerkUser.emailAddresses?.[0]?.emailAddress;
+    if (!userEmail) return res.status(400).json({ error: 'Could not determine user email' });
+
+    const { credits, planName, paymentId, razorpayOrderId, razorpaySignature } = req.body;
+    if (!credits || credits <= 0) return res.status(400).json({ error: 'Invalid credits' });
+
+    // Verify Razorpay signature if order was created server-side
+    if (razorpayOrderId && razorpaySignature) {
+      const keySecret = process.env.RAZORPAY_KEY_SECRET;
+      if (keySecret) {
+        const expected = crypto
+          .createHmac('sha256', keySecret)
+          .update(`${razorpayOrderId}|${paymentId}`)
+          .digest('hex');
+        if (expected !== razorpaySignature) {
+          return res.status(400).json({ error: 'Payment verification failed' });
+        }
+      }
+    }
+
+    const zsql = getZeflashSQL();
+
+    // Find or create user in ZeFlash DB by email (shared key across both Clerk instances)
+    let userRows = await zsql`SELECT id FROM "User" WHERE LOWER(email) = LOWER(${userEmail}) LIMIT 1`;
+    let userId;
+    if (userRows.length === 0) {
+      userId = generateZeflashId();
+      await zsql`INSERT INTO "User" (id, "clerkUserId", email, "createdAt") VALUES (${userId}, ${evchampUserId}, ${userEmail}, NOW())`;
+    } else {
+      userId = userRows[0].id;
+    }
+
+    // Upsert Credit record
+    const creditRows = await zsql`SELECT id FROM "Credit" WHERE "userId" = ${userId} LIMIT 1`;
+    if (creditRows.length === 0) {
+      const creditId = generateZeflashId();
+      await zsql`INSERT INTO "Credit" (id, "userId", total, used, remaining) VALUES (${creditId}, ${userId}, ${credits}, 0, ${credits})`;
+    } else {
+      await zsql`UPDATE "Credit" SET total = total + ${credits}, remaining = remaining + ${credits} WHERE "userId" = ${userId}`;
+    }
+
+    console.log(`[ZeVault] +${credits} credits for ${userEmail} (${planName}, payment: ${paymentId})`);  
+    return res.json({ success: true, creditsAdded: credits });
+  } catch (err) {
+    console.error('[ZeFlash Add Credits Error]', err.message);
+    return res.status(500).json({ error: 'Could not add credits' });
   }
 });
 

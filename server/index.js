@@ -1,9 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { initDB, saveAudit, getAuditBySerial, getAuditById, getAllAudits, updateCertificate, upsertUser } = require('./db');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 app.use(cors());
 app.use(express.json());
@@ -928,6 +929,158 @@ app.patch('/api/audits/:auditId/certificate', async (req, res) => {
   } catch (err) {
     console.error('Update certificate error:', err.message);
     res.status(500).json({ success: false, message: 'Failed to update certificate' });
+  }
+});
+
+// ============ ZeVault Credits ============
+const { verifyToken, createClerkClient } = require('@clerk/backend');
+const { neon: neonExtra } = require('@neondatabase/serverless');
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
+
+function getRazorpay() {
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+  if (!keyId || !keySecret) throw new Error('Razorpay keys not configured');
+  return new Razorpay({ key_id: keyId, key_secret: keySecret });
+}
+
+function generateZeflashId() {
+  return 'c' + Date.now().toString(36) + Math.random().toString(36).substr(2, 10);
+}
+
+let zeflashSql = null;
+function getZeflashSQL() {
+  if (!zeflashSql) {
+    const url = process.env.ZEFLASH_DATABASE_URL;
+    if (!url) throw new Error('ZEFLASH_DATABASE_URL is not configured');
+    zeflashSql = neonExtra(url);
+  }
+  return zeflashSql;
+}
+
+app.get('/api/zevault-credits', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Missing Authorization header' });
+    }
+    const token = authHeader.split(' ')[1];
+
+    const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+    if (!clerkSecretKey) {
+      return res.status(500).json({ error: 'Server auth not configured' });
+    }
+
+    const payload = await verifyToken(token, { secretKey: clerkSecretKey });
+    const clerkUserId = payload.sub;
+
+    // ZeFlash stores users with a placeholder email derived from the Clerk user ID
+    const placeholderEmail = `${clerkUserId}@placeholder.zeflash.app`;
+
+    const zsql = getZeflashSQL();
+    const rows = await zsql`
+      SELECT c.remaining, c.total, c.used
+      FROM "Credit" c
+      JOIN "User" u ON u.id = c."userId"
+      WHERE u."clerkUserId" = ${clerkUserId}
+      LIMIT 1
+    `;
+
+    if (rows.length === 0) {
+      return res.json({ remaining: 0, total: 0, used: 0 });
+    }
+
+    return res.json({
+      remaining: rows[0].remaining,
+      total: rows[0].total,
+      used: rows[0].used,
+    });
+  } catch (err) {
+    console.error('[ZeVault Credits Error]', err.message);
+    return res.status(500).json({ error: 'Unable to load your credits right now.' });
+  }
+});
+
+// Create Razorpay order for ZeFlash plans
+app.post('/api/zeflash-create-order', async (req, res) => {
+  try {
+    const { amount } = req.body;
+    if (!amount || amount <= 0) return res.status(400).json({ error: 'Invalid amount' });
+    const rzp = getRazorpay();
+    const order = await rzp.orders.create({
+      amount: Math.round(amount * 100),
+      currency: 'INR',
+      receipt: `zeflash_${Date.now()}`,
+    });
+    return res.json({ id: order.id, amount: order.amount, currency: order.currency });
+  } catch (err) {
+    console.error('[ZeFlash Create Order Error]', err.message);
+    return res.status(500).json({ error: 'Could not create order' });
+  }
+});
+
+// Add credits to ZeFlash after successful payment
+app.post('/api/zeflash-add-credits', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Missing Authorization header' });
+    }
+    const token = authHeader.split(' ')[1];
+    const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+    if (!clerkSecretKey) return res.status(500).json({ error: 'Server auth not configured' });
+
+    const payload = await verifyToken(token, { secretKey: clerkSecretKey });
+    const clerkUserId = payload.sub;
+
+    const { credits, planName, paymentId, razorpayOrderId, razorpaySignature } = req.body;
+    if (!credits || credits <= 0) return res.status(400).json({ error: 'Invalid credits' });
+
+    // Verify Razorpay signature if order was created server-side
+    if (razorpayOrderId && razorpaySignature) {
+      const keySecret = process.env.RAZORPAY_KEY_SECRET;
+      if (keySecret) {
+        const expected = crypto
+          .createHmac('sha256', keySecret)
+          .update(`${razorpayOrderId}|${paymentId}`)
+          .digest('hex');
+        if (expected !== razorpaySignature) {
+          return res.status(400).json({ error: 'Payment verification failed' });
+        }
+      }
+    }
+
+    const zsql = getZeflashSQL();
+
+    // Find or create user in ZeFlash DB
+    let userRows = await zsql`SELECT id FROM "User" WHERE "clerkUserId" = ${clerkUserId} LIMIT 1`;
+    let userId;
+    if (userRows.length === 0) {
+      // Create user
+      userId = generateZeflashId();
+      const clerkClient = createClerkClient({ secretKey: clerkSecretKey });
+      const clerkUser = await clerkClient.users.getUser(clerkUserId);
+      const email = clerkUser.emailAddresses?.[0]?.emailAddress || `${clerkUserId}@placeholder.zeflash.app`;
+      await zsql`INSERT INTO "User" (id, "clerkUserId", email, "createdAt") VALUES (${userId}, ${clerkUserId}, ${email}, NOW())`;
+    } else {
+      userId = userRows[0].id;
+    }
+
+    // Upsert Credit record
+    const creditRows = await zsql`SELECT id FROM "Credit" WHERE "userId" = ${userId} LIMIT 1`;
+    if (creditRows.length === 0) {
+      const creditId = generateZeflashId();
+      await zsql`INSERT INTO "Credit" (id, "userId", total, used, remaining) VALUES (${creditId}, ${userId}, ${credits}, 0, ${credits})`;
+    } else {
+      await zsql`UPDATE "Credit" SET total = total + ${credits}, remaining = remaining + ${credits} WHERE "userId" = ${userId}`;
+    }
+
+    console.log(`[ZeVault] +${credits} credits for ${clerkUserId} (${planName}, payment: ${paymentId})`);
+    return res.json({ success: true, creditsAdded: credits });
+  } catch (err) {
+    console.error('[ZeFlash Add Credits Error]', err.message);
+    return res.status(500).json({ error: 'Could not add credits' });
   }
 });
 
