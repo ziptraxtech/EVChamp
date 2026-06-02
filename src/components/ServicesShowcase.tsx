@@ -57,91 +57,128 @@ const ServicesShowcase: React.FC = () => {
 
         <div className="flex flex-col lg:flex-row gap-4">
 
-          {/* ── Large Featured Card: Find EV Service Centres ── */}
-          <div
-            onClick={() => goTo('/service-centres')}
-            style={{ '--tile-delay': '0.05s' } as React.CSSProperties}
-            className="service-tile group lg:w-[32%] bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl p-5 sm:p-7 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 min-h-[320px] sm:min-h-[420px] overflow-hidden"
-          >
-            <div>
-              <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight mb-2">
-                Find EV Service Centres
-              </h3>
-              <p className="text-purple-600 font-semibold text-sm mb-1">
-                Verified workshops near you.
-              </p>
-              <p className="text-gray-500 text-sm mb-5">
-                Locate trusted EV repair, diagnostics, and battery service support across major cities.
-              </p>
-              <CheckBadge text="Pan-India support network" colorClass="bg-purple-50 text-purple-700" />
+          {/* ── Left Side: 2 equal stacked cards ── */}
+          <div className="lg:w-[32%] flex flex-col gap-4">
+
+            {/* Charging Stations — TOP */}
+            <div
+              onClick={() => goTo('/investyz')}
+              style={{ '--tile-delay': '0.05s' } as React.CSSProperties}
+              className="service-tile group flex-1 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-2xl p-5 sm:p-6 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
+            >
+              <div>
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight mb-2">
+                  Charging Stations
+                </h3>
+                <p className="text-amber-600 font-semibold text-sm mb-1">
+                  Find EV chargers near you.
+                </p>
+                <p className="text-gray-500 text-xs mb-4">
+                  Locate nearby EV charging points, check availability, and plan your route with ease.
+                </p>
+                <CheckBadge text="Live map & navigation" colorClass="bg-amber-50 text-amber-700" />
+              </div>
+              <div className="flex items-end justify-between mt-4">
+                <img src={cometevImg} alt="Charging Stations" className="w-24 h-16 object-cover rounded-lg" />
+                <ArrowButton onClick={e => { e.stopPropagation(); goTo('/investyz'); }} />
+              </div>
             </div>
-            <div className="mt-6">
-              <img
-                src={mgzsevImg}
-                alt="Find EV Service Centres"
-                className="w-52 sm:w-60 object-cover rounded-xl drop-shadow-xl mx-auto"
-              />
-              <div className="flex justify-end mt-4">
+
+            {/* Find EV Service Centres — BOTTOM */}
+            <div
+              onClick={() => goTo('/service-centres')}
+              style={{ '--tile-delay': '0.08s' } as React.CSSProperties}
+              className="service-tile group flex-1 bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl p-5 sm:p-6 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
+            >
+              <div>
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight mb-2">
+                  Find EV Service Centres
+                </h3>
+                <p className="text-purple-600 font-semibold text-sm mb-1">
+                  Verified workshops near you.
+                </p>
+                <p className="text-gray-500 text-xs mb-4">
+                  Locate trusted EV repair, diagnostics, and battery service support across major cities.
+                </p>
+                <CheckBadge text="Pan-India support network" colorClass="bg-purple-50 text-purple-700" />
+              </div>
+              <div className="flex items-end justify-between mt-4">
+                <img src={mgzsevImg} alt="Find EV Service Centres" className="w-24 h-16 object-cover rounded-lg" />
                 <ArrowButton onClick={e => { e.stopPropagation(); goTo('/service-centres'); }} />
               </div>
             </div>
+
           </div>
 
           {/* ── Right Side: top-row (2 cards) + bottom-row (3 cards) ── */}
           <div className="lg:w-[68%] flex flex-col gap-4">
 
-            {/* Top row: 2 medium cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Top row: 3 medium cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 
               {/* Sell EV */}
               <div
                 onClick={() => goTo('/zeflash')}
                 style={{ '--tile-delay': '0.10s' } as React.CSSProperties}
-                className="service-tile group bg-gradient-to-br from-sky-50 to-blue-50 rounded-2xl p-5 sm:p-6 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden min-h-[180px] sm:min-h-[200px]"
+                className="service-tile group bg-gradient-to-br from-sky-50 to-blue-50 rounded-2xl p-5 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
               >
-                <div className="flex justify-between items-start gap-3">
-                  <div className="flex-1">
-                    <img src="/zeflash-logo.png" alt="Zeflash" className="h-8 w-auto mb-2 object-contain" />
-                    <p className="text-sky-600 font-semibold text-sm mb-2">Rapid AI battery diagnostics.</p>
-                    <p className="text-gray-500 text-sm leading-snug">
-                      20-minute field diagnostics with SoP, SoF, and instant health reports during charging.
-                    </p>
-                  </div>
-                  <img
-                    src={punchImg}
-                    alt="Zeflash"
-                    className="w-28 h-20 object-cover rounded-xl flex-shrink-0"
-                  />
+                <div>
+                  <img src="/zeflash-logo.png" alt="Zeflash" className="h-7 w-auto mb-2 object-contain" />
+                  <p className="text-sky-600 font-semibold text-sm mb-2">Rapid AI battery diagnostics.</p>
+                  <p className="text-gray-500 text-xs leading-snug">
+                    20-minute field diagnostics with SoP, SoF, and instant health reports during charging.
+                  </p>
                 </div>
-                <div className="flex items-center justify-between mt-4">
-                  <CheckBadge text="Visit zeflash.app" colorClass="bg-sky-50 text-sky-700" />
+                <div className="flex items-end justify-between mt-4">
+                  <img src={punchImg} alt="Zeflash" className="w-24 h-16 object-cover rounded-lg" />
                   <ArrowButton onClick={e => { e.stopPropagation(); goTo('/zeflash'); }} />
+                </div>
+                <div className="mt-3">
+                  <CheckBadge text="Visit zeflash.app" colorClass="bg-sky-50 text-sky-700" />
                 </div>
               </div>
 
-              {/* Find EV Service Centres */}
+              {/* Smart EV Telematics */}
               <div
                 onClick={() => goTo('/buy-plans')}
                 style={{ '--tile-delay': '0.15s' } as React.CSSProperties}
-                className="service-tile group bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-2xl p-5 sm:p-6 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden min-h-[180px] sm:min-h-[200px]"
+                className="service-tile group bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-2xl p-5 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
               >
-                <div className="flex justify-between items-start gap-3">
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">Smart EV Telematics &amp; Fleet Plans</h3>
-                    <p className="text-green-600 font-semibold text-sm mb-2">Real-time GPS. AI diagnostics.</p>
-                    <p className="text-gray-500 text-sm leading-snug">
-                      India's most advanced IoT tracking & fleet management platform built for electric vehicles.
-                    </p>
-                  </div>
-                  <img
-                    src={mockupImg}
-                    alt="EV Telematics App"
-                    className="w-28 h-20 object-contain rounded-xl flex-shrink-0 bg-white"
-                  />
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-1">Smart EV Telematics &amp; Fleet Plans</h3>
+                  <p className="text-green-600 font-semibold text-sm mb-2">Real-time GPS. AI diagnostics.</p>
+                  <p className="text-gray-500 text-xs leading-snug">
+                    India's most advanced IoT tracking & fleet management platform built for electric vehicles.
+                  </p>
                 </div>
-                <div className="flex items-center justify-between mt-4">
-                  <CheckBadge text="Plans starting at ₹4,999/yr" colorClass="bg-green-100 text-green-700" />
+                <div className="flex items-end justify-between mt-4">
+                  <img src={mockupImg} alt="EV Telematics App" className="w-24 h-16 object-contain rounded-lg bg-white" />
                   <ArrowButton onClick={e => { e.stopPropagation(); goTo('/buy-plans'); }} />
+                </div>
+                <div className="mt-3">
+                  <CheckBadge text="Plans starting at ₹4,999/yr" colorClass="bg-green-100 text-green-700" />
+                </div>
+              </div>
+
+              {/* Rent an EV */}
+              <div
+                onClick={() => goTo('/rent-ev')}
+                style={{ '--tile-delay': '0.20s' } as React.CSSProperties}
+                className="service-tile group bg-gradient-to-br from-teal-50 to-cyan-50 rounded-2xl p-5 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
+              >
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-1">Rent an EV</h3>
+                  <p className="text-teal-600 font-semibold text-sm mb-2">Flexible. Affordable. Green.</p>
+                  <p className="text-gray-500 text-xs leading-snug">
+                    Rent electric vehicles by the day or month with zero fuel costs and zero hassle.
+                  </p>
+                </div>
+                <div className="flex items-end justify-between mt-4">
+                  <img src={nexonImg} alt="Rent EV" className="w-24 h-16 object-cover rounded-lg" />
+                  <ArrowButton onClick={e => { e.stopPropagation(); goTo('/rent-ev'); }} />
+                </div>
+                <div className="mt-3">
+                  <CheckBadge text="From ₹499/day" colorClass="bg-teal-50 text-teal-700" />
                 </div>
               </div>
             </div>
