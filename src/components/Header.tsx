@@ -55,7 +55,7 @@ const Header: React.FC = () => {
   const platformLinks = [
     { label: 'EV Marketplace', desc: 'Buy & sell certified EVs', route: '/buy-used-ev' },
     { label: 'Find EV Service Centres', desc: 'Verified workshops near you', route: '/service-centres' },
-    { label: 'INVESTYZ', desc: 'Green infrastructure investment', route: '/investyz' },
+    { label: 'Find EV Chargers', desc: 'Green infrastructure investment', route: '/investyz' },
     { label: 'IoT & Software Plans', desc: 'Hardware + analytics subscriptions', route: '/buy-plans' },
     { label: 'Rent EV', desc: 'Rent electric vehicles near you', route: '/rent-ev' },
     { label: 'Roadside Assistance', desc: 'Emergency EV support', route: '/rsa-plans' },
