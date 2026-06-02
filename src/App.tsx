@@ -107,59 +107,60 @@ function HomePage() {
           <p className="text-gray-500 text-xs mb-5">Explore EVChamp services, charging support, and EV assistance from one place.</p>
 
           <div className="flex flex-col sm:flex-row gap-5 items-center">
-            {/* QR Code — custom image */}
-            <div className="flex-shrink-0 bg-gray-50 border border-gray-200 rounded-xl p-3 flex flex-col items-center gap-2">
-              <span className="text-xs font-semibold bg-blue-600 text-white px-2.5 py-0.5 rounded-full">Scan to Visit</span>
-              <img
-                src="/evchamp-qr.jpg"
-                alt="Scan to visit EVChamp website"
-                className="w-40 h-40 object-contain rounded-lg"
-              />
-            </div>
-
-            {/* Right side */}
-            <div className="flex-1">
-              <h3 className="text-base font-bold text-gray-900 mb-1">Scan to Open EVChamp</h3>
-              <p className="text-gray-500 text-xs mb-3">
-                Point your phone's camera at the QR code to instantly open the EVChamp website. App Store &amp; direct APK downloads are coming soon!
-              </p>
-
-              {/* Buttons */}
-              <div className="flex flex-wrap gap-2 mb-2">
+            {/* Store badges (replaces QR code) */}
+            <div className="flex-shrink-0 bg-gray-50 border border-gray-200 rounded-xl p-3 flex flex-col items-center gap-2 w-40">
+              <span className="text-xs font-semibold bg-blue-600 text-white px-2.5 py-0.5 rounded-full">Get the App</span>
+              <div className="flex flex-col items-center gap-2 w-full">
                 <a
                   href="https://play.google.com/store/apps/details?id=com.evchamp.app"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-green-500 text-green-700 text-xs font-medium bg-green-50 hover:bg-green-100 transition-colors"
+                  className="w-full"
                 >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M3.18 23.76A1.52 1.52 0 0 1 2 22.3V1.7A1.52 1.52 0 0 1 3.18.24L13.8 11 3.18 23.76Zm11.67-8.05-2.55-2.71 2.57-2.57 3.04 1.7a1.52 1.52 0 0 1 0 2.64l-3.06 .94ZM4.37 24l9.33-9.33 2.12 2.26L5.16 24.5A1.52 1.52 0 0 1 4.37 24Zm0-24a1.52 1.52 0 0 1 .79.5l10.66 7.07-2.12 2.26L4.37 0Z"/>
-                  </svg>
-                  Download on Play Store
+                  <img
+                    src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
+                    alt="Get it on Google Play"
+                    className="w-full h-auto object-contain scale-[1.22] origin-center"
+                  />
                 </a>
+                <div className="w-full flex flex-col items-center gap-1 cursor-not-allowed" title="Coming Soon">
+                  <img
+                    src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
+                    alt="Download on the App Store"
+                    className="w-full h-auto object-contain scale-[1.08] origin-center opacity-40"
+                  />
+                  <span className="text-[9px] font-bold text-gray-500 tracking-wide uppercase">Coming Soon</span>
+                </div>
               </div>
-              <p className="text-xs text-gray-400 mb-3">Download the EVChamp app via Google Play internal test.</p>
+            </div>
+
+            {/* Right side */}
+            <div className="flex-1">
+              <h3 className="text-base font-bold text-gray-900 mb-1">Open the EVChamp App</h3>
+              <p className="text-gray-500 text-xs mb-3">
+                Tap a badge to open EVChamp on your device. App Store listing will be live soon.
+              </p>
 
               {/* Feature bullets */}
               <ul className="space-y-1.5">
-                {[
-                  { title: 'Instant Access', desc: 'Scan once and open the platform right in your browser' },
-                  { title: 'Works on All Devices', desc: 'Compatible with any Android or iOS phone camera' },
-                  { title: 'Always Up-to-Date', desc: 'Website always reflects the latest EVChamp features' },
-                ].map((f) => (
-                  <li key={f.title} className="flex items-start gap-2">
-                    <svg className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <div>
-                      <p className="text-xs font-semibold text-gray-800">{f.title}</p>
-                      <p className="text-xs text-gray-500">{f.desc}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+                 {[
+                   { title: 'Instant Access', desc: 'Scan once and open the platform right in your browser' },
+                   { title: 'Works on All Devices', desc: 'Compatible with any Android or iOS phone camera' },
+                   { title: 'Always Up-to-Date', desc: 'Website always reflects the latest EVChamp features' },
+                 ].map((f) => (
+                   <li key={f.title} className="flex items-start gap-2">
+                     <svg className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                     </svg>
+                     <div>
+                       <p className="text-xs font-semibold text-gray-800">{f.title}</p>
+                       <p className="text-xs text-gray-500">{f.desc}</p>
+                     </div>
+                   </li>
+                 ))}
+               </ul>
+             </div>
+           </div>
         </div>
       </section>
 
@@ -325,7 +326,7 @@ function App() {
           <Route path="/zevault" element={<ZeVaultPage />} />
           <Route path="/investyz" element={<Investyz />} />
           <Route path="/blog" element={<Blog />} />
-          <Route path="https://play.google.com/apps/internaltest/4701215861025087123" element={<ContactUs />} />
+          <Route path="/contact" element={<ContactUs />} />
           <Route path="/ev-assistance" element={<SmarterEVAssistance />} />
           <Route path="/zipbattery" element={<ZipBattery />} />
           <Route path="/advance-analysis" element={
