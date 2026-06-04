@@ -86,23 +86,22 @@ async function initDB() {
     await getSQL()`CREATE INDEX IF NOT EXISTS idx_users_clerk_id ON users(clerk_id)`;
 
     await getSQL()`
-      CREATE TABLE IF NOT EXISTS zevault_credits (
+      CREATE TABLE IF NOT EXISTS wallet_balance (
         id SERIAL PRIMARY KEY,
         clerk_user_id TEXT UNIQUE NOT NULL,
-        total_credits INTEGER NOT NULL DEFAULT 0,
-        used_credits INTEGER NOT NULL DEFAULT 0,
-        remaining_credits INTEGER NOT NULL DEFAULT 0,
+        balance_paise BIGINT NOT NULL DEFAULT 0,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       )
     `;
-    await getSQL()`CREATE INDEX IF NOT EXISTS idx_zevault_clerk_id ON zevault_credits(clerk_user_id)`;
+    await getSQL()`CREATE INDEX IF NOT EXISTS idx_wallet_clerk_id ON wallet_balance(clerk_user_id)`;
 
     await getSQL()`
-      CREATE TABLE IF NOT EXISTS zevault_transactions (
+      CREATE TABLE IF NOT EXISTS wallet_transactions (
         id SERIAL PRIMARY KEY,
         clerk_user_id TEXT NOT NULL,
-        credits INTEGER NOT NULL,
-        plan_name TEXT,
+        amount_paise BIGINT NOT NULL,
+        direction TEXT NOT NULL,
+        description TEXT,
         razorpay_payment_id TEXT,
         razorpay_order_id TEXT,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -1026,37 +1025,24 @@ app.get('/api/zevault-credits', async (req, res) => {
       return res.status(401).json({ error: 'Missing Authorization header' });
     }
     const token = authHeader.split(' ')[1];
-
-    // Decode JWT to get clerkUserId
     const tokenPayload = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
     const clerkUserId = tokenPayload.sub;
     if (!clerkUserId) return res.status(401).json({ error: 'Invalid token' });
 
-    // Query EVChamp's own DB — no cross-app dependency
     const sql = getSQL();
     const rows = await sql`
-      SELECT total_credits, used_credits, remaining_credits
-      FROM zevault_credits
-      WHERE clerk_user_id = ${clerkUserId}
-      LIMIT 1
+      SELECT balance_paise FROM wallet_balance WHERE clerk_user_id = ${clerkUserId} LIMIT 1
     `;
 
-    if (rows.length === 0) {
-      return res.json({ remaining: 0, total: 0, used: 0 });
-    }
-
-    return res.json({
-      remaining: rows[0].remaining_credits,
-      total: rows[0].total_credits,
-      used: rows[0].used_credits,
-    });
+    const balancePaise = rows.length > 0 ? Number(rows[0].balance_paise) : 0;
+    return res.json({ balance_paise: balancePaise, balance_inr: balancePaise / 100 });
   } catch (err) {
-    console.error('[ZeVault Credits Error]', err.message);
-    return res.status(500).json({ error: 'Unable to load your credits right now.', detail: err.message });
+    console.error('[ZeVault Balance Error]', err.message);
+    return res.status(500).json({ error: 'Unable to load your wallet balance right now.', detail: err.message });
   }
 });
 
-// Add credits to ZeVault after successful Razorpay payment
+// Top up ZeVault wallet after successful Razorpay payment
 app.post('/api/zeflash-add-credits', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
@@ -1064,51 +1050,84 @@ app.post('/api/zeflash-add-credits', async (req, res) => {
       return res.status(401).json({ error: 'Missing Authorization header' });
     }
     const token = authHeader.split(' ')[1];
-
-    // Decode JWT to get clerkUserId
     const tokenPayload = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
     const clerkUserId = tokenPayload.sub;
     if (!clerkUserId) return res.status(401).json({ error: 'Invalid token' });
 
-    const { credits, planName, paymentId, razorpayOrderId, razorpaySignature } = req.body;
-    if (!credits || credits <= 0) return res.status(400).json({ error: 'Invalid credits' });
+    const { amount, planName, paymentId, razorpayOrderId, razorpaySignature } = req.body;
+    const amountPaise = Math.round((Number(amount) || 0) * 100);
+    if (!amountPaise || amountPaise <= 0) return res.status(400).json({ error: 'Invalid amount' });
 
-    // Verify Razorpay signature if order was created server-side
+    // Verify Razorpay signature
     if (razorpayOrderId && razorpaySignature) {
       const keySecret = process.env.RAZORPAY_KEY_SECRET;
       if (keySecret) {
-        const expected = crypto
-          .createHmac('sha256', keySecret)
-          .update(`${razorpayOrderId}|${paymentId}`)
-          .digest('hex');
+        const expected = crypto.createHmac('sha256', keySecret)
+          .update(`${razorpayOrderId}|${paymentId}`).digest('hex');
         if (expected !== razorpaySignature) {
           return res.status(400).json({ error: 'Payment verification failed' });
         }
       }
     }
 
-    // Upsert into EVChamp's own zevault_credits table
     const sql = getSQL();
     await sql`
-      INSERT INTO zevault_credits (clerk_user_id, total_credits, used_credits, remaining_credits, updated_at)
-      VALUES (${clerkUserId}, ${credits}, 0, ${credits}, NOW())
+      INSERT INTO wallet_balance (clerk_user_id, balance_paise, updated_at)
+      VALUES (${clerkUserId}, ${amountPaise}, NOW())
       ON CONFLICT (clerk_user_id) DO UPDATE
-        SET total_credits     = zevault_credits.total_credits + ${credits},
-            remaining_credits = zevault_credits.remaining_credits + ${credits},
-            updated_at        = NOW()
+        SET balance_paise = wallet_balance.balance_paise + ${amountPaise},
+            updated_at = NOW()
     `;
-
-    // Log the transaction
     await sql`
-      INSERT INTO zevault_transactions (clerk_user_id, credits, plan_name, razorpay_payment_id, razorpay_order_id)
-      VALUES (${clerkUserId}, ${credits}, ${planName || null}, ${paymentId || null}, ${razorpayOrderId || null})
+      INSERT INTO wallet_transactions (clerk_user_id, amount_paise, direction, description, razorpay_payment_id, razorpay_order_id)
+      VALUES (${clerkUserId}, ${amountPaise}, 'credit', ${planName || 'Wallet Top-up'}, ${paymentId || null}, ${razorpayOrderId || null})
     `;
 
-    console.log(`[ZeVault] +${credits} credits for ${clerkUserId} (${planName}, payment: ${paymentId})`);
-    return res.json({ success: true, creditsAdded: credits });
+    console.log(`[ZeVault] +₹${amount} (${amountPaise} paise) for ${clerkUserId} via ${paymentId}`);
+    return res.json({ success: true, amountAdded: amount, amountPaise });
   } catch (err) {
-    console.error('[ZeVault Add Credits Error]', err.message);
-    return res.status(500).json({ error: 'Could not add credits', detail: err.message });
+    console.error('[ZeVault Top-up Error]', err.message);
+    return res.status(500).json({ error: 'Could not top up wallet', detail: err.message });
+  }
+});
+
+// Deduct from ZeVault wallet when a service is used
+app.post('/api/wallet-deduct', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Missing Authorization header' });
+    }
+    const token = authHeader.split(' ')[1];
+    const tokenPayload = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
+    const clerkUserId = tokenPayload.sub;
+    if (!clerkUserId) return res.status(401).json({ error: 'Invalid token' });
+
+    const { amount, description } = req.body;
+    const amountPaise = Math.round((Number(amount) || 0) * 100);
+    if (!amountPaise || amountPaise <= 0) return res.status(400).json({ error: 'Invalid amount' });
+
+    const sql = getSQL();
+    const rows = await sql`SELECT balance_paise FROM wallet_balance WHERE clerk_user_id = ${clerkUserId} LIMIT 1`;
+    const currentBalance = rows.length > 0 ? Number(rows[0].balance_paise) : 0;
+
+    if (currentBalance < amountPaise) {
+      return res.status(402).json({ error: 'Insufficient wallet balance', balance_inr: currentBalance / 100 });
+    }
+
+    await sql`
+      UPDATE wallet_balance SET balance_paise = balance_paise - ${amountPaise}, updated_at = NOW()
+      WHERE clerk_user_id = ${clerkUserId}
+    `;
+    await sql`
+      INSERT INTO wallet_transactions (clerk_user_id, amount_paise, direction, description)
+      VALUES (${clerkUserId}, ${amountPaise}, 'debit', ${description || 'Service usage'})
+    `;
+
+    return res.json({ success: true, newBalancePaise: currentBalance - amountPaise, newBalanceInr: (currentBalance - amountPaise) / 100 });
+  } catch (err) {
+    console.error('[ZeVault Deduct Error]', err.message);
+    return res.status(500).json({ error: 'Could not process deduction', detail: err.message });
   }
 });
 

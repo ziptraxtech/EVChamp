@@ -34,12 +34,12 @@ const ZeflashPlans: React.FC = () => {
   const [numTests, setNumTests] = useState(8);
   const [validity, setValidity] = useState(12);
   const [paying, setPaying] = useState<string | null>(null);
-  const [successPlan, setSuccessPlan] = useState<string | null>(null);
+  const [successPlan, setSuccessPlan] = useState<{ name: string; amount: number } | null>(null);
 
   const pricePerTest = 200;
   const customTotal = numTests * pricePerTest;
 
-  const handlePlanClick = async (planName: string, amount: number, credits: number) => {
+  const handlePlanClick = async (planName: string, amount: number) => {
     if (!isSignedIn) { navigate('/sign-in'); return; }
 
     const key = process.env.REACT_APP_RAZORPAY_KEY_ID;
@@ -85,17 +85,17 @@ const ZeflashPlans: React.FC = () => {
                 Authorization: `Bearer ${token}`,
               },
               body: JSON.stringify({
-                credits,
+                amount,
                 planName,
                 paymentId: response.razorpay_payment_id,
                 razorpayOrderId: response.razorpay_order_id || '',
                 razorpaySignature: response.razorpay_signature || '',
               }),
             });
-            if (!creditRes.ok) throw new Error('Credit update failed');
-            setSuccessPlan(planName);
+            if (!creditRes.ok) throw new Error('Wallet top-up failed');
+            setSuccessPlan({ name: planName, amount });
           } catch (err) {
-            alert('Payment received but credit update failed. Please contact support with payment ID: ' + response.razorpay_payment_id);
+            alert('Payment received but wallet top-up failed. Please contact support with payment ID: ' + response.razorpay_payment_id);
           }
         },
       };
@@ -121,8 +121,8 @@ const ZeflashPlans: React.FC = () => {
             <CheckIcon color="text-green-500" />
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">Payment Successful!</h2>
-          <p className="text-gray-500 text-sm mb-1">Your <span className="font-semibold text-gray-800">{successPlan}</span> credits have been added to ZeVault.</p>
-          <p className="text-gray-400 text-xs mb-6">You can now use them for EV battery diagnostics on Zeflash.</p>
+          <p className="text-gray-500 text-sm mb-1"><span className="font-semibold text-gray-800">₹{successPlan?.amount.toLocaleString('en-IN')}</span> has been added to your ZeVault wallet.</p>
+          <p className="text-gray-400 text-xs mb-6">Use your balance for diagnostics, RSA, rentals, and more across EVChamp.</p>
           <div className="flex flex-col gap-2">
             <button onClick={() => navigate('/zevault')} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors">
               View ZeVault Balance
@@ -147,7 +147,7 @@ const ZeflashPlans: React.FC = () => {
           </p>
           <div className="inline-flex items-center gap-1.5 mt-4 bg-yellow-50 border border-yellow-200 text-yellow-700 text-sm font-medium px-4 py-1.5 rounded-full">
             <BoltIcon />
-            1 battery test = 1 ZeVault credit
+            Add money once — use across all EVChamp services
           </div>
         </div>
 
@@ -168,11 +168,11 @@ const ZeflashPlans: React.FC = () => {
               ))}
             </ul>
             <button
-              onClick={() => handlePlanClick('One Time', 299, 1)}
+              onClick={() => handlePlanClick('One Time', 299)}
               disabled={paying === 'One Time'}
               className="w-full bg-gray-900 hover:bg-black disabled:opacity-60 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors"
             >
-              {paying === 'One Time' ? 'Opening…' : 'Start Trial'}
+              {paying === 'One Time' ? 'Opening…' : 'Add ₹299 to Wallet'}
             </button>
           </div>
 
@@ -190,11 +190,11 @@ const ZeflashPlans: React.FC = () => {
               ))}
             </ul>
             <button
-              onClick={() => handlePlanClick('Starter Pack', 999, 4)}
+              onClick={() => handlePlanClick('Starter Pack', 999)}
               disabled={paying === 'Starter Pack'}
               className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors"
             >
-              {paying === 'Starter Pack' ? 'Opening…' : 'Get Started'}
+              {paying === 'Starter Pack' ? 'Opening…' : 'Add ₹999 to Wallet'}
             </button>
           </div>
 
@@ -213,11 +213,11 @@ const ZeflashPlans: React.FC = () => {
               ))}
             </ul>
             <button
-              onClick={() => handlePlanClick('Value Pack', 1499, 8)}
+              onClick={() => handlePlanClick('Value Pack', 1499)}
               disabled={paying === 'Value Pack'}
               className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors"
             >
-              {paying === 'Value Pack' ? 'Opening…' : 'Get Value Pack'}
+              {paying === 'Value Pack' ? 'Opening…' : 'Add ₹1,499 to Wallet'}
             </button>
           </div>
 
@@ -245,18 +245,18 @@ const ZeflashPlans: React.FC = () => {
               ))}
             </ul>
             <button
-              onClick={() => handlePlanClick('Custom Plan', customTotal, numTests)}
+              onClick={() => handlePlanClick('Custom Plan', customTotal)}
               disabled={paying === 'Custom Plan'}
               className="w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-60 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors"
             >
-              {paying === 'Custom Plan' ? 'Opening…' : 'Buy Custom Plan'}
+              {paying === 'Custom Plan' ? 'Opening…' : `Add ₹${customTotal.toLocaleString('en-IN')} to Wallet`}
             </button>
           </div>
 
         </div>
 
         <p className="text-center text-gray-400 text-xs mt-8">
-          All plans include secure Razorpay checkout • 90%+ diagnostic accuracy • Instant report generation
+          All top-ups are processed securely via Razorpay • Balance never expires • Use across all EVChamp services
         </p>
       </main>
     </div>
