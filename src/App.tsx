@@ -68,16 +68,18 @@ function HomePage() {
       {/* Hero Section */}
       <section
         className="relative overflow-hidden text-white"
-        style={{
-          backgroundImage: "url('/bg-hero.png')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center 30%',
-        }}
       >
-        <div className="absolute inset-0 bg-white/10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/55 via-slate-900/40 to-slate-900/25" />
+        <img
+          src="/bg-hero.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-fill object-center"
+          style={{ zIndex: 0 }}
+        />
+        <div className="absolute inset-0 bg-white/10" style={{ zIndex: 1 }} />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/55 via-slate-900/40 to-slate-900/25" style={{ zIndex: 1 }} />
 
-        <div className="relative container mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center max-w-4xl">
+        <div className="relative container mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center max-w-4xl" style={{ zIndex: 2 }}>
           <div className="rounded-2xl bg-black/20 backdrop-blur-[2px] px-4 py-8 sm:px-8 sm:py-10 shadow-xl">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-6 text-white drop-shadow-sm">
               Powering the Future of Electric Mobility with AI and IoT

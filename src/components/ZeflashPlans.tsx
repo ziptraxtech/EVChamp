@@ -138,35 +138,6 @@ const ZeflashPlans: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-100" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">
-              <BoltIcon />
-            </div>
-            <span className="font-bold text-gray-900 text-lg">Zeflash</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/zevault')}
-              className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors"
-            >
-              <span className="text-yellow-300"><BoltIcon /></span>
-              ZeVault
-            </button>
-            <button
-              onClick={() => { navigate('/'); window.scrollTo({ top: 0 }); }}
-              className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
-              </svg>
-              Back to Home
-            </button>
-          </div>
-        </div>
-      </header>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
         <div className="text-center mb-10">
