@@ -66,48 +66,60 @@ function HomePage() {
       </Helmet>
 
       {/* Hero Section */}
-      <section
-        className="relative overflow-hidden text-white"
-      >
-        <img
-          src="/bg-hero.png"
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 w-full h-full object-fill object-center"
-          style={{ zIndex: 0 }}
-        />
-        <div className="absolute inset-0 bg-white/10" style={{ zIndex: 1 }} />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/55 via-slate-900/40 to-slate-900/25" style={{ zIndex: 1 }} />
+      <section className="relative overflow-hidden text-white min-h-[520px] sm:min-h-[620px]">
+  <img
+    src="/bg-hero.png"
+    alt=""
+    aria-hidden="true"
+    className="absolute inset-0 w-full h-full object-fill object-center"
+    style={{ zIndex: 0 }}
+  />
 
-        <div className="relative container mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center max-w-4xl" style={{ zIndex: 2 }}>
-          <div className="rounded-2xl bg-black/20 backdrop-blur-[2px] px-4 py-8 sm:px-8 sm:py-10 shadow-xl">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-6 text-white drop-shadow-sm">
-              Powering the Future of Electric Mobility with AI and IoT
-            </h1>
-            <p className="text-white/95 text-base sm:text-lg leading-relaxed mb-8 max-w-3xl mx-auto drop-shadow-sm">
-              From certified pre-owned EVs and battery diagnostics to IoT hardware, software subscriptions, charging access, roadside assistance, and smart EV support — EVChamp brings every part of the EV journey into one connected platform.
-            </p>
-            <div className="flex flex-wrap justify-center gap-3">
-              <button onClick={scrollToTopServices} className="bg-white text-gray-900 font-semibold px-6 py-3 rounded-lg hover:bg-gray-100 transition-all text-sm shadow-sm">
-                Explore Platform
-              </button>
-              <button onClick={() => goTo('/sign-up')} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm shadow-sm">
-                Get Started
-              </button>
-              <button onClick={() => goTo('/zeflash-plans')} className="border border-white/50 bg-white/10 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/15 transition-all text-sm backdrop-blur-sm">
-                Flexible Testing Plans
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
+  <div
+    className="absolute inset-0 bg-black/10"
+    style={{ zIndex: 1 }}
+  />
 
+  {/* Buttons fixed at top of image */}
+  {/* Buttons fixed at very top of image */}
+<div
+  className="absolute left-1/2 top-3 sm:top-4 md:top-5 -translate-x-1/2 flex flex-wrap justify-center gap-3 w-full px-4"
+  style={{ zIndex: 2 }}
+>
+  <button
+    onClick={scrollToTopServices}
+    className="bg-violet-500 text-white-900 font-semibold px-4 py-2 rounded-lg hover:bg-gray-100 transition-all text-sm shadow-md"
+  >
+    Explore Platform
+  </button>
+
+
+  <button
+    onClick={() => goTo('/zeflash-plans')}
+    className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm"
+  >
+    Flexible Testing Plans
+  </button>
+</div>
+
+  {/* Heading at bottom in one line */}
+  {/* Heading at most bottom in smaller size */}
+<div
+  className="absolute bottom-0 left-0 right-0 px-3 text-center"
+  style={{ zIndex: 2 }}
+>
+  
+</div>
+</section>
       {/* Get the EVChamp App */}
       <section className="bg-white border-b border-gray-100">
         <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-5xl">
           <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">Mobile App</p>
+          <h1 className="text-xs sm:text-base md:text-2xl font-bold text-black drop-shadow-lg whitespace-nowrap overflow-hidden text-ellipsis">
+          Powering the Future of Electric Mobility with AI and IoT
+          </h1>
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">Get the EVChamp app</h2>
-          <p className="text-gray-500 text-xs mb-5">Explore EVChamp services, charging support, and EV assistance from one place.</p>
+          <p className="text-gray-500 text-xs mb-5">Explore EVChamp services, charging support, and EV assistance, From certified pre-owned EVs and battery diagnostics to IoT hardware, software subscriptions, charging access, roadside assistance, and smart EV support — EVChamp brings every part of the EV journey into one connected platform..</p>
 
           <div className="flex flex-col sm:flex-row gap-5 items-center">
             {/* Store badges (replaces QR code) */}
