@@ -83,7 +83,7 @@ function HomePage() {
   {/* Buttons fixed at top of image */}
   {/* Buttons fixed at very top of image */}
 <div
-  className="absolute left-1/2 top-3 sm:top-4 md:top-5 -translate-x-1/2 flex flex-wrap justify-center gap-3 w-full px-4"
+  className="absolute left-1/2 bottom-20 sm:bottom-25 md:bottom-30 -translate-x-1/2 flex flex-wrap justify-center gap-3 w-full px-4"
   style={{ zIndex: 2 }}
 >
   <button
@@ -98,7 +98,7 @@ function HomePage() {
     onClick={() => goTo('/zeflash-plans')}
     className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm"
   >
-    Flexible Testing Plans
+    EVChamp Super Plans
   </button>
 </div>
 
@@ -115,10 +115,7 @@ function HomePage() {
       <section className="bg-white border-b border-gray-100">
         <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-5xl">
           <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">Mobile App</p>
-          <h1 className="text-xs sm:text-base md:text-2xl font-bold text-black drop-shadow-lg whitespace-nowrap overflow-hidden text-ellipsis">
-          Powering the Future of Electric Mobility with AI and IoT
-          </h1>
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">Get the EVChamp app</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">Get the power of AI and IoT for your Electric vehicle with EVChamp AI Companion App</h2>
           <p className="text-gray-500 text-xs mb-5">Explore EVChamp services, charging support, and EV assistance, From certified pre-owned EVs and battery diagnostics to IoT hardware, software subscriptions, charging access, roadside assistance, and smart EV support — EVChamp brings every part of the EV journey into one connected platform..</p>
 
           <div className="flex flex-col sm:flex-row gap-5 items-center">
@@ -150,32 +147,15 @@ function HomePage() {
             </div>
 
             {/* Right side */}
-            <div className="flex-1">
-              <h3 className="text-base font-bold text-gray-900 mb-1">Open the EVChamp App</h3>
-              <p className="text-gray-500 text-xs mb-3">
-                Tap a badge to open EVChamp on your device. App Store listing will be live soon.
-              </p>
-
-              {/* Feature bullets */}
-              <ul className="space-y-1.5">
-                 {[
-                   { title: 'Instant Access', desc: 'Scan once and open the platform right in your browser' },
-                   { title: 'Works on All Devices', desc: 'Compatible with any Android or iOS phone camera' },
-                   { title: 'Always Up-to-Date', desc: 'Website always reflects the latest EVChamp features' },
-                 ].map((f) => (
-                   <li key={f.title} className="flex items-start gap-2">
-                     <svg className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
-                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                     </svg>
-                     <div>
-                       <p className="text-xs font-semibold text-gray-800">{f.title}</p>
-                       <p className="text-xs text-gray-500">{f.desc}</p>
-                     </div>
-                   </li>
-                 ))}
-               </ul>
-             </div>
-           </div>
+            <div className="flex-1 self-start pt-2 text-left">
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1">
+            Open the EVChamp App
+            </h3>
+          <p className="text-gray-500 text-xs sm:text-sm leading-relaxed max-w-md">
+          Tap a badge to open EVChamp on your device. App Store listing will be live soon.
+          </p>
+            </div>
+          </div>
         </div>
       </section>
 
