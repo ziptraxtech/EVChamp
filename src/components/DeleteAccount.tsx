@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useUser, useClerk } from '@clerk/clerk-react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const DeleteAccount: React.FC = () => {
-  const { isSignedIn, user } = useUser();
+  const { isSignedIn, isLoaded, user } = useUser();
   const { signOut } = useClerk();
   const navigate = useNavigate();
 
@@ -46,17 +46,28 @@ const DeleteAccount: React.FC = () => {
       setStep('error');
     }
   };
+  // Wait until Clerk finishes checking the saved/current session
+if (!isLoaded) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="text-center">
+        <div className="w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+        <p className="text-sm text-gray-500">Checking your account…</p>
+      </div>
+    </div>
+  );
+}
 
-  // Not signed in – show a message to sign in first
-  if (!isSignedIn) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-yellow-100 via-green-100 to-blue-200 flex items-center justify-center px-4">
-        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
-          <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M12 3a9 9 0 100 18A9 9 0 0012 3z" />
-            </svg>
-          </div>
+// Not signed in – show a message to sign in first
+if (!isSignedIn) {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-yellow-100 via-green-100 to-blue-200 flex items-center justify-center px-4">
+      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
+        <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M12 3a9 9 0 100 18A9 9 0 0012 3z" />
+          </svg>
+        </div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Sign In Required</h2>
           <p className="text-gray-600 mb-6">You need to be signed in to delete your account.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">

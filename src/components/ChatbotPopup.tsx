@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useAuth, useUser } from '@clerk/clerk-react';
 
 interface ChatMessage {
   content: string;
@@ -136,6 +137,11 @@ const loadHistory = (): ChatMessage[] => {
 };
 
 const ChatbotPopup: React.FC = () => {
+  const { isSignedIn, sessionId: clerkSessionId } = useAuth();
+  const { user } = useUser();
+
+  const [showLoginWelcome, setShowLoginWelcome] = useState(false);
+  const [welcomeName, setWelcomeName] = useState('EV User');
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>(loadHistory);
@@ -153,25 +159,31 @@ const ChatbotPopup: React.FC = () => {
 
   // Lazily fetch a session_id on first open. Same pattern as ZipsureAI's
   // GET /python_api/chatbot.
-  useEffect(() => {
-    if (!isOpen || sessionId) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const r = await fetch(`${CHATBOT_API_URL}/chatbot`);
-        if (!r.ok) return;
-        const data = await r.json();
-        if (cancelled || !data.session_id) return;
-        sessionStorage.setItem(SESSION_KEY, data.session_id);
-        setSessionId(data.session_id);
-      } catch {
-        // Fine — /ask will create one on its own if absent.
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [isOpen, sessionId]);
+    useEffect(() => {
+  if (!isSignedIn || !clerkSessionId || !user) return;
+
+  const welcomeSessionKey = 'evchamp_welcomed_session_id';
+  const previousSessionId = localStorage.getItem(welcomeSessionKey);
+
+  if (previousSessionId === clerkSessionId) return;
+
+  const name =
+    user.firstName ||
+    user.fullName ||
+    user.username ||
+    user.primaryEmailAddress?.emailAddress?.split('@')[0] ||
+    'EV User';
+
+  setWelcomeName(name);
+
+  localStorage.setItem(welcomeSessionKey, clerkSessionId);
+
+  const timer = window.setTimeout(() => {
+    setShowLoginWelcome(true);
+  }, 700);
+
+  return () => window.clearTimeout(timer);
+}, [isSignedIn, clerkSessionId, user]);
 
   // Persist to sessionStorage on every message change
   useEffect(() => {
@@ -288,7 +300,88 @@ const ChatbotPopup: React.FC = () => {
 
   return (
     <>
+          {/* Welcome popup after successful login or signup */}
+      {showLoginWelcome && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/35 px-5"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Welcome to EVChamp"
+        >
+          <div
+            className="
+              relative
+              flex
+              h-[50vh]
+              min-h-[400px]
+              max-h-[540px]
+              w-full
+              max-w-[390px]
+              flex-col
+              items-center
+              justify-center
+              overflow-hidden
+              rounded-[32px]
+              border
+              border-blue-100
+              bg-gradient-to-b
+              from-white
+              via-white
+              to-blue-100
+              px-8
+              py-10
+              text-center
+              shadow-2xl
+            "
+          >
+            {/* Close button */}
+            <button
+              type="button"
+              onClick={() => setShowLoginWelcome(false)}
+              className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full text-2xl text-gray-500 transition hover:bg-gray-100 hover:text-gray-900"
+              aria-label="Close welcome popup"
+            >
+              ×
+            </button>
+
+            {/* EVChamp AI icon */}
+            <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-lg">
+              <svg
+                viewBox="0 0 24 24"
+                className="h-8 w-8 fill-white"
+                aria-hidden="true"
+              >
+                <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" />
+              </svg>
+            </div>
+
+            <p className="mb-2 text-lg font-medium text-gray-500">
+              Hi,
+            </p>
+
+            <h2 className="mb-7 max-w-full break-words text-3xl font-bold text-gray-900">
+              {welcomeName}
+            </h2>
+
+            <p className="mb-9 text-2xl font-bold text-gray-900">
+              Let&apos;s Begin
+            </p>
+
+            <button
+              type="button"
+              onClick={() => {
+                setShowLoginWelcome(false);
+                setIsOpen(true);
+              }}
+              className="rounded-full bg-blue-600 px-8 py-3.5 text-base font-semibold text-white shadow-lg transition hover:bg-blue-700 hover:shadow-xl"
+            >
+              Open EVChamp Assistant
+            </button>
+          </div>
+        </div>
+      )}
       {/* Floating chat toggle button */}
+      {!showLoginWelcome && (
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
@@ -328,7 +421,7 @@ const ChatbotPopup: React.FC = () => {
           </>
         )}
       </button>
-
+      )}
       {/* Chat popup window */}
       {isOpen && (
         <div

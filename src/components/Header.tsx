@@ -53,15 +53,15 @@ const Header: React.FC = () => {
   };
 
   const platformLinks = [
-    { label: 'EV Marketplace', desc: 'Buy & sell certified EVs', route: '/buy-used-ev' },
-    { label: 'Find EV Service Centres', desc: 'Verified workshops near you', route: '/service-centres' },
-    { label: 'Find EV Chargers', desc: 'Green infrastructure investment', route: '/investyz' },
-    { label: 'IoT & Software Plans', desc: 'Hardware + analytics subscriptions', route: '/buy-plans' },
-    { label: 'Rent EV', desc: 'Rent electric vehicles near you', route: '/rent-ev' },
-    { label: 'Roadside Assistance', desc: 'Emergency EV support', route: '/rsa-plans' },
-    { label: 'ZeVault', desc: 'Your diagnostic credits wallet', route: '/zevault' },
-    { label: 'Zeflash', desc: 'Rapid AI battery diagnostics', route: '/zeflash' },
-    { label: 'ZipBattery', desc: 'AI battery intelligence', route: '/zipbattery' },
+    { label: 'EV Marketplace', route: '/buy-used-ev' },
+    { label: 'Find EV Service Centres', route: '/service-centres' },
+    { label: 'Find EV Chargers', route: '/investyz' },
+    { label: 'IoT & Software Plans', route: '/buy-plans' },
+    { label: 'Rent EV', route: '/rent-ev' },
+    { label: 'Roadside Assistance', route: '/rsa-plans' },
+    { label: 'ZeVault', route: '/zevault' },
+    { label: 'Zeflash', route: '/zeflash' },
+    { label: 'ZipBattery', route: '/zipbattery' },
   ];
 
   return (
@@ -95,7 +95,7 @@ const Header: React.FC = () => {
                     className="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition-colors group"
                   >
                     <p className="text-sm font-medium text-gray-800 group-hover:text-green-700">{item.label}</p>
-                    <p className="text-xs text-gray-400">{item.desc}</p>
+                    
                   </button>
                 ))}
               </div>
@@ -222,21 +222,26 @@ const Header: React.FC = () => {
                 Get Started
               </button>
             </div>
+        {/* Platform Links - Mobile */}
+        <div className="py-2">
+          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-2 py-1">
+            Platform
+          </p>
 
-            {/* Platform Links */}
-            <div className="py-2">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-2 py-1">Platform</p>
-              {platformLinks.map((item) => (
-                <button
-                  key={item.route}
-                  onClick={() => goTo(item.route)}
-                  className="w-full text-left px-2 py-2.5 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <p className="text-sm font-medium text-gray-800">{item.label}</p>
-                  <p className="text-xs text-gray-400">{item.desc}</p>
-                </button>
-              ))}
-            </div>
+          <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+            {platformLinks.map((item) => (
+              <button
+                key={item.route}
+                onClick={() => goTo(item.route)}
+                className="w-full text-left px-2 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <p className="text-[11px] font-medium text-gray-800 leading-tight">
+                  {item.label}
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
 
             {/* Other Links */}
             <div className="border-t border-gray-100 pt-2 space-y-1">

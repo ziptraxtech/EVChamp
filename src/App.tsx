@@ -66,50 +66,47 @@ function HomePage() {
       </Helmet>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden text-white min-h-[520px] sm:min-h-[620px]">
-  <img
-    src="/bg-hero.png"
-    alt=""
-    aria-hidden="true"
-    className="absolute inset-0 w-full h-full object-fill object-center"
-    style={{ zIndex: 0 }}
-  />
+<section className="relative w-full overflow-hidden bg-white">
+  <picture className="block w-full h-auto">
+    {/* Mobile portrait image */}
+    <source
+      media="(max-width: 768px)"
+      srcSet="/bg-hero-mobile.png"
+    />
 
+    {/* Desktop / laptop landscape image */}
+    <img
+      src="/bg-hero-desktop.png"
+      alt="EVChamp smart electric vehicle platform"
+      className="block w-full h-auto"
+    />
+  </picture>
+
+  {/* Light overlay */}
   <div
-    className="absolute inset-0 bg-black/10"
+    className="absolute inset-0 bg-black/10 pointer-events-none"
     style={{ zIndex: 1 }}
   />
 
-  {/* Buttons fixed at top of image */}
-  {/* Buttons fixed at very top of image */}
-<div
-  className="absolute left-1/2 bottom-20 sm:bottom-25 md:bottom-30 -translate-x-1/2 flex flex-wrap justify-center gap-3 w-full px-4"
-  style={{ zIndex: 2 }}
->
-  <button
-    onClick={scrollToTopServices}
-    className="bg-violet-500 text-white-900 font-semibold px-4 py-2 rounded-lg hover:bg-gray-100 transition-all text-sm shadow-md"
+  {/* Buttons at bottom centre */}
+  <div
+    className="absolute left-1/2 bottom-[7%] -translate-x-1/2 flex items-center justify-center gap-2 sm:gap-3 w-full px-4"
+    style={{ zIndex: 2 }}
   >
-    Explore Platform
-  </button>
+    <button
+      onClick={scrollToTopServices}
+      className="bg-violet-500 hover:bg-violet-600 text-white font-semibold px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg transition-all text-xs sm:text-sm shadow-md whitespace-nowrap"
+    >
+      Explore Platform
+    </button>
 
-
-  <button
-    onClick={() => goTo('/zeflash-plans')}
-    className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm"
-  >
-    EVChamp Super Plans
-  </button>
-</div>
-
-  {/* Heading at bottom in one line */}
-  {/* Heading at most bottom in smaller size */}
-<div
-  className="absolute bottom-0 left-0 right-0 px-3 text-center"
-  style={{ zIndex: 2 }}
->
-  
-</div>
+    <button
+      onClick={() => goTo('/zeflash-plans')}
+      className="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg transition-all text-xs sm:text-sm shadow-md whitespace-nowrap"
+    >
+      EVChamp Super Plans
+    </button>
+  </div>
 </section>
       {/* Get the EVChamp App */}
       <section className="bg-white border-b border-gray-100">
