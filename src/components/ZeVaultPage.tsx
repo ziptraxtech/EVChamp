@@ -200,7 +200,7 @@ const ZeVaultPage: React.FC = () => {
                 </div>
                 <div className="mb-6">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-emerald-700">₹299</span>
+                    <span className="text-4xl font-extrabold text-emerald-700">₹199</span>
                   </div>
                   <p className="text-xs text-gray-600 mt-1">₹199/test</p>
                 </div>
