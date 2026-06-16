@@ -164,7 +164,7 @@ function HomePage() {
       </section>
 
       {/* Audience Cards — compact */}
-      <section className="bg-gray-50">
+      <section className="bg-grey-50">
         <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16">
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10">Built for a Smarter EV Future</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">

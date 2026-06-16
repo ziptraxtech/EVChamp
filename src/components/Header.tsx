@@ -56,7 +56,7 @@ const Header: React.FC = () => {
     { label: 'EV Marketplace', route: '/buy-used-ev' },
     { label: 'Find EV Service Centres', route: '/service-centres' },
     { label: 'Find EV Chargers', route: '/investyz' },
-    { label: 'IoT & Software Plans', route: '/buy-plans' },
+    { label: 'ZipsureAI & IOT Plans', route: '/buy-plans' },
     { label: 'Rent EV', route: '/rent-ev' },
     { label: 'Roadside Assistance', route: '/rsa-plans' },
     { label: 'ZeVault', route: '/zevault' },
@@ -244,10 +244,12 @@ const Header: React.FC = () => {
         </div>
 
             {/* Other Links */}
-            <div className="border-t border-gray-100 pt-2 space-y-1">
-              <button onClick={() => goTo('/about')} className="w-full text-left px-2 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">About</button>
-              <button onClick={() => goTo('/contact')} className="w-full text-left px-2 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">Contact</button>
-              <button onClick={() => goTo('/blog')} className="w-full text-left px-2 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">Blog</button>
+            <div className="border-t border-gray-100 pt-2">
+              <div className="flex gap-2">
+                <button onClick={() => goTo('/about')} className="flex-1 text-center px-2 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">About</button>
+                <button onClick={() => goTo('/contact')} className="flex-1 text-center px-2 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">Contact</button>
+                <button onClick={() => goTo('/blog')} className="flex-1 text-center px-2 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">Blog</button>
+              </div>
             </div>
 
             {/* Account */}

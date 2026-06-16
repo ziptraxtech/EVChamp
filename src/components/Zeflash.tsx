@@ -1,14 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import Footer from '../Footer';
 
 const Zeflash: React.FC = () => {
   const navigate = useNavigate();
+  const [iframeKey, setIframeKey] = useState(0);
 
   const goTo = (route: string) => {
     navigate(route);
     window.scrollTo({ top: 0, behavior: 'auto' });
+  };
+
+  const reloadIframe = () => {
+    setIframeKey(prev => prev + 1);
   };
 
   return (
@@ -40,39 +45,28 @@ const Zeflash: React.FC = () => {
           <p className="text-gray-500 text-center text-sm mb-6">Browse the full Zeflash platform below.</p>
           <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-lg w-full" style={{ height: '80vh', minHeight: '500px' }}>
             <iframe
+              key={iframeKey}
               src="https://zeflash.app"
               title="Zeflash Website"
               className="w-full h-full"
               style={{ border: 'none', width: '100%', height: '100%' }}
-              allow="fullscreen"
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
+              allow="fullscreen; payment; camera; microphone; clipboard-read; clipboard-write; geolocation; accelerometer; gyroscope"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-storage-access-by-user-activation"
+              referrerPolicy="no-referrer-when-downgrade"
             />
           </div>
-        </div>
-      </section>
-
-      {/* For Partners */}
-      <section className="bg-white">
-        <div className="container mx-auto px-4 sm:px-6 py-12 max-w-4xl">
-          <div className="flex justify-center">
-            <div onClick={() => navigate('/contact')}
-              className="group rounded-2xl p-6 border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-sky-50 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer max-w-md w-full">
-              <div className="flex items-start justify-between gap-3 mb-4">
-                <h3 className="text-xl font-bold text-gray-900">For Businesses & Partners</h3>
-                <span className="text-xs font-semibold text-blue-700 bg-blue-100 px-2 py-1 rounded-full">ZipSureAI</span>
-              </div>
-              <p className="text-sm text-gray-600 leading-relaxed mb-6">
-                Join a growing charging ecosystem that supports EV adoption and improves infrastructure availability.
-              </p>
-              <div className="flex items-center justify-between">
-                <img src="/ZipsureAI Logo.png" alt="ZipsureAI" className="h-10 w-auto object-contain" />
-                <span className="text-sm font-semibold text-blue-700 group-hover:text-blue-800 transition-colors">Open ZipSureAI →</span>
-              </div>
-            </div>
+          <div className="mt-4 text-center">
+            <button 
+              onClick={reloadIframe}
+              className="text-blue-600 hover:text-blue-800 text-sm font-medium underline"
+            >
+              Reload if content doesn't load
+            </button>
           </div>
         </div>
       </section>
 
+      
       {/* CTA */}
       <section className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
         <div className="container mx-auto px-4 sm:px-6 py-12 text-center max-w-3xl">

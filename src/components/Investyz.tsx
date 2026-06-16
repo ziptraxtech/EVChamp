@@ -303,7 +303,8 @@ const Investyz: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'auto' });
   };
   const goToContact = () => {
-    window.open('https://www.investyz.com', '_blank', 'noopener,noreferrer');
+    navigate('/contact');
+    window.scrollTo({ top: 0, behavior: 'auto' });
   };
   const goToInvestyzWebsite = () => {
     window.open('https://www.investyz.com', '_blank', 'noopener,noreferrer');
@@ -345,7 +346,7 @@ const Investyz: React.FC = () => {
 
       {/* Charging Network Map */}
       <section className="bg-gray-50 py-10 sm:py-14">
-        <div className="container mx-auto px-4 sm:px-6 max-w-5xl">
+        <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 text-center mb-6">Find Charging Stations Near You</h2>
           {loading ? (
             <div className="flex justify-center items-center h-64 text-gray-500 text-sm">Loading map…</div>
@@ -403,7 +404,7 @@ const Investyz: React.FC = () => {
 
       {/* Investment Areas */}
       <section className="bg-white">
-        <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 max-w-5xl">
+        <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 max-w-6xl">
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10">What You Can Invest In</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {investmentAreas.map((item) => (
@@ -419,7 +420,7 @@ const Investyz: React.FC = () => {
 
       {/* Why INVESTYZ */}
       <section className="bg-gray-50">
-        <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 max-w-3xl">
+        <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 max-w-6xl">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">Why INVESTYZ</h2>
           <p className="text-gray-600 text-center leading-relaxed mb-8">
             As demand grows for clean energy, electrification, and digital infrastructure, there is a rising need for investment models that are both sustainable and future-ready. INVESTYZ brings together infrastructure growth and long-term yield potential.
@@ -443,7 +444,7 @@ const Investyz: React.FC = () => {
 
       {/* FAQ */}
       <section className="bg-white">
-        <div className="container mx-auto px-4 sm:px-6 py-12 max-w-3xl">
+        <div className="container mx-auto px-4 sm:px-6 py-12 max-w-6xl">
           <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">Frequently Asked Questions</h2>
           <div className="space-y-4">
             <details className="border border-gray-100 rounded-lg p-4 group">

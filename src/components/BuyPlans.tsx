@@ -51,7 +51,7 @@ const softwarePlans: Plan[] = [
   {
     id: 1,
     name: 'CORE',
-    price: 4500,
+    price: 3600,
     duration: 'Annual (per vehicle)',
     features: [
       'App + Web Dashboard Access',
@@ -61,34 +61,6 @@ const softwarePlans: Plan[] = [
       'Maintenance & Fault Alerts',
     ],
     idealFor: 'Fleet Owners',
-    type: 'software',
-  },
-  {
-    id: 2,
-    name: 'App BASIC',
-    price: 2400,
-    duration: 'Annual (per vehicle)',
-    features: [
-      'Real-time Vehicle Data',
-      'Trip Summary',
-      'Battery Alerts',
-      'Service Reminders',
-    ],
-    idealFor: 'EV Owners, Drivers, Small Operators',
-    type: 'software',
-  },
-  {
-    id: 3,
-    name: 'App PRO',
-    price: 3600,
-    duration: 'Annual (per vehicle)',
-    features: [
-      'All BASIC features',
-      'Predictive Maintenance Alerts',
-      'Fault Codes',
-      'Warranty & Buyback View',
-    ],
-    idealFor: 'EV Owners, Drivers, Small Operators',
     type: 'software',
   },
   {
@@ -107,7 +79,7 @@ const softwarePlans: Plan[] = [
   {
     id: 5,
     name: 'Dashboard ENTERPRISE',
-    price: 6500,
+    price: 7500,
     duration: 'Annual (per vehicle)',
     features: [
       'All STANDARD features',
@@ -189,7 +161,7 @@ const BuyPlans: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Helmet>
         <title>EV IoT Hardware &amp; Software Plans | Connected EV Monitoring by EVChamp</title>
         <meta name="description" content="Explore EVChamp IoT hardware plans for real-time vehicle tracking, battery monitoring, EV diagnostics, fleet visibility, and software subscription plans for analytics and optimization." />
@@ -198,137 +170,27 @@ const BuyPlans: React.FC = () => {
       
 
       {/* Plans Section */}
-      <div id="plans-section" className="py-10 sm:py-12">
-      {/* Back Button at the top */}
-      <div className="container mx-auto px-4 sm:px-6 mb-6 flex items-center">
-        <button
-          onClick={() => navigate('/')}
-          className="flex items-center text-gray-600 hover:text-gray-900 rounded-lg px-3 sm:px-4 py-2 hover:bg-gray-50 transition-all font-medium text-sm"
-        >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
-          Back
-        </button>    
-      </div>
-    {/* Hero Section */}
-      <section className="py-10 sm:py-12 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-        <div className="container mx-auto px-4 sm:px-6 flex flex-col lg:flex-row items-stretch justify-between gap-8 sm:gap-10">
-          {/* Text Section */}
-          <div className="flex-1 max-w-xl flex flex-col justify-center text-center md:text-left">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
-              Smart Hardware &amp; Software for<br />
-              <span className="text-green-400">Smarter EV Operations</span>
-            </h1>
-            <p className="mt-5 text-gray-300 text-base sm:text-lg leading-relaxed">
-              EVChamp combines IoT hardware plans for real-time fleet intelligence with software subscriptions for monitoring, analytics, and optimization. Built for modern electric mobility.
-            </p>
-            <div className="mt-6 sm:mt-8">
-              <button
-                onClick={() => {
-                  document.getElementById('plans-section')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="w-full sm:w-auto inline-block bg-white text-gray-900 font-semibold text-base sm:text-lg px-6 sm:px-10 py-3 sm:py-4 rounded-xl shadow-lg hover:bg-gray-100 transition-all sm:transform sm:hover:-translate-y-1"
-              >
-                Explore Plans &amp; Solutions
-              </button>
-            </div>
-          </div>
-          {/* Image and Points Section */}
-          <div className="flex-1 flex flex-col items-center justify-center h-full">
-            <img
-              src={headerImg}
-              alt="EV Fleet Management Illustration"
-              className="w-full h-56 sm:h-72 md:h-full rounded-xl shadow-2xl object-cover mb-6"
+      <div id="plans-section">
+      {/* ZipSureAI Embedded Section */}
+      <section className="py-2 sm:py-4 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 text-center mb-3">Explore ZipSureAI</h2>
+          <p className="text-gray-500 text-center text-sm mb-8">Browse the full ZipSureAI platform below for comprehensive insights and analytics.</p>
+          <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-lg w-full" style={{ height: '80vh', minHeight: '500px' }}>
+            <iframe
+              src="https://zipsureai.com/"
+              title="ZipSureAI Website"
+              className="w-full h-full"
+              style={{ border: 'none', width: '100%', height: '100%' }}
+              allow="fullscreen"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
             />
-            <div className="mt-4 sm:mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
-              <div className="flex items-center space-x-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2">
-                <svg className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="font-medium text-gray-100 text-sm sm:text-base">AI-Driven Leasing &amp; Asset Management</span>
-              </div>
-              <div className="flex items-center space-x-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2">
-                <svg className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="font-medium text-gray-100 text-sm sm:text-base">Smart Buyback &amp; Warranty</span>
-              </div>
-              <div className="flex items-center space-x-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 sm:col-span-2">
-                <svg className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="font-medium text-gray-100 text-sm sm:text-base">Real-Time Telematics &amp; Analytics</span>
-              </div>
-            </div>
           </div>
         </div>
       </section>
-
-      {/* EVCHAMP Overview Section */}
-      <section className="py-12 sm:py-16 bg-white border-y border-gray-100">
-        <div className="container mx-auto px-4 sm:px-6 max-w-6xl grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-          <div className="bg-gray-50 rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-sm">
-            <span className="inline-flex items-center rounded-full bg-green-100 text-green-800 px-3 py-1 text-xs font-semibold uppercase tracking-wide mb-4">
-              Platform Snapshot
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
-              Designed for Real-World EV Operations
-            </h2>
-            <p className="text-gray-600 leading-relaxed mb-6">
-              EVChamp combines connected hardware, AI-led diagnostics, and operational dashboards to help owners, fleets, and businesses run EV operations with more visibility and less downtime.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="rounded-xl bg-white border border-gray-200 p-4">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">IoT</p>
-                <p className="text-sm font-bold text-gray-900">Live vehicle data</p>
-              </div>
-              <div className="rounded-xl bg-white border border-gray-200 p-4">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">AI</p>
-                <p className="text-sm font-bold text-gray-900">Predictive insights</p>
-              </div>
-              <div className="rounded-xl bg-white border border-gray-200 p-4">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Dashboards</p>
-                <p className="text-sm font-bold text-gray-900">Actionable reports</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="text-center md:text-left">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              EVChamp Overview
-            </h2>
-            <p className="mb-6 text-base sm:text-lg text-gray-600 max-w-xl mx-auto md:mx-0">
-              At EVChamp, we simplify electric fleet management through a connected platform that blends smart hardware with intelligent software. The result is better control, faster decision-making, and a more dependable EV ecosystem.
-            </p>
-            <div className="space-y-3 sm:space-y-4">
-              <div className="flex items-center rounded-lg bg-gray-50 border border-gray-100 px-4 py-3">
-                <span className="w-8 h-8 rounded-full bg-green-100 text-green-700 flex items-center justify-center mr-3 font-bold">1</span>
-                <span className="text-gray-800 font-medium">AI-Driven EV Leasing & Asset Management</span>
-              </div>
-              <div className="flex items-center rounded-lg bg-gray-50 border border-gray-100 px-4 py-3">
-                <span className="w-8 h-8 rounded-full bg-green-100 text-green-700 flex items-center justify-center mr-3 font-bold">2</span>
-                <span className="text-gray-800 font-medium">Smart Buyback & Warranty Solutions</span>
-              </div>
-              <div className="flex items-center rounded-lg bg-gray-50 border border-gray-100 px-4 py-3">
-                <span className="w-8 h-8 rounded-full bg-green-100 text-green-700 flex items-center justify-center mr-3 font-bold">3</span>
-                <span className="text-gray-800 font-medium">Real-Time Telematics & Predictive Maintenance</span>
-              </div>
-              <div className="flex items-center rounded-lg bg-gray-50 border border-gray-100 px-4 py-3">
-                <span className="w-8 h-8 rounded-full bg-green-100 text-green-700 flex items-center justify-center mr-3 font-bold">4</span>
-                <span className="text-gray-800 font-medium">Integrated Mobile App & Web Dashboard</span>
-              </div>
-            </div>
-            <div className="mt-6">
-              <span className="inline-block bg-gray-900 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-sm">
-                Available on Android, iOS & Web
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-2 tracking-tight">EVChamp Plans & Pricing</h1>
+        <div className="text-center mb-8">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-2 tracking-tight">EVChamp Plans & Pricing</h1>
           <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">Select your hardware and software plans. You can buy both together for a seamless experience.</p>
         </div>
 

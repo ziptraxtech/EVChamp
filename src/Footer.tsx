@@ -42,7 +42,7 @@ const Footer: React.FC = () => {
                   href="/buy-plans"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
-                  IoT & Software Plans
+                  ZipsureAI & IOT Plans
                 </a>
               </li>
 
