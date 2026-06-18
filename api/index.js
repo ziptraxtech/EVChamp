@@ -4,8 +4,24 @@ const { neon } = require('@neondatabase/serverless');
 const nodemailer = require('nodemailer');
 const { verifyToken, createClerkClient } = require('@clerk/backend');
 const crypto = require('crypto');
+const admin = require('firebase-admin');
 
 const app = express();
+
+// Initialize Firebase Admin SDK
+let firebaseInitialized = false;
+if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+  try {
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
+    firebaseInitialized = true;
+    console.log('[Firebase Admin] Initialized successfully');
+  } catch (err) {
+    console.error('[Firebase Admin Init Error]', err.message);
+  }
+}
 
 app.use(cors());
 app.use(express.json());
@@ -107,6 +123,20 @@ async function initDB() {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       )
     `;
+
+    await getSQL()`
+      CREATE TABLE IF NOT EXISTS fcm_tokens (
+        id SERIAL PRIMARY KEY,
+        clerk_user_id TEXT,
+        fcm_token TEXT UNIQUE NOT NULL,
+        device_name TEXT,
+        is_active BOOLEAN DEFAULT TRUE,
+        last_used TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `;
+    await getSQL()`CREATE INDEX IF NOT EXISTS idx_fcm_tokens_user ON fcm_tokens(clerk_user_id)`;
+    await getSQL()`CREATE INDEX IF NOT EXISTS idx_fcm_tokens_active ON fcm_tokens(is_active)`;
 
     dbReady = true;
     return true;
@@ -1128,6 +1158,359 @@ app.post('/api/wallet-deduct', async (req, res) => {
   } catch (err) {
     console.error('[ZeVault Deduct Error]', err.message);
     return res.status(500).json({ error: 'Could not process deduction', detail: err.message });
+  }
+});
+
+// ============ Firebase Push Notification Endpoints ============
+
+// Test notification endpoint (no auth required for testing)
+app.post('/api/test-notification', async (req, res) => {
+  try {
+    if (!firebaseInitialized) {
+      return res.status(400).json({ 
+        error: 'Firebase Admin not initialized',
+        hint: 'Set FIREBASE_SERVICE_ACCOUNT_KEY environment variable'
+      });
+    }
+
+    const sql = getSQL();
+    const tokens = await sql`
+      SELECT fcm_token FROM fcm_tokens WHERE is_active = TRUE LIMIT 1
+    `;
+
+    if (tokens.length === 0) {
+      return res.json({ 
+        success: false, 
+        message: 'No active FCM tokens found. Install the app and enable notifications first.',
+        hint: 'Make sure the app is built and running on Android device with notifications enabled'
+      });
+    }
+
+    const testToken = tokens[0].fcm_token;
+
+    const message = {
+      notification: {
+        title: '🧪 Test Notification from EVChamp',
+        body: 'If you see this, push notifications are working!',
+      },
+      data: {
+        action: 'test',
+        timestamp: new Date().toISOString(),
+      },
+      webpush: {
+        notification: {
+          title: '🧪 Test Notification from EVChamp',
+          body: 'If you see this, push notifications are working!',
+          icon: '/evchamp-icon.png',
+        },
+      },
+    };
+
+    try {
+      const messageId = await admin.messaging().send({
+        ...message,
+        token: testToken,
+      });
+
+      console.log(`[FCM Test] Sent test notification to device: ${messageId}`);
+      
+      return res.json({
+        success: true,
+        message: 'Test notification sent successfully!',
+        messageId,
+        tokenUsed: testToken.substring(0, 20) + '...',
+        totalActiveTokens: tokens.length,
+      });
+    } catch (error) {
+      console.error('[FCM Test Send Error]', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to send test notification',
+        detail: error.message,
+      });
+    }
+  } catch (err) {
+    console.error('[FCM Test Error]', err.message);
+    return res.status(500).json({ error: 'Test notification failed', detail: err.message });
+  }
+});
+
+// Store FCM token
+app.post('/api/store-fcm-token', async (req, res) => {
+  try {
+    const { token, deviceName } = req.body;
+    if (!token) {
+      return res.status(400).json({ error: 'FCM token is required' });
+    }
+
+    const sql = getSQL();
+    
+    // Insert or update FCM token
+    await sql`
+      INSERT INTO fcm_tokens (fcm_token, device_name, last_used, created_at)
+      VALUES (${token}, ${deviceName || 'Unknown Device'}, NOW(), NOW())
+      ON CONFLICT (fcm_token) DO UPDATE
+        SET last_used = NOW(), is_active = TRUE
+    `;
+
+    console.log(`[FCM] Token stored: ${token.substring(0, 20)}...`);
+    return res.json({ success: true, message: 'FCM token stored successfully' });
+  } catch (err) {
+    console.error('[FCM Store Error]', err.message);
+    return res.status(500).json({ error: 'Failed to store FCM token', detail: err.message });
+  }
+});
+
+// Link FCM token to user (when user is authenticated)
+app.post('/api/link-fcm-token', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Missing Authorization header' });
+    }
+    const token = authHeader.split(' ')[1];
+    const tokenPayload = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
+    const clerkUserId = tokenPayload.sub;
+    if (!clerkUserId) return res.status(401).json({ error: 'Invalid token' });
+
+    const { fcmToken, deviceName } = req.body;
+    if (!fcmToken) {
+      return res.status(400).json({ error: 'FCM token is required' });
+    }
+
+    const sql = getSQL();
+    
+    await sql`
+      UPDATE fcm_tokens 
+      SET clerk_user_id = ${clerkUserId}, device_name = ${deviceName || 'Unknown Device'}, last_used = NOW()
+      WHERE fcm_token = ${fcmToken}
+    `;
+
+    console.log(`[FCM] Token linked to user ${clerkUserId}`);
+    return res.json({ success: true, message: 'FCM token linked to user' });
+  } catch (err) {
+    console.error('[FCM Link Error]', err.message);
+    return res.status(500).json({ error: 'Failed to link FCM token', detail: err.message });
+  }
+});
+
+// Get all active FCM tokens (admin endpoint - requires API key)
+app.get('/api/fcm-tokens/all', async (req, res) => {
+  try {
+    const apiKey = req.headers['x-api-key'];
+    if (apiKey !== process.env.ADMIN_API_KEY) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const sql = getSQL();
+    const tokens = await sql`
+      SELECT id, fcm_token, device_name, clerk_user_id, is_active, last_used, created_at
+      FROM fcm_tokens 
+      WHERE is_active = TRUE
+      ORDER BY last_used DESC
+    `;
+
+    return res.json({ 
+      success: true, 
+      total: tokens.length,
+      tokens 
+    });
+  } catch (err) {
+    console.error('[FCM Get Tokens Error]', err.message);
+    return res.status(500).json({ error: 'Failed to get FCM tokens', detail: err.message });
+  }
+});
+
+// Send notification to all devices (admin endpoint)
+app.post('/api/send-notification-all', async (req, res) => {
+  try {
+    const apiKey = req.headers['x-api-key'];
+    if (apiKey !== process.env.ADMIN_API_KEY) {
+      return res.status(401).json({ error: 'Unauthorized - Invalid API Key' });
+    }
+
+    const { title, body, data } = req.body;
+    if (!title || !body) {
+      return res.status(400).json({ error: 'Title and body are required' });
+    }
+
+    const sql = getSQL();
+    const tokens = await sql`
+      SELECT fcm_token FROM fcm_tokens WHERE is_active = TRUE
+    `;
+
+    if (tokens.length === 0) {
+      return res.json({ success: true, message: 'No active tokens found', count: 0 });
+    }
+
+    const admin = require('firebase-admin');
+    
+    const message = {
+      notification: {
+        title,
+        body,
+      },
+      data: data || {},
+      webpush: {
+        notification: {
+          title,
+          body,
+          icon: '/evchamp-icon.png',
+        },
+      },
+    };
+
+    const results = {
+      success: 0,
+      failed: 0,
+      errors: [],
+    };
+
+    // Send to all tokens
+    for (const tokenObj of tokens) {
+      try {
+        await admin.messaging().send({
+          ...message,
+          token: tokenObj.fcm_token,
+        });
+        results.success++;
+      } catch (error) {
+        results.failed++;
+        results.errors.push({
+          token: tokenObj.fcm_token.substring(0, 20),
+          error: error.message,
+        });
+        
+        // Mark token as inactive if it's invalid
+        if (error.code === 'messaging/invalid-registration-token') {
+          await sql`
+            UPDATE fcm_tokens SET is_active = FALSE WHERE fcm_token = ${tokenObj.fcm_token}
+          `;
+        }
+      }
+    }
+
+    console.log(`[FCM Send] Sent to ${results.success}/${tokens.length} devices, ${results.failed} failed`);
+    
+    return res.json({
+      success: true,
+      totalTokens: tokens.length,
+      successCount: results.success,
+      failedCount: results.failed,
+      errors: results.errors.slice(0, 10), // Return first 10 errors
+    });
+  } catch (err) {
+    console.error('[FCM Send Error]', err.message);
+    return res.status(500).json({ error: 'Failed to send notifications', detail: err.message });
+  }
+});
+
+// Send notification to specific user
+app.post('/api/send-notification-user', async (req, res) => {
+  try {
+    const apiKey = req.headers['x-api-key'];
+    if (apiKey !== process.env.ADMIN_API_KEY) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { clerkUserId, title, body, data } = req.body;
+    if (!clerkUserId || !title || !body) {
+      return res.status(400).json({ error: 'clerkUserId, title, and body are required' });
+    }
+
+    const sql = getSQL();
+    const tokens = await sql`
+      SELECT fcm_token FROM fcm_tokens 
+      WHERE clerk_user_id = ${clerkUserId} AND is_active = TRUE
+    `;
+
+    if (tokens.length === 0) {
+      return res.json({ success: true, message: 'No active tokens found for user', count: 0 });
+    }
+
+    const admin = require('firebase-admin');
+    
+    const message = {
+      notification: {
+        title,
+        body,
+      },
+      data: data || {},
+    };
+
+    let successCount = 0;
+    const errors = [];
+
+    for (const tokenObj of tokens) {
+      try {
+        await admin.messaging().send({
+          ...message,
+          token: tokenObj.fcm_token,
+        });
+        successCount++;
+      } catch (error) {
+        errors.push({ token: tokenObj.fcm_token.substring(0, 20), error: error.message });
+      }
+    }
+
+    console.log(`[FCM Send User] Sent to ${successCount}/${tokens.length} tokens for user ${clerkUserId}`);
+    
+    return res.json({
+      success: true,
+      clerkUserId,
+      totalTokens: tokens.length,
+      successCount,
+      failedCount: tokens.length - successCount,
+      errors: errors.slice(0, 5),
+    });
+  } catch (err) {
+    console.error('[FCM Send User Error]', err.message);
+    return res.status(500).json({ error: 'Failed to send notification to user', detail: err.message });
+  }
+});
+
+// Send notification to topic (e.g., 'all_users')
+app.post('/api/send-notification-topic', async (req, res) => {
+  try {
+    const apiKey = req.headers['x-api-key'];
+    if (apiKey !== process.env.ADMIN_API_KEY) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { topic, title, body, data } = req.body;
+    if (!topic || !title || !body) {
+      return res.status(400).json({ error: 'topic, title, and body are required' });
+    }
+
+    const admin = require('firebase-admin');
+    
+    const message = {
+      notification: {
+        title,
+        body,
+      },
+      data: data || {},
+      webpush: {
+        notification: {
+          title,
+          body,
+          icon: '/evchamp-icon.png',
+        },
+      },
+    };
+
+    const response = await admin.messaging().sendToTopic(topic, message);
+
+    console.log(`[FCM Send Topic] Sent to topic '${topic}': ${response}`);
+    
+    return res.json({
+      success: true,
+      topic,
+      messageId: response,
+    });
+  } catch (err) {
+    console.error('[FCM Send Topic Error]', err.message);
+    return res.status(500).json({ error: 'Failed to send notification to topic', detail: err.message });
   }
 });
 

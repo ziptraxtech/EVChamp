@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import Header from './components/Header';
@@ -31,6 +31,9 @@ import Zeflash from './components/Zeflash';
 import ZeVaultPage from './components/ZeVaultPage';
 import Blog from './components/Blog';
 import ZeflashPlans from './components/ZeflashPlans';
+import { initializePushNotifications } from './components/FirebaseNotification';
+import AdminNotificationPanel from './components/AdminNotificationPanel';
+
 
 import PartnersCarousel from './components/PartnersCarousel';
 import ChatbotPopup from './components/ChatbotPopup';
@@ -101,7 +104,16 @@ function HomePage() {
     </button>
 
     <button
-      onClick={() => goTo('/zeflash-plans')}
+      onClick={() => {
+        goTo('/zevault');
+        // Delay to allow page navigation
+        setTimeout(() => {
+          const pricingSection = document.getElementById('pricing-section');
+          if (pricingSection) {
+            pricingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 100);
+      }}
       className="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg transition-all text-xs sm:text-sm shadow-md whitespace-nowrap"
     >
       EVChamp Super Plans
@@ -283,6 +295,9 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  useEffect(() => {
+    initializePushNotifications();
+  }, []);
   return (
     <Router>
       <div className="min-w-0 w-full">
@@ -347,6 +362,7 @@ function App() {
               <RSAPlans />
             </ProtectedRoute>
           } />
+          <Route path="/admin/notifications" element={<AdminNotificationPanel />} />
         </Routes>
 
         {/* Floating Chatbot Popup (RAG-powered) */}
