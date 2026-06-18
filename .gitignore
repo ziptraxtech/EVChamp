@@ -79,3 +79,5 @@ jspm_packages/
 # Vercel
 .vercel
 .local-jdk/
+VERCEL_SETUP.md
+QUICK_REFERENCE.md
