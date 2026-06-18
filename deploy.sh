@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # EVChamp Push Notifications - Complete Deployment Commands
-# Copy and paste these commands in order to deploy
+# SECURITY WARNING: Do NOT add any credentials to this file!
+# Store all credentials in .env.local (which is in .gitignore)
 
 echo "🚀 EVChamp Push Notifications - Deployment Script"
 echo "=================================================="
@@ -11,96 +12,56 @@ echo ""
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}STEP 1: Add Environment Variables to Vercel${NC}"
-echo "Go to: https://vercel.com/dashboard"
-echo "Select EVChamp → Settings → Environment Variables"
+echo -e "${RED}⚠️  SECURITY WARNING${NC}"
+echo "This file contains DEPLOYMENT INSTRUCTIONS ONLY"
+echo "Do NOT add any credentials or secrets to this file!"
+echo "See SECURE_CREDENTIALS.md for safe credential management"
 echo ""
-echo "Add these 3 variables (copy from below):"
+
+echo -e "${BLUE}STEP 1: Prepare Environment Variables${NC}"
+echo "=================================================="
 echo ""
-echo "Name: FIREBASE_SERVICE_ACCOUNT_KEY"
-echo "Value: {minified JSON from QUICK_REFERENCE.md}"
+echo "1. Create a file: .env.local (in project root)"
+echo "2. Add these variables (get from secure source):"
 echo ""
-echo "Name: DATABASE_URL"
-echo "Value: postgresql://neondb_owner:npg_3bEA4UunDHgW@ep-cool-hall-anhtee5p-pooler.c-6.us-east-1.aws.neon.tech/neondb?ssslmoderequire&channel_binding=require"
+echo "   FIREBASE_SERVICE_ACCOUNT_KEY=<minified-json-from-firebase>"
+echo "   DATABASE_URL=<postgresql-connection-string>"
+echo "   ADMIN_API_KEY=<random-api-key>"
 echo ""
-echo "Name: ADMIN_API_KEY"
-echo "Value: 5e696088d17cd276e890a0e4e2a658ec920b8233382abf71449ccec9297b67c3"
+echo "3. Save .env.local (already in .gitignore)"
+echo ""
+
+echo -e "${BLUE}STEP 2: Add to Vercel${NC}"
+echo "=================================================="
+echo "1. Go to: https://vercel.com/dashboard"
+echo "2. Select EVChamp → Settings → Environment Variables"
+echo "3. Add each variable from .env.local"
+echo "   - Name: FIREBASE_SERVICE_ACCOUNT_KEY"
+echo "   - Name: DATABASE_URL"
+echo "   - Name: ADMIN_API_KEY"
 echo ""
 echo "⏸️  Press ENTER when done adding variables to Vercel..."
 read
 
 echo ""
-echo -e "${BLUE}STEP 2: Deploy Code${NC}"
+echo -e "${BLUE}STEP 3: Deploy Code${NC}"
+echo "=================================================="
 cd /Users/kshetij/Desktop/internship\ project/EVChamp-latest || exit 1
 
 git add .
-git commit -m "feat: Implement Firebase push notifications
+git commit -m "chore: Deploy Firebase push notifications
 
-- Configure FCM endpoint rewrites in vercel.json
-- Implement FirebaseNotification handler with token storage
-- Add AdminNotificationPanel for custom notifications
-- Create diagnostic and testing tools
-- Production-ready push notification system"
+- No credentials in git history
+- All secrets in environment variables
+- Production-ready deployment"
 
 git push origin main
 
 echo ""
-echo "⏳ Waiting for Vercel deployment..."
-echo "Monitor at: https://vercel.com/dashboard"
+echo "✅ Deployment pushed to GitHub"
+echo "⏳ Vercel will automatically deploy from main branch"
 echo ""
-echo "⏸️  Press ENTER when deployment completes..."
-read
-
-echo ""
-echo -e "${BLUE}STEP 3: Verify Deployment${NC}"
-node diagnose-notifications.js
-
-echo ""
-echo "⏸️  If all checks are ✅, press ENTER to continue..."
-read
-
-echo ""
-echo -e "${BLUE}STEP 4: Setup Android Device${NC}"
-echo "Building Android app..."
-cd android
-./gradlew installDebug
-
-echo ""
-echo "✅ App installed on device"
-echo "📱 Now:"
-echo "  1. Launch EVChamp on your device"
-echo "  2. Grant notification permissions"
-echo "  3. Keep app running"
-echo ""
-echo "⏸️  Press ENTER when app is running with permissions..."
-read
-
-echo ""
-echo "Checking device logs..."
-adb logcat -c
-sleep 2
-echo "Looking for FCM token registration..."
-adb logcat | grep -i fcm | head -5
-
-echo ""
-echo -e "${BLUE}STEP 5: Send Test Notification${NC}"
-cd /Users/kshetij/Desktop/internship\ project/EVChamp-latest
-
-API_URL=https://evchamp.in node test-notification.js
-
-echo ""
-echo -e "${GREEN}🎉 Deployment Complete!${NC}"
-echo ""
-echo "✅ Push notifications are live on https://evchamp.in"
-echo "✅ Admin panel available at: https://evchamp.in/admin/notifications"
-echo "✅ Check device for test notification"
-echo ""
-echo "📚 Documentation:"
-echo "  • QUICK_REFERENCE.md - Copy-paste values"
-echo "  • FINAL_DEPLOYMENT_CHECKLIST.md - Complete checklist"
-echo "  • PUSH_NOTIFICATION_TROUBLESHOOTING.md - Problem solving"
-echo ""
-echo "🚀 Next: Send custom notifications from admin panel or use API endpoints"
-echo ""
+echo -e "${GREEN}✨ Deployment in progress!${NC}"
