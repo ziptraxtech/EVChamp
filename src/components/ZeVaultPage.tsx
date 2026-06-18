@@ -9,6 +9,15 @@ const ZeVaultPage: React.FC = () => {
   const [balancePaise, setBalancePaise] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [customTests, setCustomTests] = useState(8);
+  const [customMonthIndex, setCustomMonthIndex] = useState(0);
+
+  // Custom plan calculation
+  const monthOptions = [12, 18, 24];
+  const pricePerTestMap: { [key: number]: number } = { 12: 200, 18: 190, 24: 180 };
+  const selectedMonths = monthOptions[customMonthIndex];
+  const pricePerTest = pricePerTestMap[selectedMonths];
+  const customTotalPrice = customTests * pricePerTest;
 
   useEffect(() => {
     if (!isSignedIn) { setBalancePaise(null); return; }
@@ -240,12 +249,12 @@ const ZeVaultPage: React.FC = () => {
                   <div className="flex items-baseline gap-1">
                     <span className="text-4xl font-extrabold text-gray-900">₹1499</span>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">4 tests • ₹375/test • Valid 1 year</p>
+                  <p className="text-xs text-gray-600 mt-1">8 tests • ₹187/test • Valid 1 year</p>
                 </div>
                 <ul className="space-y-3 mb-6">
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>4 AI diagnostic tests</span>
+                    <span>8 AI diagnostic tests</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
@@ -283,12 +292,12 @@ const ZeVaultPage: React.FC = () => {
                   <div className="flex items-baseline gap-1">
                     <span className="text-4xl font-extrabold text-blue-700">₹2,499</span>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">8 tests • ₹312/test • Valid 1 year</p>
+                  <p className="text-xs text-gray-600 mt-1">12 tests • ₹208/test • Valid 1 year</p>
                 </div>
                 <ul className="space-y-3 mb-6">
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>8 AI diagnostic tests</span>
+                    <span>12 AI diagnostic tests</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
@@ -323,10 +332,10 @@ const ZeVaultPage: React.FC = () => {
                 </div>
                 <div className="mb-6">
                   <div className="flex items-baseline gap-1">
-                    <span className="custom-total-price text-4xl font-extrabold text-gray-900">₹1,600</span>
+                    <span className="text-4xl font-extrabold text-gray-900">₹{customTotalPrice.toLocaleString('en-IN')}</span>
                   </div>
                   <p className="text-xs text-gray-600 mt-1">
-                    <span className="custom-per-test">₹199</span>/test
+                    ₹{pricePerTest}/test
                   </p>
                 </div>
                 
@@ -337,14 +346,15 @@ const ZeVaultPage: React.FC = () => {
                       type="range"
                       min="6"
                       max="24"
-                      defaultValue="8"
-                      className="w-full h-2 bg-gradient-to-r from-blue-200 to-blue-400 rounded-lg appearance-none cursor-pointer custom-test-slider"
+                      value={customTests}
+                      onChange={(e) => setCustomTests(parseInt(e.target.value))}
+                      className="w-full h-2 bg-gradient-to-r from-blue-200 to-blue-400 rounded-lg appearance-none cursor-pointer"
                       style={{
                         background: 'linear-gradient(to right, #93c5fd 0%, #3b82f6 100%)'
                       }}
                     />
                     <div className="mt-2 text-center">
-                      <span className="custom-test-count text-2xl font-bold text-blue-600">8</span>
+                      <span className="text-2xl font-bold text-blue-600">{customTests}</span>
                       <span className="text-sm text-gray-600 ml-1">tests</span>
                     </div>
                   </div>
@@ -356,14 +366,15 @@ const ZeVaultPage: React.FC = () => {
                       min="0"
                       max="2"
                       step="1"
-                      defaultValue="0"
-                      className="w-full h-2 bg-gradient-to-r from-emerald-200 to-emerald-400 rounded-lg appearance-none cursor-pointer custom-month-slider"
+                      value={customMonthIndex}
+                      onChange={(e) => setCustomMonthIndex(parseInt(e.target.value))}
+                      className="w-full h-2 bg-gradient-to-r from-emerald-200 to-emerald-400 rounded-lg appearance-none cursor-pointer"
                       style={{
                         background: 'linear-gradient(to right, #6ee7b7 0%, #10b981 100%)'
                       }}
                     />
                     <div className="mt-2 text-center">
-                      <span className="custom-month-count text-2xl font-bold text-emerald-600">12</span>
+                      <span className="text-2xl font-bold text-emerald-600">{selectedMonths}</span>
                       <span className="text-sm text-gray-600 ml-1">months</span>
                     </div>
                   </div>
@@ -385,18 +396,7 @@ const ZeVaultPage: React.FC = () => {
                 </ul>
                 <button
                   onClick={() => {
-                    const testSlider = document.querySelector('.custom-test-slider') as HTMLInputElement;
-                    const monthSlider = document.querySelector('.custom-month-slider') as HTMLInputElement;
-                    if (testSlider && monthSlider) {
-                      const tests = testSlider.value;
-                      const monthStep = monthSlider.value;
-                      const monthOptions = [12, 18, 24];
-                      const months = monthOptions[parseInt(monthStep)];
-                      const priceMap: { [key: number]: number } = { 12: 200, 18: 190, 24: 180 };
-                      const pricePerTest = priceMap[months];
-                      const totalPrice = parseInt(tests) * pricePerTest;
-                      window.location.href = `/checkout?plan=custom&tests=${tests}&months=${months}&price=${totalPrice}`;
-                    }
+                    navigate(`/checkout?plan=custom&tests=${customTests}&months=${selectedMonths}&price=${customTotalPrice}`);
                   }}
                   className="block w-full text-center rounded-lg bg-purple-600 text-white font-semibold px-4 py-2.5 hover:bg-purple-700 transition-colors shadow-sm"
                 >
