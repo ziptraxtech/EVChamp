@@ -24,7 +24,7 @@ import ServicesShowcase from './components/ServicesShowcase';
 import { ScrollReveal } from './components/ScrollReveal';
 import AboutUs from './components/AboutUs';
 import ChargingNetwork from './components/ChargingNetwork';
-import Investyz from './components/Investyz';
+import FindEVChargers from './components/FindEVChargers';
 import ContactUs from './components/ContactUs';
 import SmarterEVAssistance from './components/SmarterEVAssistance';
 import Zeflash from './components/Zeflash';
@@ -331,7 +331,7 @@ function App() {
           } />
           <Route path="/zeflash" element={<Zeflash />} />
           <Route path="/zevault" element={<ZeVaultPage />} />
-          <Route path="/investyz" element={<Investyz />} />
+          <Route path="/investyz" element={<FindEVChargers />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/zeflash-plans" element={<ZeflashPlans />} />
