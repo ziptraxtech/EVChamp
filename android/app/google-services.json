@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1025062994128",
+    "project_id": "evchamp-378d6",
+    "storage_bucket": "evchamp-378d6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1025062994128:android:6e90463bf2c553cc571ed5",
+        "android_client_info": {
+          "package_name": "com.evchamp.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQSBBwtOYSH_NAGvPR6Nf46Q6UTX1cFoQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
