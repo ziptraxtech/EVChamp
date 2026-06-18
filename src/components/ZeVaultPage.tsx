@@ -186,8 +186,8 @@ const ZeVaultPage: React.FC = () => {
         <section id="pricing-section" className="py-12 sm:py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="text-center mb-10">
-              <h1 className="text-3xl sm:text-4xl font-bold text-white-900">Flexible Testing Plans</h1>
-              <p className="mt-3 text-white-700 max-w-2xl mx-auto text-lg">
+              <h1 className="text-3xl sm:text-4xl font-bold text-white">Flexible Testing Plans</h1>
+              <p className="mt-3 text-gray-300 max-w-2xl mx-auto text-lg">
                 Choose the plan that fits your needs — from one-time diagnostics to regular fleet monitoring.
               </p>
               <div className="mt-3 inline-flex items-center gap-2 bg-violet-50 border border-violet-200 rounded-full px-4 py-1.5 text-sm font-semibold text-violet-700">
