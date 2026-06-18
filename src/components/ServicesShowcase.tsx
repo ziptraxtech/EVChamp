@@ -62,7 +62,7 @@ const ServicesShowcase: React.FC = () => {
 
             {/* Charging Stations — TOP */}
             <div
-              onClick={() => goTo('/investyz')}
+              onClick={() => goTo('/find-ev-chargers')}
               style={{ '--tile-delay': '0.05s' } as React.CSSProperties}
               className="service-tile group flex-1 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-2xl p-5 sm:p-6 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
             >
@@ -80,7 +80,7 @@ const ServicesShowcase: React.FC = () => {
               </div>
               <div className="flex items-end justify-between mt-4">
                 <img src={cometevImg} alt="Charging Stations" className="w-24 h-16 object-cover rounded-lg" />
-                <ArrowButton onClick={e => { e.stopPropagation(); goTo('/investyz'); }} />
+                <ArrowButton onClick={e => { e.stopPropagation(); goTo('/find-ev-chargers'); }} />
               </div>
             </div>
 

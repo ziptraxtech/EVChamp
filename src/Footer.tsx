@@ -66,7 +66,7 @@ const Footer: React.FC = () => {
 
               <li>
                 <a
-                  href="/investyz"
+                  href="/find-ev-chargers"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   Find EV Chargers

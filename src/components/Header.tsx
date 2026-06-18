@@ -55,7 +55,7 @@ const Header: React.FC = () => {
   const platformLinks = [
     { label: 'EV Marketplace', route: '/buy-used-ev' },
     { label: 'Find EV Service Centres', route: '/service-centres' },
-    { label: 'Find EV Chargers', route: '/investyz' },
+    { label: 'Find EV Chargers', route: '/find-ev-chargers' },
     { label: 'ZipsureAI & IOT Plans', route: '/buy-plans' },
     { label: 'Rent EV', route: '/rent-ev' },
     { label: 'Roadside Assistance', route: '/rsa-plans' },

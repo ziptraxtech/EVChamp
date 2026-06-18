@@ -197,8 +197,8 @@ function HomePage() {
             <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
               <h3 className="text-lg font-bold text-gray-900 mb-2">For Investors & Partners</h3>
               <p className="text-sm text-gray-600 leading-relaxed mb-4">Explore sustainable infrastructure investment opportunities and franchise models built for long-term growth in India's EV ecosystem.</p>
-              <button onClick={() => goTo('/investyz')} className="text-sm font-medium text-green-700 hover:text-green-800 transition-colors">
-                Learn About INVESTYZ →
+              <button onClick={() => goTo('/find-ev-chargers')} className="text-sm font-medium text-green-700 hover:text-green-800 transition-colors">
+                Explore EV Chargers →
               </button>
             </div>
           </div>
@@ -331,6 +331,7 @@ function App() {
           } />
           <Route path="/zeflash" element={<Zeflash />} />
           <Route path="/zevault" element={<ZeVaultPage />} />
+          <Route path="/find-ev-chargers" element={<FindEVChargers />} />
           <Route path="/investyz" element={<FindEVChargers />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/contact" element={<ContactUs />} />

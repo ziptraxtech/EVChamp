@@ -51,8 +51,8 @@ const Franchise: React.FC = () => {
             <button onClick={() => goTo('/contact')} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
               Apply Now
             </button>
-            <button onClick={() => goTo('/investyz')} className="border border-white/30 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/10 transition-all text-sm">
-              Explore INVESTYZ
+            <button onClick={() => goTo('/find-ev-chargers')} className="border border-white/30 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/10 transition-all text-sm">
+              Find EV Chargers
             </button>
           </div>
         </div>
