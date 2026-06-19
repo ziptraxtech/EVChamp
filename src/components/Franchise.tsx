@@ -41,14 +41,23 @@ const Franchise: React.FC = () => {
       </Helmet>
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-        <div className="container mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center max-w-3xl">
+      <section
+        className="relative overflow-hidden text-white"
+        style={{
+          backgroundImage: "url('/investyz.png')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="absolute inset-0 bg-slate-950/55" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/60 via-slate-900/45 to-slate-900/30" />
+        <div className="relative container mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center max-w-3xl">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">Build the Future with EVChamp</h1>
           <p className="text-gray-300 text-base sm:text-lg leading-relaxed mb-6">
             EVChamp Franchise Partnership offers a business opportunity for entrepreneurs and organizations looking to enter the fast-growing electric mobility sector.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <button onClick={() => goTo('/contact')} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
+            <button onClick={goToContact} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
               Apply Now
             </button>
             <button onClick={() => goTo('/find-ev-chargers')} className="border border-white/30 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/10 transition-all text-sm">
@@ -139,8 +148,17 @@ const Franchise: React.FC = () => {
       </section>
 
       {/* CTA */}
-      <section className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-        <div className="container mx-auto px-4 sm:px-6 py-14 text-center max-w-3xl">
+      <section
+        className="relative overflow-hidden text-white"
+        style={{
+          backgroundImage: "url('/investyz.png')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="absolute inset-0 bg-slate-950/55" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/60 via-slate-900/45 to-slate-900/30" />
+        <div className="relative container mx-auto px-4 sm:px-6 py-14 text-center max-w-3xl">
           <h2 className="text-2xl font-bold mb-3">Don't Just Watch the EV Revolution — Lead It</h2>
           <p className="text-gray-300 text-sm mb-6">Limited opportunities available. Secure your exclusive territory and become a pioneer in India's EV service industry.</p>
           <div className="flex flex-wrap justify-center gap-3">
@@ -151,6 +169,8 @@ const Franchise: React.FC = () => {
               Call +91 83686 81769
             </a>
           </div>
+        </div>
+      </section>
         </div>
       </section>
 

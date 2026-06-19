@@ -319,15 +319,7 @@ const FindEVChargers: React.FC = () => {
       </Helmet>
 
       {/* Hero */}
-      <section
-        className="relative overflow-hidden text-white"
-        style={{
-          backgroundImage: "url('/investyz.png')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <div className="absolute inset-0 bg-slate-950/55" />
+      <section className="relative overflow-hidden text-white bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950/60 via-slate-900/45 to-slate-900/30" />
         <div className="relative container mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center max-w-3xl">
           <p className="text-green-400 text-sm font-semibold tracking-wider uppercase mb-3">By EVChamp</p>
@@ -474,12 +466,10 @@ const FindEVChargers: React.FC = () => {
       <section
         className="relative overflow-hidden text-white"
         style={{
-          backgroundImage: "url('/investyz.png')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%)',
         }}
       >
-        <div className="absolute inset-0 bg-slate-950/60" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/40 via-slate-900/20 to-slate-900/10" />
         <div className="relative container mx-auto px-4 sm:px-6 py-14 text-center max-w-3xl">
           <h2 className="text-2xl font-bold mb-4">Ready to Find Your Nearest Charger?</h2>
           <p className="text-gray-300 text-sm mb-6">Start exploring our network of EV charging stations across India. Get real-time availability and smart directions today.</p>
