@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useUser, useClerk } from '@clerk/clerk-react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const DeleteAccount: React.FC = () => {
   const { isSignedIn, isLoaded, user } = useUser();

@@ -1053,6 +1053,37 @@ app.get('/api/zevault-credits', async (req, res) => {
   }
 });
 
+// Create Razorpay order for BuyPlans (EVChamp Plans)
+app.post('/api/create-order', async (req, res) => {
+  try {
+    const { amount, currency = 'INR' } = req.body;
+    if (!amount || amount <= 0) return res.status(400).json({ error: 'Invalid amount' });
+    
+    const rzp = getRazorpay();
+    const order = await rzp.orders.create({
+      amount: Math.round(amount), // Amount is already in paise from the client
+      currency,
+      receipt: `evchamp_plan_${Date.now()}`,
+    });
+    
+    console.log('[BuyPlans Create Order] Order created:', {
+      orderId: order.id,
+      amount: order.amount,
+      currency: order.currency,
+      amountInRupees: order.amount / 100
+    });
+    
+    return res.json({ 
+      id: order.id, 
+      amount: order.amount, 
+      currency: order.currency 
+    });
+  } catch (err) {
+    console.error('[BuyPlans Create Order Error]', err.message);
+    return res.status(500).json({ error: 'Could not create order' });
+  }
+});
+
 // Create Razorpay order for ZeFlash plans
 app.post('/api/zeflash-create-order', async (req, res) => {
   try {

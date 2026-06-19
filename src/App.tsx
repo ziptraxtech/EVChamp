@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import Header from './components/Header';
@@ -29,6 +29,7 @@ import ContactUs from './components/ContactUs';
 import SmarterEVAssistance from './components/SmarterEVAssistance';
 import Zeflash from './components/Zeflash';
 import ZeVaultPage from './components/ZeVaultPage';
+import ZeVaultCheckout from './components/ZeVaultCheckout';
 import Blog from './components/Blog';
 import ZeflashPlans from './components/ZeflashPlans';
 import { initializePushNotifications } from './components/FirebaseNotification';
@@ -337,6 +338,7 @@ function App() {
           } />
           <Route path="/zeflash" element={<Zeflash />} />
           <Route path="/zevault" element={<ZeVaultPage />} />
+          <Route path="/checkout" element={<ZeVaultCheckout />} />
           <Route path="/find-ev-chargers" element={<FindEVChargers />} />
           <Route path="/investyz" element={<FindEVChargers />} />
           <Route path="/blog" element={<Blog />} />

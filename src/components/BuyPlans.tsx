@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
 import { Helmet } from 'react-helmet-async';
 import razorpayService from '../services/razorpayService';
-import headerImg from '../assets/header.jpg';
 
 interface Plan {
   id: number;
@@ -93,7 +92,6 @@ const softwarePlans: Plan[] = [
 ];
 
 const BuyPlans: React.FC = () => {
-  const navigate = useNavigate();
   const { user } = useUser();
   const [selectedPlans, setSelectedPlans] = useState<Plan[]>([]);
   const [showDetails, setShowDetails] = useState(false);
@@ -142,9 +140,18 @@ const BuyPlans: React.FC = () => {
     setIsProcessing(true);
 
     try {
+      console.log('🛒 Payment initiated for user:', user.id);
       const planNames = selectedPlans.map(plan => plan.name).join(', ');
       const description = `EVChamp Plans: ${planNames}`;
       
+      console.log('� Order Summary:', {
+        selectedPlans: selectedPlans.map(p => ({ name: p.name, price: p.price })),
+        totalPriceInRupees: totalPrice,
+        totalPriceInPaise: totalPrice * 100,
+        description
+      });
+      
+      console.log('�💳 Calling razorpayService.initializePayment...');
       await razorpayService.initializePayment(
         totalPrice,
         'EVChamp Plans Purchase',
@@ -152,9 +159,11 @@ const BuyPlans: React.FC = () => {
         user.primaryEmailAddress?.emailAddress || undefined,
         user.firstName || user.username || undefined
       );
+      console.log('✓ Payment initialized successfully');
     } catch (error) {
-      console.error('Payment error:', error);
-      alert('Payment failed. Please try again.');
+      console.error('❌ Payment error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      alert(`Payment Error: ${errorMessage}`);
     } finally {
       setIsProcessing(false);
     }

@@ -1,0 +1,58 @@
+# ⚡ RAZORPAY PAYMENT FIX - QUICK REFERENCE
+
+## 🔴 Problem
+Razorpay payment is not opening when clicking "Buy Plan" on ZeVault page
+
+## 🟢 Solution (2 Steps)
+
+### STEP 1: Get Your Keys
+- Go to: https://dashboard.razorpay.com/app/settings/api-keys
+- Copy: **Key ID** (looks like `rzp_test_xxx...`)
+- Copy: **Key Secret** (looks like `abc123...`)
+
+### STEP 2: Update File
+**File:** `.env.local` (in project root)
+
+**Find:**
+```
+REACT_APP_RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxxx
+REACT_APP_RAZORPAY_KEY_SECRET=xxxxxxxxxxxxxxxxxxxxx
+```
+
+**Replace with your actual keys:**
+```
+REACT_APP_RAZORPAY_KEY_ID=rzp_test_abc123...
+REACT_APP_RAZORPAY_KEY_SECRET=your_secret_key...
+```
+
+**Then restart:** `npm start`
+
+---
+
+## ✅ Verify It Works
+
+1. Click "Buy Plan" button on ZeVault
+2. Razorpay modal should pop up
+3. Try test card: `4111 1111 1111 1111` with any expiry
+
+---
+
+## 📋 What Was Changed
+
+| File | Change |
+|------|--------|
+| `.env.local` | Added Razorpay configuration variables |
+| `razorpayService.ts` | Improved error messages |
+| Created | `RAZORPAY_SETUP_GUIDE.md` - Full setup guide |
+| Created | `RAZORPAY_PAYMENT_FIX.md` - Troubleshooting |
+
+---
+
+## 🔗 Documentation
+- **Setup Guide:** `RAZORPAY_SETUP_GUIDE.md`
+- **Troubleshooting:** `RAZORPAY_PAYMENT_FIX.md`
+- **Validation Script:** `./validate-razorpay.sh`
+
+---
+
+**Status:** Ready for configuration with your Razorpay credentials

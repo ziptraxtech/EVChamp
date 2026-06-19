@@ -8,6 +8,7 @@ import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import L from 'leaflet';
 import 'leaflet-routing-machine';
 
+
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
@@ -221,6 +222,54 @@ interface Station {
   stationStatus: string;
   evses: { id: string; status: string }[];
 }
+interface FitMapToStationsProps {
+  stations: Station[];
+}
+
+const FitMapToStations: React.FC<FitMapToStationsProps> = ({
+  stations,
+}) => {
+  const map = useMap();
+
+  useEffect(() => {
+    const validStations = stations.filter(
+      station =>
+        Number.isFinite(station.lat) &&
+        Number.isFinite(station.lng),
+    );
+
+    if (validStations.length === 0) {
+      return;
+    }
+
+    if (validStations.length === 1) {
+      map.setView(
+        [validStations[0].lat, validStations[0].lng],
+        14,
+        {
+          animate: true,
+        },
+      );
+
+      return;
+    }
+
+    const bounds = L.latLngBounds(
+      validStations.map(
+        station =>
+          [station.lat, station.lng] as [number, number],
+      ),
+    );
+
+    map.fitBounds(bounds, {
+      padding: [40, 40],
+      maxZoom: 13,
+      animate: true,
+    });
+  }, [stations, map]);
+
+  return null;
+};
 
 const investmentAreas = [
   { icon: '⚡', title: 'Real-Time Availability', desc: 'Check live charging station status and availability instantly.' },
@@ -306,9 +355,6 @@ const FindEVChargers: React.FC = () => {
     navigate('/contact');
     window.scrollTo({ top: 0, behavior: 'auto' });
   };
-  const goToInvestyzWebsite = () => {
-    window.open('https://www.investyz.com', '_blank', 'noopener,noreferrer');
-  };
 
   return (
     <div className="bg-white min-h-screen">
@@ -340,9 +386,12 @@ const FindEVChargers: React.FC = () => {
       </section>
 
       {/* Charging Network Map */}
-      <section className="bg-gray-50 py-10 sm:py-14">
+      <section
+      id="charging-station-map"
+      className="bg-gray-50 py-10 sm:py-14"
+      >
         <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 text-center mb-6">Find Charging Stations Near You</h2>
+          <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 text-center mb-6">Find Charging Stations Near You</h2>
           {loading ? (
             <div className="flex justify-center items-center h-64 text-gray-500 text-sm">Loading map…</div>
           ) : (
@@ -357,6 +406,7 @@ const FindEVChargers: React.FC = () => {
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
+                <FitMapToStations stations={stations} />
                 <RoutingControl
                   destination={routeDestination}
                   onClear={() => setRouteDestination(null)}
@@ -399,64 +449,319 @@ const FindEVChargers: React.FC = () => {
 
       {/* Features */}
       <section className="bg-white">
-        <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 max-w-6xl">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10">Why Use Our Charging Network</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="container mx-auto px-4 sm:px-6 py-14 sm:py-20 max-w-6xl">
+          <div className="max-w-3xl mx-auto text-center mb-12">
+            <span className="inline-block text-green-600 font-semibold text-sm uppercase tracking-wider mb-3">
+              Smarter EV Charging
+            </span>
+
+            <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Why Choose EVChamp to Find EV Charging Stations Near You?
+            </h2>
+
+            <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+              Discover reliable EV charging stations across India with location details,
+              charger information, route guidance, and availability updates. EVChamp helps
+              electric vehicle owners find suitable charging points quickly and plan every
+              journey with greater confidence.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {investmentAreas.map((item) => (
-              <div key={item.title} className="p-5 rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all">
-                <span className="text-2xl block mb-3">{item.icon}</span>
-                <h3 className="text-sm font-bold text-gray-900 mb-1">{item.title}</h3>
-                <p className="text-xs text-gray-500 leading-snug">{item.desc}</p>
+              <div
+                key={item.title}
+                className="group p-6 rounded-2xl border border-gray-100 bg-white hover:-translate-y-1 hover:border-green-200 hover:shadow-xl transition-all duration-300"
+              >
+                <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center mb-4 group-hover:bg-green-100 transition-colors">
+                  <span className="text-2xl">{item.icon}</span>
+                </div>
+
+                <h3 className="text-base font-bold text-gray-900 mb-2">
+                  {item.title}
+                </h3>
+
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {item.desc}
+                </p>
               </div>
             ))}
+          </div>
+
+          <div className="mt-10 text-center">
+            <button
+              onClick={() => {
+                document
+                  .getElementById('charging-station-map')
+                  ?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="inline-flex items-center justify-center bg-green-600 text-white font-semibold px-7 py-3.5 rounded-xl hover:bg-green-700 hover:shadow-lg transition-all"
+            >
+              Find EV Chargers Near Me
+            </button>
           </div>
         </div>
       </section>
 
       {/* How It Works */}
       <section className="bg-gray-50">
-        <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 max-w-6xl">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">How It Works</h2>
-          <p className="text-gray-600 text-center leading-relaxed mb-8">
-            Our intelligent charging network helps you find the nearest available station, get real-time directions, and navigate safely with live vehicle tracking.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl p-6 border border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900 mb-2">📍 Find Nearby Stations</h3>
+        <div className="container mx-auto px-4 sm:px-6 py-14 sm:py-20 max-w-6xl">
+          <div className="max-w-3xl mx-auto text-center mb-12">
+            <span className="inline-block text-green-600 font-semibold text-sm uppercase tracking-wider mb-3">
+              Simple and Fast
+            </span>
+
+            <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Find an EV Charging Station in Three Easy Steps
+            </h2>
+
+            <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+              Use the EVChamp charging station finder to locate nearby electric vehicle
+              chargers, compare station details, and navigate to your preferred charging
+              point without unnecessary delays.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="relative bg-white rounded-2xl p-7 border border-gray-100 shadow-sm hover:shadow-lg transition-all">
+              <span className="absolute top-5 right-5 text-5xl font-bold text-gray-100">
+                01
+              </span>
+
+              <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center text-2xl mb-5">
+                📍
+              </div>
+
+              <h3 className="text-lg font-bold text-gray-900 mb-3">
+                Detect Your Location
+              </h3>
+
               <p className="text-sm text-gray-600 leading-relaxed">
-                View all EV charging stations on an interactive map. See real-time availability, status, and detailed information about each location.
+                Enable location access or search by city, area, landmark, or PIN code to
+                view EV charging stations near your current location.
               </p>
             </div>
-            <div className="bg-white rounded-xl p-6 border border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900 mb-2">🚗 Smart Navigation</h3>
+
+            <div className="relative bg-white rounded-2xl p-7 border border-gray-100 shadow-sm hover:shadow-lg transition-all">
+              <span className="absolute top-5 right-5 text-5xl font-bold text-gray-100">
+                02
+              </span>
+
+              <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center text-2xl mb-5">
+                ⚡
+              </div>
+
+              <h3 className="text-lg font-bold text-gray-900 mb-3">
+                Compare Charging Stations
+              </h3>
+
               <p className="text-sm text-gray-600 leading-relaxed">
-                Get optimized turn-by-turn directions, live vehicle tracking, and distance information to reach your charging station faster.
+                Review station location, charger availability, operating status, distance,
+                and other useful details before choosing the most convenient charging point.
+              </p>
+            </div>
+
+            <div className="relative bg-white rounded-2xl p-7 border border-gray-100 shadow-sm hover:shadow-lg transition-all">
+              <span className="absolute top-5 right-5 text-5xl font-bold text-gray-100">
+                03
+              </span>
+
+              <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center text-2xl mb-5">
+                🚗
+              </div>
+
+              <h3 className="text-lg font-bold text-gray-900 mb-3">
+                Navigate and Start Charging
+              </h3>
+
+              <p className="text-sm text-gray-600 leading-relaxed">
+                Get route guidance to the selected EV charger and reach the station using
+                optimized directions designed to make your charging journey faster and easier.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* FAQ */}
+      {/* SEO Information Section */}
       <section className="bg-white">
-        <div className="container mx-auto px-4 sm:px-6 py-12 max-w-6xl">
-          <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">Frequently Asked Questions</h2>
+        <div className="container mx-auto px-4 sm:px-6 py-14 sm:py-20 max-w-6xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+            <div>
+              <span className="inline-block text-green-600 font-semibold text-sm uppercase tracking-wider mb-3">
+                Charge With Confidence
+              </span>
+
+              <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-5">
+                Your Trusted EV Charger Locator Across India
+              </h2>
+
+              <p className="text-gray-600 leading-relaxed mb-4">
+                EVChamp makes it easier to search for electric vehicle charging stations
+                near you. Whether you are travelling within your city or planning a longer
+                road trip, our EV charging network finder helps you identify suitable
+                charging locations along your route.
+              </p>
+
+              <p className="text-gray-600 leading-relaxed">
+                Search for public EV chargers, fast-charging stations, and nearby charging
+                points using a simple, user-friendly interface. Check available station
+                information before starting your journey and reduce the time spent searching
+                for a reliable place to charge your electric vehicle.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="rounded-2xl bg-gray-50 p-6 border border-gray-100">
+                <p className="text-3xl mb-3">📌</p>
+                <h3 className="font-bold text-gray-900 mb-2">
+                  Location-Based Search
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Find charging points by current location, city, area, or destination.
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-gray-50 p-6 border border-gray-100">
+                <p className="text-3xl mb-3">🗺️</p>
+                <h3 className="font-bold text-gray-900 mb-2">
+                  Route Assistance
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Navigate directly to your selected EV charging station.
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-gray-50 p-6 border border-gray-100">
+                <p className="text-3xl mb-3">🔌</p>
+                <h3 className="font-bold text-gray-900 mb-2">
+                  Charger Information
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Review useful charging station details before travelling.
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-gray-50 p-6 border border-gray-100">
+                <p className="text-3xl mb-3">🌱</p>
+                <h3 className="font-bold text-gray-900 mb-2">
+                  Better EV Journeys
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Plan convenient and more dependable electric vehicle trips.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="bg-gray-50">
+        <div className="container mx-auto px-4 sm:px-6 py-14 sm:py-20 max-w-4xl">
+          <div className="text-center mb-10">
+            <span className="inline-block text-green-600 font-semibold text-sm uppercase tracking-wider mb-3">
+              EV Charging Help
+            </span>
+
+            <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Frequently Asked Questions About EV Charging Stations
+            </h2>
+
+            <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+              Find answers to common questions about locating, selecting, and navigating
+              to electric vehicle charging stations through EVChamp.
+            </p>
+          </div>
+
           <div className="space-y-4">
-            <details className="border border-gray-100 rounded-lg p-4 group">
-              <summary className="text-sm font-medium text-gray-900 cursor-pointer">How do I find charging stations near me?</summary>
-              <p className="mt-2 text-sm text-gray-600">Simply view the interactive map on this page. All EV charging stations across India are displayed with real-time availability status. Click on any station to see details.</p>
+            <details className="bg-white border border-gray-200 rounded-xl p-5 group open:shadow-md transition-all">
+              <summary className="flex items-center justify-between text-base font-semibold text-gray-900 cursor-pointer list-none">
+                How do I find EV charging stations near me?
+                <span className="text-green-600 text-xl group-open:rotate-45 transition-transform">
+                  +
+                </span>
+              </summary>
+
+              <p className="mt-4 text-sm text-gray-600 leading-relaxed">
+                Enable location access to view nearby EV charging stations automatically.
+                You can also search using a city, area, landmark, destination, or PIN code
+                to find suitable electric vehicle chargers.
+              </p>
             </details>
-            <details className="border border-gray-100 rounded-lg p-4 group">
-              <summary className="text-sm font-medium text-gray-900 cursor-pointer">Can I get directions to a charging station?</summary>
-              <p className="mt-2 text-sm text-gray-600">Yes! Click the "Get Directions" button on any station to activate smart navigation. We'll calculate the optimal route and provide turn-by-turn guidance to your destination.</p>
+
+            <details className="bg-white border border-gray-200 rounded-xl p-5 group open:shadow-md transition-all">
+              <summary className="flex items-center justify-between text-base font-semibold text-gray-900 cursor-pointer list-none">
+                Can I get directions to an EV charging station?
+                <span className="text-green-600 text-xl group-open:rotate-45 transition-transform">
+                  +
+                </span>
+              </summary>
+
+              <p className="mt-4 text-sm text-gray-600 leading-relaxed">
+                Yes. Select a charging station and use the directions option to view the
+                route from your current location to the selected charging point.
+              </p>
             </details>
-            <details className="border border-gray-100 rounded-lg p-4 group">
-              <summary className="text-sm font-medium text-gray-900 cursor-pointer">How accurate is the real-time availability?</summary>
-              <p className="mt-2 text-sm text-gray-600">Our data is updated regularly from charging networks across India. Availability status shows whether stations are operational, but we recommend confirming with the station before arriving.</p>
+
+            <details className="bg-white border border-gray-200 rounded-xl p-5 group open:shadow-md transition-all">
+              <summary className="flex items-center justify-between text-base font-semibold text-gray-900 cursor-pointer list-none">
+                Does EVChamp show real-time charger availability?
+                <span className="text-green-600 text-xl group-open:rotate-45 transition-transform">
+                  +
+                </span>
+              </summary>
+
+              <p className="mt-4 text-sm text-gray-600 leading-relaxed">
+                EVChamp may display station status and availability information when it is
+                provided by the relevant charging network. Availability can change quickly,
+                so confirming with the charging station before arrival is recommended.
+              </p>
             </details>
-            <details className="border border-gray-100 rounded-lg p-4 group">
-              <summary className="text-sm font-medium text-gray-900 cursor-pointer">Is the navigation feature free?</summary>
-              <p className="mt-2 text-sm text-gray-600">Yes, our charging station finder and navigation service is completely free for all EVChamp users. Just enable location access on your device.</p>
+
+            <details className="bg-white border border-gray-200 rounded-xl p-5 group open:shadow-md transition-all">
+              <summary className="flex items-center justify-between text-base font-semibold text-gray-900 cursor-pointer list-none">
+                Can I find fast-charging stations through EVChamp?
+                <span className="text-green-600 text-xl group-open:rotate-45 transition-transform">
+                  +
+                </span>
+              </summary>
+
+              <p className="mt-4 text-sm text-gray-600 leading-relaxed">
+                Where charger-type information is available, you can review station details
+                to identify charging points that may support fast charging or other suitable
+                connector options for your electric vehicle.
+              </p>
+            </details>
+
+            <details className="bg-white border border-gray-200 rounded-xl p-5 group open:shadow-md transition-all">
+              <summary className="flex items-center justify-between text-base font-semibold text-gray-900 cursor-pointer list-none">
+                Is the EV charging station finder free to use?
+                <span className="text-green-600 text-xl group-open:rotate-45 transition-transform">
+                  +
+                </span>
+              </summary>
+
+              <p className="mt-4 text-sm text-gray-600 leading-relaxed">
+                The EVChamp charger search and navigation experience can be used to locate
+                charging stations. Individual charging station operators may apply their
+                own charging rates, parking fees, or service charges.
+              </p>
+            </details>
+
+            <details className="bg-white border border-gray-200 rounded-xl p-5 group open:shadow-md transition-all">
+              <summary className="flex items-center justify-between text-base font-semibold text-gray-900 cursor-pointer list-none">
+                Should I confirm station availability before travelling?
+                <span className="text-green-600 text-xl group-open:rotate-45 transition-transform">
+                  +
+                </span>
+              </summary>
+
+              <p className="mt-4 text-sm text-gray-600 leading-relaxed">
+                Yes. Charger availability, operating hours, maintenance status, and pricing
+                may change. Confirming directly with the charging station is advisable,
+                especially before long-distance journeys.
+              </p>
             </details>
           </div>
         </div>

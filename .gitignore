@@ -16,6 +16,19 @@ yarn-error.log*
 .env.production.local
 server/.env
 
+# ⚠️ CRITICAL: Never commit files containing secrets
+# These files should NEVER be committed - they contain sensitive credentials
+# Including: API keys, database passwords, Razorpay keys, Firebase keys, etc.
+# If accidentally committed, rotate all keys immediately!
+
+# Sensitive credential files
+.env*.local
+.env.secrets
+secrets/
+config/secrets
+**/.env.production
+**/.env.local.backup
+
 # SSH keys
 *.pem
 
@@ -81,9 +94,3 @@ jspm_packages/
 .local-jdk/
 VERCEL_SETUP.md
 QUICK_REFERENCE.md
-
-# Sensitive documentation
-FINAL_DEPLOYMENT_CHECKLIST.md
-DEPLOYMENT_CHECKLIST.md
-SECRET_MANAGEMENT.md
-SECURE_CREDENTIALS.md

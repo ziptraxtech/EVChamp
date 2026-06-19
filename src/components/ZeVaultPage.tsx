@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, useUser } from '@clerk/clerk-react';
 
@@ -232,7 +232,10 @@ const ZeVaultPage: React.FC = () => {
                   </li>
                 </ul>
                 <button
-                  onClick={() => navigate('/checkout?plan=trial&tests=1&months=0&price=99')}
+                  onClick={() => {
+                    console.log('📋 Trial Plan Selected:', { plan: 'trial', tests: 1, months: 0, price: 199, amountInPaise: 19900 });
+                    navigate('/checkout?plan=trial&tests=1&months=0&price=199');
+                  }}
                   className="block w-full text-center rounded-lg bg-emerald-600 text-white font-semibold px-4 py-2.5 hover:bg-emerald-700 transition-colors shadow-sm"
                 >
                   Start Trial
@@ -270,7 +273,10 @@ const ZeVaultPage: React.FC = () => {
                   </li>
                 </ul>
                 <button
-                  onClick={() => navigate('/checkout?plan=starter&tests=4&months=12&price=999')}
+                  onClick={() => {
+                    console.log('📋 Starter Plan Selected:', { plan: 'starter', tests: 4, months: 12, price: 1499, amountInPaise: 149900 });
+                    navigate('/checkout?plan=starter&tests=4&months=12&price=1499');
+                  }}
                   className="block w-full text-center rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold px-4 py-2.5 hover:from-blue-700 hover:to-cyan-700 shadow-md transition-all"
                 >
                   Get Started
@@ -317,7 +323,10 @@ const ZeVaultPage: React.FC = () => {
                   </li>
                 </ul>
                 <button
-                  onClick={() => navigate('/checkout?plan=value&tests=8&months=12&price=1499')}
+                  onClick={() => {
+                    console.log('📋 Value Pack Plan Selected:', { plan: 'value', tests: 12, months: 12, price: 2499, amountInPaise: 249900 });
+                    navigate('/checkout?plan=value&tests=12&months=12&price=2499');
+                  }}
                   className="block w-full text-center rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold px-4 py-2.5 hover:from-blue-700 hover:to-cyan-700 shadow-md transition-all"
                 >
                   Get Value Pack
@@ -344,7 +353,7 @@ const ZeVaultPage: React.FC = () => {
                     <label className="text-sm font-medium text-gray-700 mb-2 block">Number of tests</label>
                     <input
                       type="range"
-                      min="6"
+                      min="8"
                       max="24"
                       value={customTests}
                       onChange={(e) => setCustomTests(parseInt(e.target.value))}
@@ -396,6 +405,13 @@ const ZeVaultPage: React.FC = () => {
                 </ul>
                 <button
                   onClick={() => {
+                    console.log('📋 Custom Plan Selected:', {
+                      tests: customTests,
+                      months: selectedMonths,
+                      pricePerTest: pricePerTest,
+                      totalPrice: customTotalPrice,
+                      totalInPaise: customTotalPrice * 100
+                    });
                     navigate(`/checkout?plan=custom&tests=${customTests}&months=${selectedMonths}&price=${customTotalPrice}`);
                   }}
                   className="block w-full text-center rounded-lg bg-purple-600 text-white font-semibold px-4 py-2.5 hover:bg-purple-700 transition-colors shadow-sm"
