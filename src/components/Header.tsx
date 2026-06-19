@@ -36,6 +36,7 @@ const Header: React.FC = () => {
   const protectedRoutes = [
     '/charging-network', '/service-centres', '/buy-plans', '/buy-used-ev',
     '/rsa-plans', '/sell-ev', '/rent-ev', '/advance-analysis', '/delete-account',
+    '/ev-marketplace',
   ];
 
   const goTo = (route: string) => {
