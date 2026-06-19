@@ -1,0 +1,109 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   EV Marketplace (Decision Toolkit) — scoped styles.
+   EVERYTHING here is namespaced under `.ev-marketplace` (and keyframes are
+   prefixed `mk*`) so it can never affect the rest of the EVChamp site.
+   Ported from the EV-Buyer Next.js app's globals.css (Tailwind v4 @theme),
+   re-expressed as plain CSS for EVChamp's Tailwind v3 / CRA setup.
+   ────────────────────────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap');
+
+/* Page surface: Manrope body font, ink text, faint 64px grid background. */
+.ev-marketplace {
+  font-family: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  color: #0f2133;
+  letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  background-color: #ffffff;
+  background-image:
+    linear-gradient(rgba(15, 33, 51, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 33, 51, 0.022) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+.ev-marketplace h1,
+.ev-marketplace h2,
+.ev-marketplace h3,
+.ev-marketplace h4 {
+  font-family: 'Sora', ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+/* green→blue gradient text clip */
+.ev-marketplace .text-gradient {
+  background: linear-gradient(110deg, #0a8a52, #1257c4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* primary action gradient */
+.ev-marketplace .bg-primary-gradient {
+  background: linear-gradient(120deg, #0a8a52, #1257c4);
+}
+
+/* nav backdrop */
+.ev-marketplace .nav-glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+
+/* pulsing badge dot */
+.ev-marketplace .pulse-dot { animation: mkPulse 2.2s ease-in-out infinite; }
+@keyframes mkPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.72); }
+}
+
+/* modal + toast entrances */
+.ev-marketplace .modal-enter { animation: mkModalIn 0.26s cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes mkModalIn {
+  from { opacity: 0; transform: translateY(18px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.ev-marketplace .fade-in { animation: mkFadeIn 0.22s ease; }
+@keyframes mkFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.ev-marketplace .toast-enter { animation: mkToastIn 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes mkToastIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* range slider — accent green, custom thumb */
+.ev-marketplace input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: #e4e9f0;
+  outline: none;
+  cursor: pointer;
+}
+.ev-marketplace input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #0a8a52;
+  border: 3px solid #ffffff;
+  box-shadow: 0 1px 4px rgba(10, 138, 82, 0.4);
+  cursor: pointer;
+}
+.ev-marketplace input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  background: #0a8a52;
+  box-shadow: 0 1px 4px rgba(10, 138, 82, 0.4);
+  cursor: pointer;
+}
+
+.ev-marketplace .no-scrollbar::-webkit-scrollbar { display: none; }
+.ev-marketplace .no-scrollbar { scrollbar-width: none; }

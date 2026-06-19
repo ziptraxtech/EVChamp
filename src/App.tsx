@@ -37,6 +37,7 @@ import AdminNotificationPanel from './components/AdminNotificationPanel';
 
 import PartnersCarousel from './components/PartnersCarousel';
 import ChatbotPopup from './components/ChatbotPopup';
+import EVMarketplace from './components/marketplace/EVMarketplace';
 
 function HomePage() {
   const navigate = useNavigate();
@@ -304,6 +305,7 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/ev-marketplace" element={<EVMarketplace />} />
           <Route path="/sign-in" element={<SmartSignIn />} />
           <Route path="/sign-up" element={<SignUp routing="path" path="/sign-up" forceRedirectUrl="/" fallbackRedirectUrl="/" />} />
           <Route path="/user" element={<UserSettingsPage />} />

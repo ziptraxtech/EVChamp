@@ -57,7 +57,7 @@ const Franchise: React.FC = () => {
             EVChamp Franchise Partnership offers a business opportunity for entrepreneurs and organizations looking to enter the fast-growing electric mobility sector.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <button onClick={goToContact} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
+            <button onClick={() => goTo('/contact')} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
               Apply Now
             </button>
             <button onClick={() => goTo('/find-ev-chargers')} className="border border-white/30 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/10 transition-all text-sm">
@@ -169,8 +169,6 @@ const Franchise: React.FC = () => {
               Call +91 83686 81769
             </a>
           </div>
-        </div>
-      </section>
         </div>
       </section>
 

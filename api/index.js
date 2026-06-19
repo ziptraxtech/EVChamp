@@ -138,6 +138,40 @@ async function initDB() {
     await getSQL()`CREATE INDEX IF NOT EXISTS idx_fcm_tokens_user ON fcm_tokens(clerk_user_id)`;
     await getSQL()`CREATE INDEX IF NOT EXISTS idx_fcm_tokens_active ON fcm_tokens(is_active)`;
 
+    // EV Marketplace — test-drive bookings
+    await getSQL()`
+      CREATE TABLE IF NOT EXISTS test_drive_bookings (
+        id SERIAL PRIMARY KEY,
+        reference TEXT UNIQUE NOT NULL,
+        car_id TEXT NOT NULL,
+        first_name TEXT NOT NULL,
+        last_name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        country_code TEXT,
+        phone TEXT,
+        city TEXT,
+        preferred_date TEXT,
+        address TEXT,
+        time_slot TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `;
+
+    // EV Marketplace — monthly offer leads
+    await getSQL()`
+      CREATE TABLE IF NOT EXISTS offer_leads (
+        id SERIAL PRIMARY KEY,
+        car_id TEXT NOT NULL,
+        full_name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        country_code TEXT,
+        phone TEXT,
+        offer_total INTEGER,
+        source TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `;
+
     dbReady = true;
     return true;
   } catch (err) {
@@ -1511,6 +1545,48 @@ app.post('/api/send-notification-topic', async (req, res) => {
   } catch (err) {
     console.error('[FCM Send Topic Error]', err.message);
     return res.status(500).json({ error: 'Failed to send notification to topic', detail: err.message });
+  }
+});
+
+// ============ EV Marketplace ============
+// Test-drive booking (from the marketplace BookingModal)
+app.post('/api/bookings', async (req, res) => {
+  try {
+    const b = req.body || {};
+    if (!b.carId || !b.firstName || !b.lastName || !b.email) {
+      return res.status(400).json({ error: 'Missing required booking fields' });
+    }
+    const reference = 'EVC-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+    await getSQL()`
+      INSERT INTO test_drive_bookings
+        (reference, car_id, first_name, last_name, email, country_code, phone, city, preferred_date, address, time_slot)
+      VALUES
+        (${reference}, ${b.carId}, ${b.firstName}, ${b.lastName}, ${b.email}, ${b.countryCode || '+91'}, ${b.phone || null},
+         ${b.city || null}, ${b.preferredDate || null}, ${b.address || null}, ${b.timeSlot || null})
+    `;
+    res.json({ ok: true, reference, persisted: true });
+  } catch (err) {
+    console.error('[bookings] DB insert failed:', err.message);
+    res.status(500).json({ error: 'Could not save booking' });
+  }
+});
+
+// Monthly offer lead (from the marketplace OffersModal)
+app.post('/api/offer-leads', async (req, res) => {
+  try {
+    const l = req.body || {};
+    if (!l.carId || !l.fullName || !l.email) {
+      return res.status(400).json({ error: 'Missing required lead fields' });
+    }
+    const rows = await getSQL()`
+      INSERT INTO offer_leads (car_id, full_name, email, country_code, phone, offer_total, source)
+      VALUES (${l.carId}, ${l.fullName}, ${l.email}, ${l.countryCode || '+91'}, ${l.phone || null}, ${l.offerTotal ?? null}, ${l.source ?? null})
+      RETURNING id
+    `;
+    res.json({ ok: true, id: rows[0].id, persisted: true });
+  } catch (err) {
+    console.error('[offer-leads] DB insert failed:', err.message);
+    res.status(500).json({ error: 'Could not save lead' });
   }
 });
 

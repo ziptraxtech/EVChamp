@@ -53,7 +53,7 @@ const Header: React.FC = () => {
   };
 
   const platformLinks = [
-    { label: 'EV Marketplace', route: '/buy-used-ev' },
+    { label: 'EV Marketplace', route: '/ev-marketplace' },
     { label: 'Find EV Service Centres', route: '/service-centres' },
     { label: 'Find EV Chargers', route: '/find-ev-chargers' },
     { label: 'ZipsureAI & IOT Plans', route: '/buy-plans' },

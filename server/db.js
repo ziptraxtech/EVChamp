@@ -1,7 +1,26 @@
+const net = require('node:net');
+const path = require('node:path');
 const { neon } = require('@neondatabase/serverless');
-require('dotenv').config();
+// Load env from the project root (.env.local / .env) as well as server/.env, so
+// a single DATABASE_URL in the root .env.local is picked up regardless of cwd.
+require('dotenv').config({
+  path: [
+    path.resolve(__dirname, '../.env.local'),
+    path.resolve(__dirname, '../.env'),
+    path.resolve(__dirname, '.env'),
+  ],
+});
 
-const sql = neon(process.env.DATABASE_URL);
+// Neon's HTTP driver uses global fetch (undici). On a slow/marginal network,
+// undici's Happy-Eyeballs default 250ms per-address attempt timeout can bounce
+// between the host's IPv4/IPv6 addresses and abort with UND_ERR_CONNECT_TIMEOUT
+// (surfacing as an intermittent 504) before any connection completes. Give each
+// address more time to connect.
+net.setDefaultAutoSelectFamilyAttemptTimeout(5000);
+
+// Null when DATABASE_URL is absent so the server can still boot in local dev
+// (endpoints that need the DB guard on this / on process.env.DATABASE_URL).
+const sql = process.env.DATABASE_URL ? neon(process.env.DATABASE_URL) : null;
 
 async function initDB() {
   try {
@@ -69,6 +88,42 @@ async function initDB() {
       CREATE INDEX IF NOT EXISTS idx_users_clerk_id ON users(clerk_id)
     `;
     console.log('✅ Neon DB: users table ready');
+
+    // EV Marketplace — test-drive bookings
+    await sql`
+      CREATE TABLE IF NOT EXISTS test_drive_bookings (
+        id SERIAL PRIMARY KEY,
+        reference TEXT UNIQUE NOT NULL,
+        car_id TEXT NOT NULL,
+        first_name TEXT NOT NULL,
+        last_name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        country_code TEXT,
+        phone TEXT,
+        city TEXT,
+        preferred_date TEXT,
+        address TEXT,
+        time_slot TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `;
+    console.log('✅ Neon DB: test_drive_bookings table ready');
+
+    // EV Marketplace — monthly offer leads
+    await sql`
+      CREATE TABLE IF NOT EXISTS offer_leads (
+        id SERIAL PRIMARY KEY,
+        car_id TEXT NOT NULL,
+        full_name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        country_code TEXT,
+        phone TEXT,
+        offer_total INTEGER,
+        source TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `;
+    console.log('✅ Neon DB: offer_leads table ready');
 
     return true;
   } catch (err) {
@@ -163,4 +218,26 @@ async function updateCertificate(auditId, certificateNumber) {
   return result[0] || null;
 }
 
-module.exports = { sql, initDB, saveAudit, getAuditBySerial, getAuditById, getAllAudits, updateCertificate, upsertUser };
+// ── EV Marketplace ──────────────────────────────────────────────────────────
+async function saveBooking(b) {
+  const result = await sql`
+    INSERT INTO test_drive_bookings
+      (reference, car_id, first_name, last_name, email, country_code, phone, city, preferred_date, address, time_slot)
+    VALUES
+      (${b.reference}, ${b.carId}, ${b.firstName}, ${b.lastName}, ${b.email}, ${b.countryCode || '+91'}, ${b.phone || null},
+       ${b.city || null}, ${b.preferredDate || null}, ${b.address || null}, ${b.timeSlot || null})
+    RETURNING *
+  `;
+  return result[0];
+}
+
+async function saveOfferLead(l) {
+  const result = await sql`
+    INSERT INTO offer_leads (car_id, full_name, email, country_code, phone, offer_total, source)
+    VALUES (${l.carId}, ${l.fullName}, ${l.email}, ${l.countryCode || '+91'}, ${l.phone || null}, ${l.offerTotal ?? null}, ${l.source ?? null})
+    RETURNING id
+  `;
+  return result[0];
+}
+
+module.exports = { sql, initDB, saveAudit, getAuditBySerial, getAuditById, getAllAudits, updateCertificate, upsertUser, saveBooking, saveOfferLead };

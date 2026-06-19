@@ -62,6 +62,14 @@
       "destination": "/api/index.js"
     },
     {
+      "source": "/api/bookings",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/api/offer-leads",
+      "destination": "/api/index.js"
+    },
+    {
       "source": "/api/:path*",
       "destination": "http://100.24.9.16:5000/api/:path*"
     },

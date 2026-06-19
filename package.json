@@ -31,6 +31,7 @@
     "html5-qrcode": "^2.3.8",
     "leaflet": "^1.9.4",
     "leaflet-routing-machine": "^3.2.12",
+    "lucide-react": "^1.21.0",
     "nodemailer": "^6.9.16",
     "papaparse": "^5.5.3",
     "qrcode.react": "^4.2.0",
@@ -46,6 +47,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "dev": "react-scripts start",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

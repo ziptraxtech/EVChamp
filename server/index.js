@@ -1,7 +1,16 @@
-require('dotenv').config();
+const path = require('path');
+// Load env from the project root (.env.local / .env) as well as server/.env, so
+// a single DATABASE_URL in the root .env.local is picked up regardless of cwd.
+require('dotenv').config({
+  path: [
+    path.resolve(__dirname, '../.env.local'),
+    path.resolve(__dirname, '../.env'),
+    path.resolve(__dirname, '.env'),
+  ],
+});
 const express = require('express');
 const cors = require('cors');
-const { initDB, saveAudit, getAuditBySerial, getAuditById, getAllAudits, updateCertificate, upsertUser } = require('./db');
+const { initDB, saveAudit, getAuditBySerial, getAuditById, getAllAudits, updateCertificate, upsertUser, saveBooking, saveOfferLead } = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -12,6 +21,48 @@ app.use(express.json());
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// ── EV Marketplace ──────────────────────────────────────────────────────────
+// Test-drive booking (from the marketplace BookingModal)
+app.post('/api/bookings', async (req, res) => {
+  const b = req.body || {};
+  if (!b.carId || !b.firstName || !b.lastName || !b.email) {
+    return res.status(400).json({ error: 'Missing required booking fields' });
+  }
+  const reference = 'EVC-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+  if (!process.env.DATABASE_URL) {
+    // No DB configured (e.g. local dev) — complete the UX without persisting.
+    console.warn('[bookings] DATABASE_URL not set; booking not persisted:', reference, b.email);
+    return res.json({ ok: true, reference, persisted: false });
+  }
+  try {
+    await saveBooking({ ...b, reference });
+    res.json({ ok: true, reference, persisted: true });
+  } catch (err) {
+    console.error('[bookings] DB insert failed:', err.message);
+    res.status(500).json({ error: 'Could not save booking' });
+  }
+});
+
+// Monthly offer lead (from the marketplace OffersModal)
+app.post('/api/offer-leads', async (req, res) => {
+  const l = req.body || {};
+  if (!l.carId || !l.fullName || !l.email) {
+    return res.status(400).json({ error: 'Missing required lead fields' });
+  }
+  if (!process.env.DATABASE_URL) {
+    // No DB configured (e.g. local dev) — reveal the offers anyway.
+    console.warn('[offer-leads] DATABASE_URL not set; lead not persisted:', l.email);
+    return res.json({ ok: true, persisted: false });
+  }
+  try {
+    const row = await saveOfferLead(l);
+    res.json({ ok: true, id: row.id, persisted: true });
+  } catch (err) {
+    console.error('[offer-leads] DB insert failed:', err.message);
+    res.status(500).json({ error: 'Could not save lead' });
+  }
 });
 
 // Clerk user sync endpoint
