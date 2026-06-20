@@ -18,6 +18,39 @@ const PORT = process.env.PORT || 5001;
 app.use(cors());
 app.use(express.json());
 
+// ============================================
+// 🔒 SECURITY VALIDATION
+// ============================================
+// Verify backend secrets are properly loaded
+const validateSecrets = () => {
+  const errors = [];
+  
+  if (!process.env.RAZORPAY_KEY_ID) {
+    errors.push('❌ RAZORPAY_KEY_ID not found - payment orders will fail');
+  }
+  
+  if (!process.env.RAZORPAY_KEY_SECRET) {
+    errors.push('❌ RAZORPAY_KEY_SECRET not found - payment verification will fail');
+  }
+  
+  if (!process.env.RAZORPAY_WEBHOOK_SECRET) {
+    errors.push('⚠️  RAZORPAY_WEBHOOK_SECRET not found - webhook verification disabled');
+  }
+  
+  if (errors.length > 0) {
+    console.error('\n🔴 RAZORPAY CONFIGURATION ERRORS:');
+    errors.forEach(err => console.error(err));
+    console.error('\n📖 Setup Guide: See server/.env.example for configuration\n');
+  } else {
+    console.log('✅ All Razorpay backend secrets properly configured');
+  }
+  
+  return errors.length === 0;
+};
+
+// Validate on startup
+validateSecrets();
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

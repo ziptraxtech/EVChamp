@@ -56,22 +56,6 @@ class RazorpayService {
         'color: #ff0000; font-weight: bold;'
       );
     }
-    
-    // Log warning if secret is accidentally configured in frontend
-    if (process.env.REACT_APP_RAZORPAY_KEY_SECRET || process.env.RAZORPAY_KEY_SECRET) {
-      console.warn(
-        '%c⚠️  SECURITY WARNING: Razorpay KEY_SECRET found in frontend environment!',
-        'color: #ff9900; font-weight: bold; font-size: 14px;'
-      );
-      console.warn(
-        '%cREAZON: KEY_SECRET must ONLY exist on backend server for payment verification.',
-        'color: #ff9900;'
-      );
-      console.warn(
-        '%cACTION: Remove RAZORPAY_KEY_SECRET from .env.local and frontend .env files immediately!',
-        'color: #ff0000; font-weight: bold;'
-      );
-    }
   }
 
   // Initialize Razorpay script
