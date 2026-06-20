@@ -11,6 +11,8 @@ import TripPlanner from "./TripPlanner";
 import { BookingModal } from "./BookingModal";
 import { OffersModal } from "./OffersModal";
 import { Toast } from "./Toast";
+import { CompareBar } from "./CompareBar";
+import { CompareModal } from "./CompareModal";
 
 export default function Toolkit() {
   const [cur, setCur] = useState<Currency>("INR");
@@ -18,6 +20,8 @@ export default function Toolkit() {
   const [toast, setToast] = useState("");
   const [booking, setBooking] = useState<{ carId: string } | null>(null);
   const [offers, setOffers] = useState<{ carId: string; source: OfferSource } | null>(null);
+  const [compareIds, setCompareIds] = useState<string[]>([]);
+  const [compareOpen, setCompareOpen] = useState(false);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const showToast = useCallback((msg: string) => {
@@ -32,9 +36,26 @@ export default function Toolkit() {
     [],
   );
 
+  const toggleCompare = useCallback(
+    (id: string) => {
+      setCompareIds((ids) => {
+        if (ids.includes(id)) return ids.filter((x) => x !== id);
+        if (ids.length >= 4) {
+          showToast("You can compare up to 4 EVs");
+          return ids;
+        }
+        return [...ids, id];
+      });
+    },
+    [showToast],
+  );
+  const clearCompare = useCallback(() => setCompareIds([]), []);
+  const openCompare = useCallback(() => setCompareOpen(true), []);
+  const closeCompare = useCallback(() => setCompareOpen(false), []);
+
   const ctx = useMemo<ToolkitContextValue>(
-    () => ({ cur, setCur, tab, setTab, openBooking, openOffers, showToast }),
-    [cur, tab, openBooking, openOffers, showToast],
+    () => ({ cur, setCur, tab, setTab, openBooking, openOffers, showToast, compareIds, toggleCompare, clearCompare, openCompare }),
+    [cur, tab, openBooking, openOffers, showToast, compareIds, toggleCompare, clearCompare, openCompare],
   );
 
   return (
@@ -72,6 +93,9 @@ export default function Toolkit() {
       )}
 
       {toast && <Toast message={toast} />}
+
+      <CompareBar />
+      {compareOpen && <CompareModal onClose={closeCompare} />}
     </ToolkitContext.Provider>
   );
 }

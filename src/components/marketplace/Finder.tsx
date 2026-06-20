@@ -135,7 +135,8 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function CarCard({ match }: { match: ScoredCar }) {
   const { car, reasons, scorePct } = match;
-  const { cur, openBooking, openOffers, showToast } = useToolkit();
+  const { cur, openBooking, openOffers, compareIds, toggleCompare } = useToolkit();
+  const inCompare = compareIds.includes(car.id);
   const [idx, setIdx] = useState(0);
   const imgs = car.images;
   const n = imgs.length;
@@ -238,10 +239,14 @@ function CarCard({ match }: { match: ScoredCar }) {
           <div className="ml-auto flex gap-2">
             <button
               type="button"
-              onClick={() => showToast(`Added ${car.name} to compare`)}
-              className="rounded-[10px] border border-line bg-transparent px-3.5 py-[9px] text-[0.8rem] font-semibold text-body transition-all hover:border-[#cdd6e2] hover:text-ink"
+              onClick={() => toggleCompare(car.id)}
+              className={`rounded-[10px] border px-3.5 py-[9px] text-[0.8rem] font-semibold transition-all ${
+                inCompare
+                  ? "border-green bg-[rgba(10,138,82,.12)] text-green"
+                  : "border-line bg-transparent text-body hover:border-[#cdd6e2] hover:text-ink"
+              }`}
             >
-              Compare
+              {inCompare ? "✓ Added" : "Compare"}
             </button>
             <button
               type="button"

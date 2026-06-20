@@ -3,6 +3,7 @@ import { Route, Zap } from "lucide-react";
 import { INVENTORY } from "./data/cars";
 import { planTrip, fmtHours } from "./lib/calc";
 import { rupee } from "./lib/format";
+import { useToolkit } from "./context";
 import { Card, ToolHeader, Slider, OptionButton } from "./ui";
 import { CarSelect } from "./CarSelect";
 

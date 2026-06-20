@@ -15,6 +15,14 @@ export interface ToolkitContextValue {
   openOffers: (carId: string, source: OfferSource) => void;
   /** Fire a bottom-right toast (auto-dismisses). */
   showToast: (msg: string) => void;
+  /** Car IDs currently selected for comparison (max 4). */
+  compareIds: string[];
+  /** Add/remove a car from the compare set (capped at 4, toasts when full). */
+  toggleCompare: (id: string) => void;
+  /** Empty the compare set. */
+  clearCompare: () => void;
+  /** Open the side-by-side compare modal. */
+  openCompare: () => void;
 }
 
 export const ToolkitContext = createContext<ToolkitContextValue | null>(null);

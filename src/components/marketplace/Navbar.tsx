@@ -19,34 +19,15 @@ export default function Navbar() {
   const { tab, setTab, cur, setCur } = useToolkit();
 
   return (
-    <nav className="nav-glass sticky top-0 z-50 flex h-[66px] items-center justify-between border-b border-line px-10">
-      <div className="font-display text-[1.4rem] font-extrabold tracking-[0.5px]">
+    <nav className="nav-glass sticky top-0 z-50 flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-line px-4 py-2.5 sm:h-[66px] sm:flex-nowrap sm:justify-between sm:px-10 sm:py-0">
+      {/* logo */}
+      <div className="order-1 font-display text-[1.4rem] font-extrabold tracking-[0.5px]">
         <span className="text-blue">EV</span>
         <span className="text-green">Champ</span>
       </div>
 
-      {/* tab group */}
-      <div className="flex gap-1 rounded-xl border border-line bg-panel p-1">
-        {TABS.map((t) => {
-          const active = tab === t.id;
-          return (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setTab(t.id)}
-              className={`inline-flex items-center gap-[7px] whitespace-nowrap rounded-[9px] px-[15px] py-2 text-[0.83rem] transition-all ${
-                active ? "bg-primary-gradient font-bold text-white" : "font-semibold text-body hover:text-ink"
-              }`}
-            >
-              {t.icon && <Search size={15} strokeWidth={1.8} />}
-              {t.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* currency toggle */}
-      <div className="flex gap-[2px] rounded-[9px] border border-line bg-panel p-[3px]">
+      {/* currency toggle — top-right beside the logo on mobile, far-right on desktop */}
+      <div className="order-2 ml-auto flex flex-shrink-0 gap-[2px] rounded-[9px] border border-line bg-panel p-[3px] sm:order-3 sm:ml-0">
         {CURRENCIES.map((c) => {
           const active = cur === c.id;
           return (
@@ -54,7 +35,7 @@ export default function Navbar() {
               key={c.id}
               type="button"
               onClick={() => setCur(c.id)}
-              className={`whitespace-nowrap rounded-md px-[11px] py-1.5 text-[0.78rem] transition-all ${
+              className={`whitespace-nowrap rounded-md px-2.5 py-1.5 text-[0.78rem] transition-all sm:px-[11px] ${
                 active ? "bg-primary-gradient font-bold text-white" : "font-semibold text-body hover:text-ink"
               }`}
             >
@@ -62,6 +43,28 @@ export default function Navbar() {
             </button>
           );
         })}
+      </div>
+
+      {/* tab group — full-width, horizontally scrollable strip on mobile; inline on desktop */}
+      <div className="order-3 w-full overflow-x-auto no-scrollbar sm:order-2 sm:w-auto sm:overflow-visible">
+        <div className="flex w-max gap-1 rounded-xl border border-line bg-panel p-1 sm:w-auto">
+          {TABS.map((t) => {
+            const active = tab === t.id;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setTab(t.id)}
+                className={`inline-flex items-center gap-[7px] whitespace-nowrap rounded-[9px] px-3 py-2 text-[0.83rem] transition-all sm:px-[15px] ${
+                  active ? "bg-primary-gradient font-bold text-white" : "font-semibold text-body hover:text-ink"
+                }`}
+              >
+                {t.icon && <Search size={15} strokeWidth={1.8} />}
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </nav>
   );
