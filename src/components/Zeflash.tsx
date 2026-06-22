@@ -43,7 +43,7 @@ const Zeflash: React.FC = () => {
         <div className="container mx-auto px-4 sm:px-6 py-10 max-w-6xl">
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-4">Explore Zeflash</h2>
           <p className="text-gray-500 text-center text-sm mb-6">Browse the full Zeflash platform below.</p>
-          <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-lg w-full" style={{ height: '80vh', minHeight: '500px' }}>
+          <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-lg w-full bg-gray-50" style={{ height: '80vh', minHeight: '500px' }}>
             <iframe
               key={iframeKey}
               src="https://zeflash.app"
@@ -51,8 +51,7 @@ const Zeflash: React.FC = () => {
               className="w-full h-full"
               style={{ border: 'none', width: '100%', height: '100%' }}
               allow="fullscreen; payment; camera; microphone; clipboard-read; clipboard-write; geolocation; accelerometer; gyroscope"
-              sandbox="allow-scripts allow-same-origin allow-forms allow-storage-access-by-user-activation"
-              referrerPolicy="no-referrer-when-downgrade"
+              referrerPolicy="no-referrer"
             />
           </div>
           <div className="mt-4 text-center">
