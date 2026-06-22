@@ -4,6 +4,11 @@ import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 let initialized = false;
 let currentFCMToken: string | null = null;
 
+// Resolve backend API base (works in dev and production)
+const API_BASE =
+  process.env.REACT_APP_API_URL ||
+  (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5001');
+
 // Store notification callbacks for UI updates
 export let onNotificationReceived: ((notification: any) => void) | null = null;
 export let onNotificationActionPerformed: ((notification: any) => void) | null = null;
@@ -79,7 +84,7 @@ export const initializePushNotifications = async (): Promise<void> => {
 // Store FCM token on backend for later use
 async function storeFCMTokenOnBackend(token: string): Promise<void> {
   try {
-    const response = await fetch('/api/store-fcm-token', {
+    const response = await fetch(`${API_BASE}/api/store-fcm-token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

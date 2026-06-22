@@ -24,27 +24,28 @@ app.use(express.json());
 // Verify backend secrets are properly loaded
 const validateSecrets = () => {
   const errors = [];
-  
-  if (!process.env.RAZORPAY_KEY_ID) {
-    errors.push('❌ RAZORPAY_KEY_ID not found - payment orders will fail');
-  }
-  
-  if (!process.env.RAZORPAY_KEY_SECRET) {
-    errors.push('❌ RAZORPAY_KEY_SECRET not found - payment verification will fail');
-  }
-  
-  if (!process.env.RAZORPAY_WEBHOOK_SECRET) {
-    errors.push('⚠️  RAZORPAY_WEBHOOK_SECRET not found - webhook verification disabled');
-  }
-  
+  const warnings = [];
+
+  if (!process.env.RAZORPAY_KEY_ID)      errors.push('❌ RAZORPAY_KEY_ID not found - payment orders will fail');
+  if (!process.env.RAZORPAY_KEY_SECRET)  errors.push('❌ RAZORPAY_KEY_SECRET not found - payment verification will fail');
+  if (!process.env.RAZORPAY_WEBHOOK_SECRET) warnings.push('⚠️  RAZORPAY_WEBHOOK_SECRET not found - webhook verification disabled');
+  if (!process.env.FIREBASE_SERVICE_ACCOUNT_KEY) warnings.push('⚠️  FIREBASE_SERVICE_ACCOUNT_KEY not found - push notifications disabled');
+  if (!process.env.ADMIN_API_KEY)        warnings.push('⚠️  ADMIN_API_KEY not found - admin notification panel will be locked');
+
   if (errors.length > 0) {
-    console.error('\n🔴 RAZORPAY CONFIGURATION ERRORS:');
-    errors.forEach(err => console.error(err));
-    console.error('\n📖 Setup Guide: See server/.env.example for configuration\n');
-  } else {
-    console.log('✅ All Razorpay backend secrets properly configured');
+    console.error('\n🔴 SERVER CONFIGURATION ERRORS:');
+    errors.forEach(e => console.error('  ' + e));
+    console.error('\n📖 Setup Guide: See server/.env.example\n');
   }
-  
+  if (warnings.length > 0) {
+    warnings.forEach(w => console.warn('  ' + w));
+  }
+  if (errors.length === 0 && warnings.length === 0) {
+    console.log('✅ All backend secrets properly configured');
+  } else if (errors.length === 0) {
+    console.log('✅ Razorpay secrets OK  |  ⚠️  Some optional secrets missing (see above)');
+  }
+
   return errors.length === 0;
 };
 
@@ -1197,6 +1198,264 @@ app.post('/api/zeflash-add-credits', async (req, res) => {
     console.error('[ZeFlash Add Credits Error]', err.message);
     return res.status(500).json({ error: 'Could not add credits' });
   }
+});
+
+// ============================================================
+// 🔔 FIREBASE PUSH NOTIFICATIONS
+// ============================================================
+const admin = require('firebase-admin');
+
+// Lazily init Firebase Admin SDK
+let firebaseApp = null;
+function getFirebaseApp() {
+  if (firebaseApp) return firebaseApp;
+
+  const serviceAccountRaw = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+  if (!serviceAccountRaw) {
+    throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY environment variable is not set');
+  }
+
+  let serviceAccount;
+  try {
+    serviceAccount = JSON.parse(serviceAccountRaw);
+  } catch {
+    throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY is not valid JSON');
+  }
+
+  firebaseApp = admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+
+  console.log('✅ Firebase Admin SDK initialized for project:', serviceAccount.project_id);
+  return firebaseApp;
+}
+
+// In-memory FCM token store (in production use your DB)
+const fcmTokenStore = new Set();
+
+// Helper: validate Admin API key
+function requireAdminApiKey(req, res, next) {
+  const key = req.headers['x-api-key'];
+  const adminKey = process.env.ADMIN_API_KEY;
+  if (!adminKey) {
+    return res.status(500).json({ error: 'ADMIN_API_KEY not configured on server' });
+  }
+  if (!key || key !== adminKey) {
+    return res.status(403).json({ error: 'Invalid or missing x-api-key header' });
+  }
+  next();
+}
+
+// POST /api/store-fcm-token  — called by the app when it gets a token
+app.post('/api/store-fcm-token', async (req, res) => {
+  const { token } = req.body;
+  if (!token || typeof token !== 'string') {
+    return res.status(400).json({ error: 'token is required' });
+  }
+  fcmTokenStore.add(token.trim());
+  console.log(`[FCM] Token stored. Total tokens: ${fcmTokenStore.size}`);
+  return res.json({ success: true, totalTokens: fcmTokenStore.size });
+});
+
+// POST /api/send-notification-all  — send to ALL registered devices
+app.post('/api/send-notification-all', requireAdminApiKey, async (req, res) => {
+  const { title, body, data } = req.body;
+  if (!title || !body) return res.status(400).json({ error: 'title and body are required' });
+
+  try {
+    const firebase = getFirebaseApp();
+    const messaging = admin.messaging(firebase);
+
+    const tokens = Array.from(fcmTokenStore);
+    if (tokens.length === 0) {
+      return res.status(404).json({ error: 'No active FCM tokens found. Open the app first.' });
+    }
+
+    const message = {
+      notification: { title, body },
+      data: data || {},
+      android: {
+        notification: {
+          sound: 'default',
+          channelId: 'evchamp_default',
+          priority: 'high',
+        },
+      },
+      apns: {
+        payload: { aps: { sound: 'default', badge: 1 } },
+      },
+    };
+
+    // Send in chunks of 500 (FCM limit)
+    let successCount = 0;
+    let failCount = 0;
+    const tokenArray = tokens;
+    for (let i = 0; i < tokenArray.length; i += 500) {
+      const chunk = tokenArray.slice(i, i + 500);
+      const response = await messaging.sendEachForMulticast({ ...message, tokens: chunk });
+      successCount += response.successCount;
+      failCount += response.failureCount;
+
+      // Remove invalid tokens
+      response.responses.forEach((r, idx) => {
+        if (!r.success && (
+          r.error?.code === 'messaging/invalid-registration-token' ||
+          r.error?.code === 'messaging/registration-token-not-registered'
+        )) {
+          fcmTokenStore.delete(chunk[idx]);
+        }
+      });
+    }
+
+    console.log(`[FCM] Sent to all — success: ${successCount}, failed: ${failCount}`);
+    return res.json({
+      success: true,
+      message: `Notification sent to ${successCount} device(s)`,
+      successCount,
+      failCount,
+      totalTokens: fcmTokenStore.size,
+    });
+  } catch (err) {
+    console.error('[FCM Send All Error]', err.message);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/send-notification-topic  — send to a Firebase topic (e.g. "all_users")
+app.post('/api/send-notification-topic', requireAdminApiKey, async (req, res) => {
+  const { title, body, data, topic } = req.body;
+  if (!title || !body) return res.status(400).json({ error: 'title and body are required' });
+  if (!topic) return res.status(400).json({ error: 'topic is required' });
+
+  try {
+    const firebase = getFirebaseApp();
+    const messaging = admin.messaging(firebase);
+
+    const messageId = await messaging.send({
+      notification: { title, body },
+      data: data || {},
+      topic,
+      android: {
+        notification: {
+          sound: 'default',
+          channelId: 'evchamp_default',
+          priority: 'high',
+        },
+      },
+      apns: {
+        payload: { aps: { sound: 'default', badge: 1 } },
+      },
+    });
+
+    console.log(`[FCM] Topic "${topic}" — messageId: ${messageId}`);
+    return res.json({ success: true, message: `Sent to topic: ${topic}`, messageId, topic });
+  } catch (err) {
+    console.error('[FCM Send Topic Error]', err.message);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/send-notification-user  — send to a specific Clerk user
+app.post('/api/send-notification-user', requireAdminApiKey, async (req, res) => {
+  const { title, body, data, clerkUserId } = req.body;
+  if (!title || !body) return res.status(400).json({ error: 'title and body are required' });
+  if (!clerkUserId) return res.status(400).json({ error: 'clerkUserId is required' });
+
+  // In a real app you would look up the token from your DB by clerkUserId.
+  // For now, broadcast to all tokens with clerkUserId in the data payload so
+  // the app can filter on its side (a simple but functional approach).
+  try {
+    const firebase = getFirebaseApp();
+    const messaging = admin.messaging(firebase);
+
+    const tokens = Array.from(fcmTokenStore);
+    if (tokens.length === 0) {
+      return res.status(404).json({ error: 'No active FCM tokens. User must open the app first.' });
+    }
+
+    const message = {
+      notification: { title, body },
+      data: { ...(data || {}), targetClerkUserId: clerkUserId },
+      android: {
+        notification: {
+          sound: 'default',
+          channelId: 'evchamp_default',
+          priority: 'high',
+        },
+      },
+      apns: {
+        payload: { aps: { sound: 'default', badge: 1 } },
+      },
+    };
+
+    const response = await messaging.sendEachForMulticast({ ...message, tokens });
+    console.log(`[FCM] User ${clerkUserId} — success: ${response.successCount}`);
+    return res.json({
+      success: true,
+      message: `Notification sent for user ${clerkUserId}`,
+      successCount: response.successCount,
+      failCount: response.failureCount,
+    });
+  } catch (err) {
+    console.error('[FCM Send User Error]', err.message);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/test-notification  — quick test (no API key needed, but rate-limited)
+app.post('/api/test-notification', async (req, res) => {
+  try {
+    const firebase = getFirebaseApp();
+    const messaging = admin.messaging(firebase);
+
+    const tokens = Array.from(fcmTokenStore);
+    if (tokens.length === 0) {
+      return res.status(404).json({
+        error: 'No active FCM tokens found',
+        message: 'Open the EVChamp app on your Android device first, then retry.',
+        totalActiveTokens: 0,
+      });
+    }
+
+    // Send to first available token
+    const token = tokens[0];
+    const messageId = await messaging.send({
+      notification: {
+        title: '🔔 EVChamp Test',
+        body: 'Push notifications are working! ✅',
+      },
+      data: { type: 'test', timestamp: Date.now().toString() },
+      token,
+      android: {
+        notification: {
+          sound: 'default',
+          channelId: 'evchamp_default',
+          priority: 'high',
+        },
+      },
+    });
+
+    console.log(`[FCM] Test notification sent — messageId: ${messageId}`);
+    return res.json({
+      success: true,
+      message: 'Test notification sent!',
+      messageId,
+      tokenUsed: token.slice(0, 20) + '...',
+      totalActiveTokens: fcmTokenStore.size,
+    });
+  } catch (err) {
+    console.error('[FCM Test Error]', err.message);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/fcm-status  — check how many tokens are registered
+app.get('/api/fcm-status', requireAdminApiKey, (req, res) => {
+  res.json({
+    registeredTokens: fcmTokenStore.size,
+    firebaseConfigured: !!process.env.FIREBASE_SERVICE_ACCOUNT_KEY,
+    adminKeyConfigured: !!process.env.ADMIN_API_KEY,
+  });
 });
 
 // Initialize DB and start server
