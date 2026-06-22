@@ -38,6 +38,10 @@
       "destination": "/api/index.js"
     },
     {
+      "source": "/api/fcm-debug",
+      "destination": "/api/index.js"
+    },
+    {
       "source": "/api/link-fcm-token",
       "destination": "/api/index.js"
     },
