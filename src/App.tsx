@@ -304,8 +304,8 @@ function App() {
     setupLocalNotificationTapHandler();
     scheduleLocalNotifications();
     // 🔔 TEMP TEST: fire one notification ~6s after launch so you can verify
-    // it works on the emulator without waiting for 11 AM / 7 PM. Remove before
-    // deploying to production.
+    // it works on production without waiting for 11 AM / 7 PM. Remove after
+    // confirming notifications work.
     sendTestNotification(6);
   }, []);
   return (
