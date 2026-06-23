@@ -33,6 +33,7 @@ import ZeVaultCheckout from './components/ZeVaultCheckout';
 import Blog from './components/Blog';
 import ZeflashPlans from './components/ZeflashPlans';
 import { initializePushNotifications } from './components/FirebaseNotification';
+import { scheduleLocalNotifications, setupLocalNotificationTapHandler, sendTestNotification } from './components/LocalNotifications';
 import AdminNotificationPanel from './components/AdminNotificationPanel';
 
 
@@ -299,6 +300,13 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function App() {
   useEffect(() => {
     initializePushNotifications();
+    // Hardcoded local notifications at random time slots (no Firebase needed).
+    setupLocalNotificationTapHandler();
+    scheduleLocalNotifications();
+    // 🔔 TEMP TEST: fire one notification ~6s after launch so you can verify
+    // it works on the emulator without waiting for 11 AM / 7 PM. Remove before
+    // deploying to production.
+    sendTestNotification(6);
   }, []);
   return (
     <Router>

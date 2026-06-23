@@ -1204,6 +1204,7 @@ app.post('/api/zeflash-add-credits', async (req, res) => {
 // 🔔 FIREBASE PUSH NOTIFICATIONS
 // ============================================================
 const admin = require('firebase-admin');
+const { initializeApp, cert, messaging } = require('firebase-admin');
 
 // Lazily init Firebase Admin SDK
 let firebaseApp = null;
@@ -1223,7 +1224,7 @@ function getFirebaseApp() {
   }
 
   firebaseApp = admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+    credential: admin.cert(serviceAccount),
   });
 
   console.log('✅ Firebase Admin SDK initialized for project:', serviceAccount.project_id);
@@ -1264,7 +1265,7 @@ app.post('/api/send-notification-all', requireAdminApiKey, async (req, res) => {
 
   try {
     const firebase = getFirebaseApp();
-    const messaging = admin.messaging(firebase);
+    const msg = messaging(firebase);
 
     const tokens = Array.from(fcmTokenStore);
     if (tokens.length === 0) {
@@ -1292,7 +1293,7 @@ app.post('/api/send-notification-all', requireAdminApiKey, async (req, res) => {
     const tokenArray = tokens;
     for (let i = 0; i < tokenArray.length; i += 500) {
       const chunk = tokenArray.slice(i, i + 500);
-      const response = await messaging.sendEachForMulticast({ ...message, tokens: chunk });
+      const response = await msg.sendEachForMulticast({ ...message, tokens: chunk });
       successCount += response.successCount;
       failCount += response.failureCount;
 
@@ -1329,7 +1330,7 @@ app.post('/api/send-notification-topic', requireAdminApiKey, async (req, res) =>
 
   try {
     const firebase = getFirebaseApp();
-    const messaging = admin.messaging(firebase);
+    const messaging = admin.messaging();
 
     const messageId = await messaging.send({
       notification: { title, body },
@@ -1366,7 +1367,7 @@ app.post('/api/send-notification-user', requireAdminApiKey, async (req, res) => 
   // the app can filter on its side (a simple but functional approach).
   try {
     const firebase = getFirebaseApp();
-    const messaging = admin.messaging(firebase);
+    const messaging = admin.messaging();
 
     const tokens = Array.from(fcmTokenStore);
     if (tokens.length === 0) {
@@ -1406,7 +1407,7 @@ app.post('/api/send-notification-user', requireAdminApiKey, async (req, res) => 
 app.post('/api/test-notification', async (req, res) => {
   try {
     const firebase = getFirebaseApp();
-    const messaging = admin.messaging(firebase);
+    const msg = messaging(firebase);
 
     const tokens = Array.from(fcmTokenStore);
     if (tokens.length === 0) {
@@ -1419,7 +1420,7 @@ app.post('/api/test-notification', async (req, res) => {
 
     // Send to first available token
     const token = tokens[0];
-    const messageId = await messaging.send({
+    const messageId = await msg.send({
       notification: {
         title: '🔔 EVChamp Test',
         body: 'Push notifications are working! ✅',

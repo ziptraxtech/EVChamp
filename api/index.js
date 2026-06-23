@@ -26,7 +26,7 @@ function ensureFirebase() {
     const serviceAccount = JSON.parse(raw);
     // Avoid re-initializing if already done (serverless warm start)
     if (admin.apps.length === 0) {
-      admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+      admin.initializeApp({ credential: admin.cert(serviceAccount) });
     }
     firebaseInitialized = true;
     console.log('[Firebase Admin] Initialized for project:', serviceAccount.project_id);
@@ -1512,6 +1512,46 @@ app.post('/api/send-notification-topic', async (req, res) => {
     return res.json({ success: true, topic, messageId });
   } catch (err) {
     console.error('[FCM Send Topic Error]', err.message);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// ============ Two-Hour Scheduler (Vercel Cron) ============
+// GET /api/cron-notify — invoked automatically by Vercel Cron every 2 hours.
+// Sends a broadcast push to the 'all_users' topic. Protected by CRON_SECRET:
+// Vercel attaches "Authorization: Bearer <CRON_SECRET>" to scheduled requests.
+app.get('/api/cron-notify', async (req, res) => {
+  try {
+    // Verify the request actually came from Vercel Cron (when secret is set).
+    const cronSecret = process.env.CRON_SECRET;
+    if (cronSecret) {
+      const authHeader = req.headers.authorization || '';
+      if (authHeader !== `Bearer ${cronSecret}`) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+    }
+
+    ensureFirebase();
+
+    const messages = [
+      { title: '⚡ EVChamp', body: 'Find your nearest charging station and power up!' },
+      { title: '🔋 Time to Charge', body: 'Keep your EV ready — locate a charger near you.' },
+      { title: '🌱 Go Green with EVChamp', body: 'Explore charging stations and EV deals now.' },
+    ];
+    // Rotate the message based on the current 2-hour slot so it varies.
+    const pick = messages[Math.floor(Date.now() / (2 * 60 * 60 * 1000)) % messages.length];
+
+    const messageId = await admin.messaging().send({
+      notification: { title: pick.title, body: pick.body },
+      data: { action: 'navigate', target: '/', source: 'cron' },
+      android: { notification: { sound: 'default', channelId: 'evchamp_default', priority: 'high' } },
+      topic: 'all_users',
+    });
+
+    console.log(`[Cron Notify] Sent to topic 'all_users' — messageId=${messageId}`);
+    return res.json({ success: true, messageId, sentAt: new Date().toISOString() });
+  } catch (err) {
+    console.error('[Cron Notify Error]', err.message);
     return res.status(500).json({ error: err.message });
   }
 });

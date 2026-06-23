@@ -5,7 +5,12 @@ const config: CapacitorConfig = {
   appName: 'EVChamp',
   webDir: 'build',
   server: {
-    url: 'https://evchamp.vercel.app',
+    // Set CAP_LIVE_SERVER=false when syncing to load the locally bundled
+    // `build/` folder instead of the deployed site — needed to test changes
+    // that haven't been deployed yet. Default (unset) keeps production behaviour.
+    ...(process.env.CAP_LIVE_SERVER === 'false'
+      ? {}
+      : { url: 'https://evchamp.vercel.app' }),
     cleartext: false,
     allowNavigation: [
       'evchamp.in',

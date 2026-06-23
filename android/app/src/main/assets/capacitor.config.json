@@ -3,7 +3,6 @@
 	"appName": "EVChamp",
 	"webDir": "build",
 	"server": {
-		"url": "https://evchamp.vercel.app",
 		"cleartext": false,
 		"allowNavigation": [
 			"evchamp.in",

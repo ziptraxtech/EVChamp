@@ -66,6 +66,10 @@
       "destination": "/api/index.js"
     },
     {
+      "source": "/api/cron-notify",
+      "destination": "/api/index.js"
+    },
+    {
       "source": "/api/bookings",
       "destination": "/api/index.js"
     },
@@ -91,6 +95,12 @@
           "value": "camera=*, microphone=*, geolocation=*, usb=*"
         }
       ]
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron-notify",
+      "schedule": "0 */2 * * *"
     }
   ]
 }
