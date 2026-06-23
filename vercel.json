@@ -96,11 +96,5 @@
         }
       ]
     }
-  ],
-  "crons": [
-    {
-      "path": "/api/cron-notify",
-      "schedule": "0 */2 * * *"
-    }
   ]
 }
