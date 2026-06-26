@@ -42,17 +42,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         "Regular checks can help improve your EV's performance and reliability.",
         "Browse useful EV accessories, services, and mobility solutions.",
         "EV trouble on the road? Explore available assistance through EVChamp.",
-        "Charging, navigation, support, and EV services—all in one place.",
-        "Book an EV from our rental fleet and save on fuel costs.",
-        "Get roadside assistance anytime with EVChamp RSA plans.",
-        "Sell your used EV safely with verified buyers on EVChamp.",
-        "Access verified EV service centres near you instantly.",
-        "Track your EV's battery health with AI-powered diagnostics.",
-        "Join thousands of EV owners trusting EVChamp daily.",
-        "Find the best EV deals and offers in your area today.",
-        "Optimize your charging routine for better battery longevity.",
-        "Compare EV models and make the right choice with us.",
-        "Get expert EV maintenance tips delivered to your phone."
+        "Charging, navigation, support, and EV services—all in one place."
     };
 
     private static final String[] TITLES = {
@@ -75,17 +65,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         "🔧 Keep Your EV Healthy",
         "🏪 EV Marketplace",
         "🚨 Roadside Support",
-        "💚 Your EV Companion",
-        "🚗 Rent an EV",
-        "🆘 Need Help?",
-        "💰 Sell Your EV",
-        "🏥 Service Centre",
-        "🔬 Battery Health",
-        "👥 Join EVChamp",
-        "🎯 Best EV Deals",
-        "⚙️ Battery Care",
-        "🚙 EV Comparison",
-        "📚 EV Maintenance"
+        "💚 Your EV Companion"
     };
 
     @Override
@@ -227,21 +207,17 @@ public class NotificationReceiver extends BroadcastReceiver {
             
             // Create intent to open MainActivity when notification is clicked
             Intent launchIntent = new Intent(context, MainActivity.class);
-            launchIntent.setAction("com.evchamp.NOTIFICATION_CLICK");
-            launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             
-            // Use unique request code based on notification ID to avoid collisions
             PendingIntent contentIntent = PendingIntent.getActivity(
                 context,
-                notificationId,
+                0,
                 launchIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
             );
             
-            // Use custom notification icon drawable (lightning bolt)
-            // Android automatically recolors this to white/light gray for notification bar
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notification)  // Custom EVChamp notification icon
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setAutoCancel(true)

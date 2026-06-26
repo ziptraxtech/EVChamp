@@ -2,7 +2,6 @@ package com.evchamp.app;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -10,7 +9,6 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +28,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.getcapacitor.BridgeActivity;
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.util.Log;
 
 public class MainActivity extends BridgeActivity {
 
@@ -44,19 +43,17 @@ public class MainActivity extends BridgeActivity {
     private WebView webView;
     private ConnectivityManager.NetworkCallback networkCallback;
     private boolean permissionsGranted = false;
-    private boolean permissionsRequested = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d(TAG, "🚀 MainActivity onCreate - requesting permissions");
+        Log.d(TAG, "🚀 MainActivity onCreate - attempting to schedule notifications");
         
-        // Request permissions on app launch
-        if (!permissionsRequested) {
-            permissionsRequested = true;
-            requestAppPermissions();
-        }
+        // Try to schedule notifications immediately
+        // If permissions are already granted, this will work
+        // If not, request them
+        attemptScheduleNotifications();
 
         webView = getBridge().getWebView();
         if (webView == null) return;
@@ -315,217 +312,12 @@ public class MainActivity extends BridgeActivity {
     }
 
     /**
-     * Request all required permissions for the app
-     */
-    private void requestAppPermissions() {
-        Log.d(TAG, "🔐 Requesting app permissions...");
-        
-        java.util.List<String> requiredPermissions = new java.util.ArrayList<>();
-        
-        // Location permissions (for finding nearby chargers)
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requiredPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
-        }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requiredPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
-        }
-        
-        // Camera permission (for EV marketplace, profile photos, etc.)
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            requiredPermissions.add(Manifest.permission.CAMERA);
-        }
-        
-        // Notification permission (for Android 13+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                requiredPermissions.add(Manifest.permission.POST_NOTIFICATIONS);
-            }
-        }
-        
-        // Exact alarm permission (for Android 12+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.SCHEDULE_EXACT_ALARM) != PackageManager.PERMISSION_GRANTED) {
-                requiredPermissions.add(Manifest.permission.SCHEDULE_EXACT_ALARM);
-            }
-        }
-        
-        // Storage permission (for file uploads)
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requiredPermissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-        }
-        
-        if (!requiredPermissions.isEmpty()) {
-            showPermissionDialog(requiredPermissions.toArray(new String[0]));
-        } else {
-            Log.d(TAG, "✅ All permissions already granted");
-            permissionsGranted = true;
-            attemptScheduleNotifications();
-        }
-    }
-
-    /**
-     * Show beautiful permission request dialog
-     */
-    private void showPermissionDialog(String[] permissions) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setCancelable(false);
-        
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(32, 32, 32, 32);
-        
-        // Title
-        TextView title = new TextView(this);
-        title.setText("App Permissions");
-        title.setTextSize(22f);
-        title.setTextColor(Color.parseColor("#111827"));
-        title.setTypeface(null, android.graphics.Typeface.BOLD);
-        title.setPadding(0, 0, 0, 16);
-        layout.addView(title);
-        
-        // Description
-        TextView description = new TextView(this);
-        description.setText("EVChamp needs the following permissions to provide you with the best experience:");
-        description.setTextSize(14f);
-        description.setTextColor(Color.parseColor("#6B7280"));
-        description.setLineSpacing(1.5f, 1.5f);
-        description.setPadding(0, 0, 0, 24);
-        layout.addView(description);
-        
-        // Permission items
-        LinearLayout permissionsContainer = new LinearLayout(this);
-        permissionsContainer.setOrientation(LinearLayout.VERTICAL);
-        permissionsContainer.setBackgroundColor(Color.parseColor("#F3F4F6"));
-        permissionsContainer.setPadding(16, 16, 16, 16);
-        
-        for (String permission : permissions) {
-            LinearLayout permissionItem = createPermissionItem(permission);
-            permissionsContainer.addView(permissionItem);
-        }
-        
-        layout.addView(permissionsContainer);
-        
-        builder.setView(layout);
-        
-        builder.setPositiveButton("Allow All", (dialog, which) -> {
-            Log.d(TAG, "User allowed all permissions");
-            ActivityCompat.requestPermissions(MainActivity.this, permissions, PERMISSION_REQUEST_CODE);
-        });
-        
-        builder.setNegativeButton("Skip for Now", (dialog, which) -> {
-            Log.d(TAG, "User skipped permissions - enabling notifications automatically");
-            // Request notification permission automatically
-            requestNotificationPermissionAutomatically();
-        });
-        
-        AlertDialog dialog = builder.create();
-        dialog.show();
-        
-        // Style buttons
-        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-        if (positiveButton != null) {
-            positiveButton.setTextColor(Color.parseColor("#22C55E"));
-            positiveButton.setTextSize(16f);
-        }
-        
-        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-        if (negativeButton != null) {
-            negativeButton.setTextColor(Color.parseColor("#6B7280"));
-            negativeButton.setTextSize(16f);
-        }
-    }
-
-    /**
-     * Create a permission item UI
-     */
-    private LinearLayout createPermissionItem(String permission) {
-        LinearLayout item = new LinearLayout(this);
-        item.setOrientation(LinearLayout.HORIZONTAL);
-        item.setPadding(0, 12, 0, 12);
-        
-        // Icon
-        TextView icon = new TextView(this);
-        icon.setTextSize(20f);
-        icon.setPadding(0, 0, 16, 0);
-        
-        String description = "";
-        switch (permission) {
-            case Manifest.permission.ACCESS_FINE_LOCATION:
-            case Manifest.permission.ACCESS_COARSE_LOCATION:
-                icon.setText("L");
-                description = "Location - Find nearby charging stations and services";
-                break;
-            case Manifest.permission.CAMERA:
-                icon.setText("C");
-                description = "Camera - Upload EV photos and take pictures";
-                break;
-            case Manifest.permission.POST_NOTIFICATIONS:
-                icon.setText("N");
-                description = "Notifications - Get charging reminders and updates";
-                break;
-            case Manifest.permission.SCHEDULE_EXACT_ALARM:
-                icon.setText("A");
-                description = "Alarms - Schedule precise notification timings";
-                break;
-            case Manifest.permission.READ_EXTERNAL_STORAGE:
-                icon.setText("S");
-                description = "Storage - Upload documents and photos";
-                break;
-            default:
-                icon.setText("P");
-                description = permission;
-        }
-        
-        item.addView(icon);
-        
-        // Description text
-        TextView text = new TextView(this);
-        text.setText(description);
-        text.setTextSize(13f);
-        text.setTextColor(Color.parseColor("#374151"));
-        text.setLineSpacing(1.4f, 1.4f);
-        
-        LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            1.0f
-        );
-        text.setLayoutParams(textParams);
-        item.addView(text);
-        
-        return item;
-    }
-
-    /**
      * Schedule notifications only if permissions are granted
      */
     private void scheduleNotificationsIfPermitted() {
         Log.d(TAG, "📅 Scheduling notifications...");
         NotificationScheduler.scheduleAll(this);
         Log.d(TAG, "✅ Notifications scheduled successfully");
-    }
-
-    /**
-     * Automatically request notification permission when user skips
-     */
-    private void requestNotificationPermissionAutomatically() {
-        Log.d(TAG, "Requesting notification permission automatically...");
-        
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(
-                    this,
-                    new String[]{Manifest.permission.POST_NOTIFICATIONS},
-                    PERMISSION_REQUEST_CODE
-                );
-                Log.d(TAG, "Requesting POST_NOTIFICATIONS permission");
-                return;
-            }
-        }
-        
-        // If already granted or Android version doesn't need it, schedule notifications
-        Log.d(TAG, "Notification permission already granted or not needed");
-        attemptScheduleNotifications();
     }
 
     /**
@@ -552,20 +344,6 @@ public class MainActivity extends BridgeActivity {
         super.onResume();
         Log.d(TAG, "onResume - checking permissions and rescheduling if needed");
         attemptScheduleNotifications();
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        
-        Log.d(TAG, "📲 onNewIntent called - Intent action: " + (intent != null ? intent.getAction() : "null"));
-        
-        // Handle notification click
-        if (intent != null && "com.evchamp.NOTIFICATION_CLICK".equals(intent.getAction())) {
-            Log.d(TAG, "✅ Notification click detected - app is now active");
-            // The app is now open, no additional action needed
-            // The WebView will already be visible to the user
-        }
     }
 }
 
