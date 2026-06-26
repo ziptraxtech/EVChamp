@@ -227,17 +227,21 @@ public class NotificationReceiver extends BroadcastReceiver {
             
             // Create intent to open MainActivity when notification is clicked
             Intent launchIntent = new Intent(context, MainActivity.class);
-            launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            launchIntent.setAction("com.evchamp.NOTIFICATION_CLICK");
+            launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             
+            // Use unique request code based on notification ID to avoid collisions
             PendingIntent contentIntent = PendingIntent.getActivity(
                 context,
-                0,
+                notificationId,
                 launchIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
             );
             
+            // Use custom notification icon drawable (lightning bolt)
+            // Android automatically recolors this to white/light gray for notification bar
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.ic_notification)  // Custom EVChamp notification icon
                 .setContentTitle(title)
                 .setContentText(message)
                 .setAutoCancel(true)

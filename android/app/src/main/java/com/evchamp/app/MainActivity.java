@@ -2,6 +2,7 @@ package com.evchamp.app;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -9,6 +10,7 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +30,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.getcapacitor.BridgeActivity;
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.util.Log;
 
 public class MainActivity extends BridgeActivity {
 
@@ -551,6 +552,20 @@ public class MainActivity extends BridgeActivity {
         super.onResume();
         Log.d(TAG, "onResume - checking permissions and rescheduling if needed");
         attemptScheduleNotifications();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        
+        Log.d(TAG, "📲 onNewIntent called - Intent action: " + (intent != null ? intent.getAction() : "null"));
+        
+        // Handle notification click
+        if (intent != null && "com.evchamp.NOTIFICATION_CLICK".equals(intent.getAction())) {
+            Log.d(TAG, "✅ Notification click detected - app is now active");
+            // The app is now open, no additional action needed
+            // The WebView will already be visible to the user
+        }
     }
 }
 
