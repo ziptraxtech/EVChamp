@@ -110,7 +110,16 @@ const ContactUs: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Message *</label>
                     <textarea name="message" value={formData.message} onChange={handleChange} required rows={4} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm" placeholder="Tell us how we can help..." />
                   </div>
-                  <button type="submit" disabled={loading} className="w-full bg-gray-900 text-white font-medium py-3 rounded-lg hover:bg-gray-800 transition-all text-sm disabled:opacity-60">
+                  <button 
+                    type="submit" 
+                    disabled={loading} 
+                    className="w-full text-white font-medium py-3 rounded-lg transition-all text-sm disabled:opacity-60"
+                    style={{
+                      background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                    }}
+                    onMouseEnter={(e) => !loading && (e.currentTarget.style.filter = 'brightness(1.1)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
+                  >
                     {loading ? 'Sending...' : 'Send Message'}
                   </button>
                   {error && <p className="text-red-500 text-sm text-center">{error}</p>}

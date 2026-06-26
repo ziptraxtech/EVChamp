@@ -19,9 +19,11 @@ import java.util.TimeZone;
 public class NotificationReceiver extends BroadcastReceiver {
     private static final String TAG = "EVChamp";
     private static final String CHANNEL_ID = "evchamp_default";
+    private static final String LAST_NOTIFICATION_TIME = "last_notification_time";
+    private static final long NOTIFICATION_DEBOUNCE_MS = 60000; // 1 minute debounce
     private static int notificationCounter = 1;
 
-    // EV-related messages
+    // EV-related messages (30 total)
     private static final String[] MESSAGES = {
         "Find your nearest EV charging station and get back on the road faster.",
         "Planning a drive today? Check your battery level before you leave.",
@@ -42,7 +44,17 @@ public class NotificationReceiver extends BroadcastReceiver {
         "Regular checks can help improve your EV's performance and reliability.",
         "Browse useful EV accessories, services, and mobility solutions.",
         "EV trouble on the road? Explore available assistance through EVChamp.",
-        "Charging, navigation, support, and EV services—all in one place."
+        "Charging, navigation, support, and EV services—all in one place.",
+        "Maximize your EV range with smart charging and driving tips.",
+        "Get roadside assistance 24/7 with EVChamp's RSA plans.",
+        "Join India's fastest-growing EV community on EVChamp.",
+        "Track your vehicle's health and get AI-powered battery diagnostics.",
+        "Schedule your EV service at verified centers near you.",
+        "Compare EV models and find your perfect match on EVChamp.",
+        "Earn rewards every time you charge with EVChamp.",
+        "Real-time traffic updates help optimize your charging stops.",
+        "Download offline maps to find chargers without internet.",
+        "Get instant alerts for new charging stations in your area."
     };
 
     private static final String[] TITLES = {
@@ -65,7 +77,17 @@ public class NotificationReceiver extends BroadcastReceiver {
         "🔧 Keep Your EV Healthy",
         "🏪 EV Marketplace",
         "🚨 Roadside Support",
-        "💚 Your EV Companion"
+        "💚 Your EV Companion",
+        "📊 Battery Insights",
+        "🛟 Emergency Help",
+        "👥 EV Community",
+        "🏥 Vehicle Health",
+        "🔧 Service Center",
+        "🚙 Find Your EV",
+        "🎁 Rewards Program",
+        "🚦 Smart Navigation",
+        "📱 Offline Maps",
+        "🔔 New Chargers"
     };
 
     @Override
@@ -74,6 +96,18 @@ public class NotificationReceiver extends BroadcastReceiver {
         Log.d(TAG, "🔔 NotificationReceiver triggered at " + new java.util.Date(receivedTime));
         
         try {
+            // Debounce check: prevent duplicate notifications within 1 minute
+            android.content.SharedPreferences prefs = context.getSharedPreferences("EVChamp", Context.MODE_PRIVATE);
+            long lastNotificationTime = prefs.getLong(LAST_NOTIFICATION_TIME, 0);
+            
+            if (receivedTime - lastNotificationTime < NOTIFICATION_DEBOUNCE_MS) {
+                Log.w(TAG, "⚠️ Duplicate notification detected - ignoring (debounce)");
+                return;
+            }
+            
+            // Update last notification time
+            prefs.edit().putLong(LAST_NOTIFICATION_TIME, receivedTime).apply();
+            
             String action = intent.getAction();
             Log.d(TAG, "📬 Intent Action: " + action);
             
@@ -217,7 +251,8 @@ public class NotificationReceiver extends BroadcastReceiver {
             );
             
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setColor(0x22C55E)  // EVChamp green color
                 .setContentTitle(title)
                 .setContentText(message)
                 .setAutoCancel(true)

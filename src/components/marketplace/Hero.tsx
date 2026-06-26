@@ -33,9 +33,9 @@ export default function Hero() {
               key={tab}
               type="button"
               onClick={() => setTab(tab)}
-              className="inline-flex items-center gap-[9px] rounded-[11px] border border-line bg-white px-4 py-[11px] text-[0.88rem] font-bold text-ink transition-all hover:-translate-y-px hover:shadow-[0_6px_16px_rgba(16,33,51,.08)]"
+              className="inline-flex items-center gap-[9px] rounded-[11px] bg-primary-gradient px-4 py-[11px] text-[0.88rem] font-bold text-white transition-all hover:-translate-y-px hover:shadow-[0_6px_20px_rgba(10,138,82,.28)]"
             >
-              <Icon size={17} strokeWidth={1.8} className="text-green" />
+              <Icon size={17} strokeWidth={1.8} />
               {label}
             </button>
           ))}

@@ -13,7 +13,16 @@ const BrandCard: React.FC<BrandCardProps> = ({ name, image, description, price }
     <h3 className="text-xl font-semibold text-gray-900 mb-2">{name}</h3>
     <p className="text-gray-600 text-center mb-4">{description}</p>
     <span className="inline-block bg-green-100 text-green-800 font-bold rounded-full px-4 py-1 mb-4">{price}</span>
-    <button className="mt-auto bg-green-700 hover:bg-green-800 text-white font-semibold px-6 py-2 rounded-lg transition-colors">Subscribe</button>
+    <button 
+      className="mt-auto text-white font-semibold px-6 py-2 rounded-lg transition-colors"
+      style={{
+        background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+      onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
+    >
+      Subscribe
+    </button>
   </div>
 );
 

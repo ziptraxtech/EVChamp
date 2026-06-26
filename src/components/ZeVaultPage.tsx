@@ -85,14 +85,7 @@ const ZeVaultPage: React.FC = () => {
               </h1>
               <p className="text-xs sm:text-sm text-slate-400">Your unified wallet for all EVChamp services.</p>
             </div>
-          </div>
-          <button onClick={() => {
-            const pricingSection = document.getElementById('pricing-section');
-            pricingSection?.scrollIntoView({ behavior: 'smooth' });
-          }} className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-semibold px-4 py-3 hover:from-cyan-600 hover:to-blue-700 shadow-lg shadow-cyan-500/40">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-            Add Money
-          </button>
+          </div>          
         </div>
       </header>
 
@@ -120,7 +113,7 @@ const ZeVaultPage: React.FC = () => {
               <button onClick={() => {
                 const pricingSection = document.getElementById('pricing-section');
                 pricingSection?.scrollIntoView({ behavior: 'smooth' });
-              }} className="w-full inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-semibold px-4 py-3 hover:from-cyan-600 hover:to-blue-700 shadow-lg shadow-cyan-500/40">
+              }} className="w-full inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-red-500 to-orange-600 text-white text-sm font-semibold px-4 py-3 hover:from-red-600 hover:to-orange-700 shadow-lg shadow-cyan-500/40">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
                 Add Money
               </button>
@@ -176,7 +169,7 @@ const ZeVaultPage: React.FC = () => {
           <button onClick={() => {
             const pricingSection = document.getElementById('pricing-section');
             pricingSection?.scrollIntoView({ behavior: 'smooth' });
-          }} className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-semibold px-4 py-3 hover:from-cyan-600 hover:to-blue-700 shadow-lg shadow-cyan-500/40">
+          }} className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-gradient-to-r from-red-500 to-orange-600 text-white text-sm font-semibold px-4 py-3 hover:from-red-600 hover:to-orange-700 shadow-lg shadow-cyan-500/40">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
             Add Money Now
           </button>
@@ -209,9 +202,9 @@ const ZeVaultPage: React.FC = () => {
                 </div>
                 <div className="mb-6">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-emerald-700">₹199</span>
+                    <span className="text-4xl font-extrabold text-emerald-700">₹200</span>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">₹199/test • Valid for one time use only</p>
+                  <p className="text-xs text-gray-600 mt-1"> • Valid for one time use only</p>
                 </div>
                 <ul className="space-y-3 mb-6 flex-grow">
                   <li className="flex items-start gap-2 text-sm text-gray-700">
@@ -254,9 +247,9 @@ const ZeVaultPage: React.FC = () => {
                 </div>
                 <div className="mb-6">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-gray-900">₹1499</span>
+                    <span className="text-4xl font-extrabold text-gray-900">₹2,000</span>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">8 tests • ₹187/test • Valid for 1 year</p>
+                  <p className="text-xs text-gray-600 mt-1">8 tests  • Valid for 1 year</p>
                 </div>
                 <ul className="space-y-3 mb-6 flex-grow">
                   <li className="flex items-start gap-2 text-sm text-gray-700">
@@ -308,9 +301,9 @@ const ZeVaultPage: React.FC = () => {
                 </div>
                 <div className="mb-6">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-blue-700">₹2,499</span>
+                    <span className="text-4xl font-extrabold text-blue-700">₹3,000</span>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">12 tests • ₹208/test • Valid for 1 year</p>
+                  <p className="text-xs text-gray-600 mt-1">12 tests  • Valid for 1 year</p>
                 </div>
                 <ul className="space-y-3 mb-6 flex-grow">
                   <li className="flex items-start gap-2 text-sm text-gray-700">
@@ -320,6 +313,54 @@ const ZeVaultPage: React.FC = () => {
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
                     <span>1 year validity</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm text-gray-700">
+                    <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                    <span>Priority support</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm text-gray-700">
+                    <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                    <span>Quarterly performance reports</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm text-gray-700">
+                    <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                    <span>Free battery optimization tips</span>
+                  </li>
+                </ul>
+                <button
+                  onClick={() => {
+                    console.log('📋 Value Pack Plan Selected:', { plan: 'value', tests: 12, months: 12, price: 2499, amountInPaise: 249900 });
+                    navigate('/checkout?plan=value&tests=12&months=12&price=2499');
+                  }}
+                  className="block w-full text-center rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold px-4 py-2.5 hover:from-blue-700 hover:to-cyan-700 shadow-md transition-all"
+                >
+                  Get Value Pack
+                </button>
+              </div>
+
+              {/* 8 Tests Pack - Popular */}
+              <div className="relative rounded-2xl border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-white p-6 shadow-xl hover:shadow-2xl transition-all flex flex-col">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                  
+                </div>
+                <div className="mb-4 mt-2">
+                  <h3 className="text-xl font-bold text-gray-900">Smart Pack</h3>
+                  <p className="text-sm text-gray-600 mt-1">Best value saver</p>
+                </div>
+                <div className="mb-6">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-4xl font-extrabold text-blue-700">₹6,000</span>
+                  </div>
+                  <p className="text-xs text-gray-600 mt-1">24 tests  • Valid for 2 years</p>
+                </div>
+                <ul className="space-y-3 mb-6 flex-grow">
+                  <li className="flex items-start gap-2 text-sm text-gray-700">
+                    <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                    <span>24 AI diagnostic tests</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm text-gray-700">
+                    <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                    <span>2 years validity</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
@@ -349,94 +390,7 @@ const ZeVaultPage: React.FC = () => {
                   }}
                   className="block w-full text-center rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold px-4 py-2.5 hover:from-blue-700 hover:to-cyan-700 shadow-md transition-all"
                 >
-                  Get Value Pack
-                </button>
-              </div>
-
-              {/* Custom Plan */}
-              <div className="relative rounded-2xl border-2 border-purple-600 bg-white p-6 hover:shadow-lg hover:border-pink-500 transition-all">
-                <div className="mb-4">
-                  <h3 className="text-xl font-bold text-gray-900">Custom Plan</h3>
-                  <p className="text-sm text-gray-600 mt-1">Tailored for you</p>
-                </div>
-                <div className="mb-6">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-gray-900">₹{customTotalPrice.toLocaleString('en-IN')}</span>
-                  </div>
-                  <p className="text-xs text-gray-600 mt-1">
-                    ₹{pricePerTest}/test
-                  </p>
-                </div>
-                
-                <div className="mb-6 space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700 mb-2 block">Number of tests</label>
-                    <input
-                      type="range"
-                      min="8"
-                      max="24"
-                      value={customTests}
-                      onChange={(e) => setCustomTests(parseInt(e.target.value))}
-                      className="w-full h-2 bg-gradient-to-r from-blue-200 to-blue-400 rounded-lg appearance-none cursor-pointer"
-                      style={{
-                        background: 'linear-gradient(to right, #93c5fd 0%, #3b82f6 100%)'
-                      }}
-                    />
-                    <div className="mt-2 text-center">
-                      <span className="text-2xl font-bold text-blue-600">{customTests}</span>
-                      <span className="text-sm text-gray-600 ml-1">tests</span>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="text-sm font-medium text-gray-700 mb-2 block">Validity period</label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="2"
-                      step="1"
-                      value={customMonthIndex}
-                      onChange={(e) => setCustomMonthIndex(parseInt(e.target.value))}
-                      className="w-full h-2 bg-gradient-to-r from-emerald-200 to-emerald-400 rounded-lg appearance-none cursor-pointer"
-                      style={{
-                        background: 'linear-gradient(to right, #6ee7b7 0%, #10b981 100%)'
-                      }}
-                    />
-                    <div className="mt-2 text-center">
-                      <span className="text-2xl font-bold text-emerald-600">{selectedMonths}</span>
-                      <span className="text-sm text-gray-600 ml-1">months</span>
-                    </div>
-                  </div>
-                </div>
-
-                <ul className="space-y-3 mb-6">
-                  <li className="flex items-start gap-2 text-sm text-gray-700">
-                    <svg className="text-purple-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>Flexible validity</span>
-                  </li>
-                  <li className="flex items-start gap-2 text-sm text-gray-700">
-                    <svg className="text-purple-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>Volume discounts</span>
-                  </li>
-                  <li className="flex items-start gap-2 text-sm text-gray-700">
-                    <svg className="text-purple-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>Dedicated support</span>
-                  </li>
-                </ul>
-                <button
-                  onClick={() => {
-                    console.log('📋 Custom Plan Selected:', {
-                      tests: customTests,
-                      months: selectedMonths,
-                      pricePerTest: pricePerTest,
-                      totalPrice: customTotalPrice,
-                      totalInPaise: customTotalPrice * 100
-                    });
-                    navigate(`/checkout?plan=custom&tests=${customTests}&months=${selectedMonths}&price=${customTotalPrice}`);
-                  }}
-                  className="block w-full text-center rounded-lg bg-purple-600 text-white font-semibold px-4 py-2.5 hover:bg-purple-700 transition-colors shadow-sm"
-                >
-                  Buy Custom Plan
+                  Get Smart Pack
                 </button>
               </div>
             </div>

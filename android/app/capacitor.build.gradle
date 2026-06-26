@@ -9,8 +9,9 @@ android {
 
 apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
 dependencies {
-    // Removed capacitor-local-notifications - using custom notification system
-    // implementation project(':capacitor-local-notifications')
+    implementation project(':capacitor-firebase-messaging')
+    implementation project(':capacitor-local-notifications')
+
 }
 
 

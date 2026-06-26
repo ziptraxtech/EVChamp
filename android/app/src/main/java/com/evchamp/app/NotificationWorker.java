@@ -120,7 +120,7 @@ public class NotificationWorker extends Worker {
     private void sendNotification(Context context, String title, String message, int notificationId) {
         try {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setAutoCancel(true)

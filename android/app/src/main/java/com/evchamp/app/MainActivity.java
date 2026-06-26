@@ -28,6 +28,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.getcapacitor.BridgeActivity;
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 public class MainActivity extends BridgeActivity {
@@ -43,17 +44,37 @@ public class MainActivity extends BridgeActivity {
     private WebView webView;
     private ConnectivityManager.NetworkCallback networkCallback;
     private boolean permissionsGranted = false;
+    private SharedPreferences sharedPreferences;
+    private static final String PREF_PERMISSION_DIALOG_SHOWN = "permission_dialog_shown";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d(TAG, "🚀 MainActivity onCreate - attempting to schedule notifications");
+        Log.d(TAG, "🚀 MainActivity onCreate - requesting permissions and scheduling notifications");
         
-        // Try to schedule notifications immediately
-        // If permissions are already granted, this will work
-        // If not, request them
-        attemptScheduleNotifications();
+        // Initialize SharedPreferences
+        sharedPreferences = getSharedPreferences("EVChampPrefs", Context.MODE_PRIVATE);
+        boolean hasShownPermissionDialog = sharedPreferences.getBoolean(PREF_PERMISSION_DIALOG_SHOWN, false);
+        
+        // Request all required permissions first
+        if (!PermissionManager.hasAllPermissions(this)) {
+            Log.d(TAG, "⚠️ Not all permissions granted - checking if we should show dialog");
+            // Only show dialog if we haven't shown it before
+            if (!hasShownPermissionDialog) {
+                Log.d(TAG, "📋 First time - showing permission dialog");
+                showPermissionRequestDialog();
+                // Mark that we've shown the dialog
+                sharedPreferences.edit().putBoolean(PREF_PERMISSION_DIALOG_SHOWN, true).apply();
+            } else {
+                Log.d(TAG, "⏭️ Dialog already shown before - skipping");
+                attemptScheduleNotifications();
+            }
+        } else {
+            Log.d(TAG, "✅ All permissions already granted");
+            permissionsGranted = true;
+            attemptScheduleNotifications();
+        }
 
         webView = getBridge().getWebView();
         if (webView == null) return;
@@ -327,13 +348,55 @@ public class MainActivity extends BridgeActivity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         
-        Log.d(TAG, "Permission result for request code: " + requestCode);
+        Log.d(TAG, "📋 Permission result for request code: " + requestCode);
+        PermissionManager.logPermissionResults(permissions, grantResults);
         
-        if (requestCode == PERMISSION_REQUEST_CODE || requestCode == EXACT_ALARM_REQUEST_CODE) {
-            // Retry scheduling after permission request
-            Log.d(TAG, "Retrying notification scheduling after permission request");
-            attemptScheduleNotifications();
+        if (requestCode == PermissionManager.ALL_PERMISSIONS_CODE ||
+            requestCode == PermissionManager.LOCATION_PERMISSION_CODE ||
+            requestCode == PermissionManager.NOTIFICATION_PERMISSION_CODE ||
+            requestCode == PermissionManager.CAMERA_PERMISSION_CODE) {
+            
+            if (PermissionManager.areAllPermissionsGranted(grantResults)) {
+                Log.d(TAG, "✅ All requested permissions granted!");
+                permissionsGranted = true;
+                attemptScheduleNotifications();
+            } else {
+                Log.w(TAG, "⚠️ Some permissions were denied");
+                permissionsGranted = false;
+                attemptScheduleNotifications();
+            }
         }
+    }
+
+    /**
+     * Show dialog to request permissions - shown only once on first launch
+     */
+    private void showPermissionRequestDialog() {
+        // Build permission list with bullet points
+        String permissionMessage = "EVChamp needs the following permissions to function properly:\n\n" +
+            "• Location - For finding nearby EV charging stations and services\n" +
+            "• Camera - For vehicle diagnostics and QR code scanning\n" +
+            "• Notifications - To keep you updated with important alerts\n" +
+            "• Alarms - For scheduling reminders and diagnostics";
+        
+        AlertDialog dialog = new AlertDialog.Builder(this)
+            .setTitle("Required Permissions")
+            .setMessage(permissionMessage)
+            .setPositiveButton("Accept", (dialogInterface, which) -> {
+                // Accept button - Enable all permissions in one click
+                Log.d(TAG, "✅ User clicked Accept - requesting all permissions");
+                PermissionManager.requestAllPermissions(this);
+            })
+            .setNegativeButton("Skip", (dialogInterface, which) -> {
+                // Skip button - Auto-enable notification permission and continue
+                Log.d(TAG, "⏭️ User clicked Skip - allowing to continue");
+                dialogInterface.dismiss();
+                permissionsGranted = false;
+                // Auto-enable notification by attempting to schedule
+                attemptScheduleNotifications();
+            })
+            .setCancelable(false)
+            .show();
     }
 
     /**
@@ -342,8 +405,18 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume - checking permissions and rescheduling if needed");
-        attemptScheduleNotifications();
+        Log.d(TAG, "onResume - checking permissions");
+        
+        // Only attempt scheduling - don't show dialog again
+        if (PermissionManager.hasAllPermissions(this)) {
+            Log.d(TAG, "✅ All permissions granted on resume");
+            permissionsGranted = true;
+            attemptScheduleNotifications();
+        } else {
+            Log.d(TAG, "⚠️ Some permissions still missing on resume");
+            permissionsGranted = false;
+            attemptScheduleNotifications();
+        }
     }
 }
 

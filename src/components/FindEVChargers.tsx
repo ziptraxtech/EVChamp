@@ -375,7 +375,15 @@ const FindEVChargers: React.FC = () => {
           </p>
           
           <div className="flex flex-wrap justify-center gap-3">
-            <button onClick={() => document.querySelector('[style*="height: 480px"]')?.scrollIntoView({ behavior: 'smooth' })} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
+            <button 
+              onClick={() => document.querySelector('[style*="height: 480px"]')?.scrollIntoView({ behavior: 'smooth' })} 
+              className="text-white font-semibold px-6 py-3 rounded-lg transition-all text-sm"
+              style={{
+                background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+              onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
+            >
               Find Chargers
             </button>
             <button onClick={() => goTo('/franchise')} className="border border-white/30 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/10 transition-all text-sm">
@@ -495,7 +503,12 @@ const FindEVChargers: React.FC = () => {
                   .getElementById('charging-station-map')
                   ?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="inline-flex items-center justify-center bg-green-600 text-white font-semibold px-7 py-3.5 rounded-xl hover:bg-green-700 hover:shadow-lg transition-all"
+              className="inline-flex items-center justify-center text-white font-semibold px-7 py-3.5 rounded-xl shadow-lg transition-all"
+              style={{
+                background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+              onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
             >
               Find EV Chargers Near Me
             </button>
@@ -779,7 +792,15 @@ const FindEVChargers: React.FC = () => {
           <h2 className="text-2xl font-bold mb-4">Ready to Find Your Nearest Charger?</h2>
           <p className="text-gray-300 text-sm mb-6">Start exploring our network of EV charging stations across India. Get real-time availability and smart directions today.</p>
           <div className="flex flex-wrap justify-center gap-3">
-            <button onClick={() => document.querySelector('[style*="height: 480px"]')?.scrollIntoView({ behavior: 'smooth' })} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
+            <button 
+              onClick={() => document.querySelector('[style*="height: 480px"]')?.scrollIntoView({ behavior: 'smooth' })} 
+              className="text-white font-semibold px-6 py-3 rounded-lg transition-all text-sm"
+              style={{
+                background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+              onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
+            >
               Explore Map
             </button>
             <button onClick={goToContact} className="border border-white/30 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/10 transition-all text-sm">

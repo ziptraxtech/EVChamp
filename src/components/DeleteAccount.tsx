@@ -73,7 +73,12 @@ if (!isSignedIn) {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={() => navigate('/sign-in')}
-              className="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition"
+              className="text-white px-6 py-2 rounded-lg font-semibold transition"
+              style={{
+                background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+              onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
             >
               Sign In
             </button>
@@ -141,7 +146,12 @@ if (!isSignedIn) {
                   await signOut();
                   navigate('/sign-in');
                 }}
-                className="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition"
+                className="text-white px-6 py-2 rounded-lg font-semibold transition"
+                style={{
+                  background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+                onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
               >
                 Sign Out & Sign In Again
               </button>

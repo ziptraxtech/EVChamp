@@ -101,7 +101,12 @@ function HomePage() {
   >
     <button
       onClick={scrollToTopServices}
-      className="bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 hover:from-green-600 hover:via-teal-600 hover:to-blue-600 active:from-green-700 active:via-teal-700 active:to-blue-700 text-white font-semibold px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg transition-all text-xs sm:text-sm shadow-md whitespace-nowrap"
+      className="text-white font-semibold px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg transition-all text-xs sm:text-sm shadow-md whitespace-nowrap"
+      style={{
+        background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+      onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
     >
       Explore Platform
     </button>
@@ -117,7 +122,12 @@ function HomePage() {
           }
         }, 100);
       }}
-      className="bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 hover:from-green-600 hover:via-teal-600 hover:to-blue-600 active:from-green-700 active:via-teal-700 active:to-blue-700 text-white font-semibold px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg transition-all text-xs sm:text-sm shadow-md whitespace-nowrap"
+      className="text-white font-semibold px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg transition-all text-xs sm:text-sm shadow-md whitespace-nowrap"
+      style={{
+        background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+      onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
     >
       EVChamp Super Plans
     </button>
@@ -186,21 +196,48 @@ function HomePage() {
             <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
               <h3 className="text-lg font-bold text-gray-900 mb-2">For Individuals</h3>
               <p className="text-sm text-gray-600 leading-relaxed mb-4">Buy or sell EVs with confidence, access battery diagnostics, get help when needed, and discover nearby charging support.</p>
-              <button onClick={() => goTo('/buy-used-ev')} className="text-sm font-medium text-green-700 hover:text-green-800 transition-colors">
+              <button 
+                onClick={() => goTo('/buy-used-ev')} 
+                className="text-sm font-medium transition-colors"
+                style={{
+                  background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
                 Explore Marketplace →
               </button>
             </div>
             <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
               <h3 className="text-lg font-bold text-gray-900 mb-2">For Fleets & Businesses</h3>
               <p className="text-sm text-gray-600 leading-relaxed mb-4">Monitor vehicle performance, reduce downtime, improve operational efficiency, and manage EV assets with real-time intelligence.</p>
-              <button onClick={() => goTo('/buy-plans')} className="text-sm font-medium text-green-700 hover:text-green-800 transition-colors">
+              <button 
+                onClick={() => goTo('/buy-plans')} 
+                className="text-sm font-medium transition-colors"
+                style={{
+                  background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
                 View Plans →
               </button>
             </div>
             <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
               <h3 className="text-lg font-bold text-gray-900 mb-2">For Investors & Partners</h3>
               <p className="text-sm text-gray-600 leading-relaxed mb-4">Explore sustainable infrastructure investment opportunities and franchise models built for long-term growth in India's EV ecosystem.</p>
-              <button onClick={() => goTo('/find-ev-chargers')} className="text-sm font-medium text-green-700 hover:text-green-800 transition-colors">
+              <button 
+                onClick={() => goTo('/find-ev-chargers')} 
+                className="text-sm font-medium transition-colors"
+                style={{
+                  background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
                 Explore EV Chargers →
               </button>
             </div>
@@ -227,7 +264,15 @@ function HomePage() {
           <h2 className="text-2xl sm:text-3xl font-bold mb-4">Join the EVChamp Network</h2>
           <p className="text-gray-300 text-base mb-8">Be part of the next generation of electric mobility in India.</p>
           <div className="flex flex-wrap justify-center gap-3">
-            <button onClick={() => goTo('/sign-up')} className="bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 hover:from-green-600 hover:via-teal-600 hover:to-blue-600 active:from-green-700 active:via-teal-700 active:to-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-all text-sm shadow-lg hover:shadow-xl">
+            <button 
+              onClick={() => goTo('/sign-up')} 
+              className="text-white font-semibold px-6 py-3 rounded-lg transition-all text-sm shadow-lg"
+              style={{
+                background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+              onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
+            >
               Get Started Free
             </button>
             <button onClick={() => goTo('https://play.google.com/apps/internaltest/4701215861025087123')} className="border border-white/30 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/10 transition-all text-sm">

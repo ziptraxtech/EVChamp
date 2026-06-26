@@ -11,7 +11,18 @@ import tiagoevImg from '../assets/tiagoev.jpg';
 const ArrowButton: React.FC<{ onClick: (e: React.MouseEvent) => void }> = ({ onClick }) => (
   <button
     onClick={onClick}
-    className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-green-500 hover:text-white hover:border-green-500 transition-all duration-300 flex-shrink-0 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+    className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-white transition-all duration-300 flex-shrink-0 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
+    style={{
+      '--hover-bg': 'linear-gradient(120deg, #0a8a52, #1257c4)',
+    } as React.CSSProperties}
+    onMouseEnter={(e) => {
+      (e.currentTarget as HTMLButtonElement).style.background = 'linear-gradient(120deg, #0a8a52, #1257c4)';
+      (e.currentTarget as HTMLButtonElement).style.borderColor = 'transparent';
+    }}
+    onMouseLeave={(e) => {
+      (e.currentTarget as HTMLButtonElement).style.background = 'white';
+      (e.currentTarget as HTMLButtonElement).style.borderColor = '#e5e7eb';
+    }}
     aria-label="View service details"
   >
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -221,7 +232,12 @@ const ServicesShowcase: React.FC = () => {
             id="services-heading"
             className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 leading-tight"
           >
-            Explore Our Top <span className="bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 bg-clip-text text-transparent">EV Services</span>
+            Explore Our Top <span style={{
+              background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>EV Services</span>
           </h2>
           <p className="text-gray-600 text-sm sm:text-base max-w-3xl mx-auto leading-relaxed">
             Complete electric vehicle solutions — from charging infrastructure and maintenance to rentals and battery diagnostics. Everything you need on your EV journey.
@@ -230,15 +246,30 @@ const ServicesShowcase: React.FC = () => {
           {/* Trust/Stats Section */}
           <div className="mt-8 flex flex-wrap justify-center gap-6 sm:gap-8">
             <div className="flex flex-col items-center">
-              <p className="text-xl sm:text-2xl font-bold text-green-600">500+</p>
+              <p className="text-xl sm:text-2xl font-bold" style={{
+                background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}>500+</p>
               <p className="text-gray-600 text-xs sm:text-sm">Charging Points</p>
             </div>
             <div className="flex flex-col items-center">
-              <p className="text-xl sm:text-2xl font-bold text-green-600">100+</p>
+              <p className="text-xl sm:text-2xl font-bold" style={{
+                background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}>100+</p>
               <p className="text-gray-600 text-xs sm:text-sm">Service Centres</p>
             </div>
             <div className="flex flex-col items-center">
-              <p className="text-xl sm:text-2xl font-bold text-green-600">50K+</p>
+              <p className="text-xl sm:text-2xl font-bold" style={{
+                background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}>50K+</p>
               <p className="text-gray-600 text-xs sm:text-sm">Happy Users</p>
             </div>
           </div>
@@ -266,7 +297,12 @@ const ServicesShowcase: React.FC = () => {
         <div className="mt-16 sm:mt-20 text-center">
           <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-8 sm:p-12 border border-green-200">
             <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
-              Ready to Transform Your <span className="bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 bg-clip-text text-transparent">EV Experience?</span>
+              Ready to Transform Your <span style={{
+                background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}>EV Experience?</span>
             </h3>
             <p className="text-gray-600 text-sm sm:text-base mb-6 max-w-2xl mx-auto">
               Join thousands of EV owners who trust EVChamp for their complete electric vehicle needs
@@ -274,13 +310,24 @@ const ServicesShowcase: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
                 onClick={() => goTo('/find-ev-chargers')}
-                className="bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 hover:from-green-600 hover:via-teal-600 hover:to-blue-600 active:from-green-700 active:via-teal-700 active:to-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                className="text-white font-semibold px-8 py-3 rounded-lg transition-all duration-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
+                style={{
+                  background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+                onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
               >
                 Start Exploring
               </button>
               <button
                 onClick={() => navigate('/about')}
-                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-transparent bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 bg-clip-text font-semibold px-8 py-3 rounded-lg border-2 border-gradient-to-r from-green-500 via-teal-500 to-blue-500 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                className="text-white font-semibold px-8 py-3 rounded-lg border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                style={{
+                  background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                  borderColor: 'transparent',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+                onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
               >
                 Learn More
               </button>
@@ -291,8 +338,10 @@ const ServicesShowcase: React.FC = () => {
         {/* Benefits Section */}
         <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 text-green-600 rounded-full mb-4">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full mb-4" style={{
+              background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+            }}>
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
@@ -300,8 +349,10 @@ const ServicesShowcase: React.FC = () => {
             <p className="text-gray-600 text-sm">All partners verified with strict quality standards</p>
           </div>
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 text-green-600 rounded-full mb-4">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full mb-4" style={{
+              background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+            }}>
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
@@ -309,8 +360,10 @@ const ServicesShowcase: React.FC = () => {
             <p className="text-gray-600 text-sm">Live availability, pricing, and support 24/7</p>
           </div>
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 text-green-600 rounded-full mb-4">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full mb-4" style={{
+              background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+            }}>
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>

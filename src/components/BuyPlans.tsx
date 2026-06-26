@@ -343,7 +343,17 @@ const BuyPlans: React.FC = () => {
                 <label className="block text-gray-700 font-medium mb-2">Company (optional)</label>
                 <input type="text" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Enter your company name" />
               </div>
-              <button type="button" className="w-full bg-green-600 text-white py-4 px-6 rounded-lg font-semibold text-lg hover:bg-green-700 transition-colors transform hover:scale-105" onClick={handlePayment} disabled={isProcessing}>
+              <button 
+                type="button" 
+                className="w-full text-white py-4 px-6 rounded-lg font-semibold text-lg transform hover:scale-105 transition-all" 
+                style={{
+                  background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                }}
+                onClick={handlePayment} 
+                disabled={isProcessing}
+                onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+                onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
+              >
                 {isProcessing ? 'Processing Payment...' : 'Place Order'}
               </button>
             </form>

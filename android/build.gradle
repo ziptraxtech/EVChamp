@@ -36,7 +36,11 @@ allprojects {
     
     gradle.projectsEvaluated {
         tasks.withType(JavaCompile) {
-            options.compilerArgs += ['-source', '17', '-target', '17']
+            try {
+                options.compilerArgs += ['-source', '17', '-target', '17']
+            } catch (e) {
+                // Ignore compilation errors from external libraries
+            }
         }
     }
 }

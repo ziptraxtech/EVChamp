@@ -140,7 +140,15 @@ const AboutUs: React.FC = () => {
             EVChamp serves EV owners, used EV buyers and sellers, fleet operators, businesses, charging partners, franchise partners, and sustainability-focused investors.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <button onClick={goToTopServices} className="bg-gray-900 text-white font-medium px-5 py-2.5 rounded-lg hover:bg-gray-800 transition-all text-sm">
+            <button 
+              onClick={goToTopServices} 
+              className="text-white font-medium px-5 py-2.5 rounded-lg transition-all text-sm"
+              style={{
+                background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+              onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
+            >
               Explore Platform
             </button>
             <button onClick={() => goTo('/contact')} className="border border-gray-200 text-gray-700 font-medium px-5 py-2.5 rounded-lg hover:bg-gray-50 transition-all text-sm">

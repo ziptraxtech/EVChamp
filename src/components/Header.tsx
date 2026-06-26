@@ -135,7 +135,12 @@ const Header: React.FC = () => {
           )}
           <button
             onClick={() => goTo('/buy-plans')}
-            className="bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 hover:from-green-600 hover:via-teal-600 hover:to-blue-600 active:from-green-700 active:via-teal-700 active:to-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-all text-sm shadow-md"
+            className="inline-flex items-center gap-1.5 font-semibold px-4 py-2 rounded-lg text-sm text-white shadow-md transition-all"
+            style={{
+              background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+            onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
           >
             Get Started
           </button>
@@ -225,7 +230,15 @@ const Header: React.FC = () => {
           <div className="px-4 py-4 space-y-1">
             {/* Primary CTAs */}
             <div className="flex gap-2 pb-3 border-b border-gray-100">
-              <button onClick={() => goTo('/buy-plans')} className="flex-1 text-center bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 hover:from-green-600 hover:via-teal-600 hover:to-blue-600 active:from-green-700 active:via-teal-700 active:to-blue-700 text-white font-medium px-3 py-2.5 rounded-lg text-sm shadow-md transition-all">
+              <button 
+                onClick={() => goTo('/buy-plans')} 
+                className="flex-1 text-center text-white font-medium px-3 py-2.5 rounded-lg text-sm shadow-md transition-all"
+                style={{
+                  background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+                onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
+              >
                 Get Started
               </button>
             </div>
@@ -284,7 +297,15 @@ const Header: React.FC = () => {
                 </div>
               ) : (
                 <SignInButton mode="modal">
-                  <button className="w-full text-center bg-gray-900 text-white font-medium px-4 py-2.5 rounded-lg text-sm" onClick={() => setIsMobileMenuOpen(false)}>
+                  <button 
+                    className="w-full text-center text-white font-medium px-4 py-2.5 rounded-lg text-sm" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    style={{
+                      background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
+                  >
                     Sign In
                   </button>
                 </SignInButton>

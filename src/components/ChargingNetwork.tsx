@@ -258,7 +258,15 @@ const ChargingNetwork: React.FC = () => {
       <section className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
         <div className="container mx-auto px-4 sm:px-6 py-12 text-center max-w-3xl">
           <p className="text-gray-300 text-base mb-6">EVChamp's charging network is part of a larger mission to make electric mobility easier, more accessible, and more dependable across India.</p>
-          <button onClick={() => goTo('/contact')} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
+          <button 
+            onClick={() => goTo('/contact')} 
+            className="text-white font-semibold px-6 py-3 rounded-lg transition-all text-sm"
+            style={{
+              background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+            onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
+          >
             Partner With Us
           </button>
         </div>

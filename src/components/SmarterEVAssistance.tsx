@@ -35,7 +35,15 @@ const SmarterEVAssistance: React.FC = () => {
             EVChamp Smarter EV Assistance helps you make better EV decisions in real time. Understand vehicle behavior, improve charging decisions, and troubleshoot issues quickly with AI-powered intelligence.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <button onClick={() => goTo('/buy-plans')} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
+            <button 
+              onClick={() => goTo('/buy-plans')} 
+              className="text-white font-semibold px-6 py-3 rounded-lg transition-all text-sm"
+              style={{
+                background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+              onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
+            >
               Get Started
             </button>
             <button onClick={() => goTo('/contact')} className="border border-white/30 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/10 transition-all text-sm">
@@ -87,7 +95,15 @@ const SmarterEVAssistance: React.FC = () => {
         <div className="container mx-auto px-4 sm:px-6 py-14 text-center max-w-3xl">
           <h2 className="text-2xl font-bold mb-3">Better Visibility. Faster Support. Smarter Decisions.</h2>
           <p className="text-gray-300 text-sm mb-6">EVChamp Smarter EV Assistance turns complex EV data into useful, practical guidance.</p>
-          <button onClick={() => goTo('/buy-plans')} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
+          <button 
+            onClick={() => goTo('/buy-plans')} 
+            className="text-white font-semibold px-6 py-3 rounded-lg transition-all text-sm"
+            style={{
+              background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+            onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
+          >
             Explore Plans
           </button>
         </div>

@@ -265,9 +265,12 @@ const ServiceCentres: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setServiceType('battery')}
-                    className={`flex-1 rounded-xl px-4 py-3 font-semibold transition-colors ${
-                      serviceType === 'battery' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700'
+                    className={`flex-1 rounded-xl px-4 py-3 font-semibold transition-colors text-white ${
+                      serviceType === 'battery' ? 'text-white' : 'bg-gray-100 text-gray-700'
                     }`}
+                    style={serviceType === 'battery' ? {
+                      background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                    } : {}}
                   >
                     Battery Service
                   </button>
@@ -426,7 +429,12 @@ const ServiceCentres: React.FC = () => {
               />
               <button
                 type="submit"
-                className="bg-gradient-to-r from-sky-600 to-green-600 text-white font-semibold px-5 py-3 rounded-xl hover:opacity-95 transition-opacity"
+                className="text-white font-semibold px-5 py-3 rounded-xl transition-opacity"
+                style={{
+                  background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+                onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
               >
                 Submit Service Centre
               </button>

@@ -153,7 +153,17 @@ const BuyUsedEV: React.FC = () => {
               </div>
               <div className="flex justify-end space-x-4 pt-4">
                 <button onClick={() => setShowEnquiryModal(false)} className="px-6 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100">Cancel</button>
-                <button onClick={() => { alert('Thank you for your enquiry! Our team will be in touch.'); setShowEnquiryModal(false); }} className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Confirm Enquiry</button>
+                <button 
+                  onClick={() => { alert('Thank you for your enquiry! Our team will be in touch.'); setShowEnquiryModal(false); }} 
+                  className="px-6 py-2 text-white rounded-lg transition-colors"
+                  style={{
+                    background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
+                >
+                  Confirm Enquiry
+                </button>
               </div>
             </div>
           </div>

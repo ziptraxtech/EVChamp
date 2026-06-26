@@ -61,7 +61,15 @@ const Franchise: React.FC = () => {
             EVChamp Franchise Partnership offers a business opportunity for entrepreneurs and organizations looking to enter the fast-growing electric mobility sector.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <button onClick={goToContact} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
+            <button 
+              onClick={goToContact} 
+              className="text-white font-semibold px-6 py-3 rounded-lg transition-all text-sm"
+              style={{
+                background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+              onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
+            >
               Apply Now
             </button>
             <button
@@ -103,7 +111,12 @@ const Franchise: React.FC = () => {
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <button
           onClick={goToContact}
-          className="bg-green-600 text-white font-semibold px-7 py-3.5 rounded-xl hover:bg-green-700 hover:shadow-lg transition-all"
+          className="text-white font-semibold px-7 py-3.5 rounded-xl shadow-lg transition-all"
+          style={{
+            background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+          onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
         >
           Become an EVChamp Partner
         </button>
@@ -171,7 +184,12 @@ const Franchise: React.FC = () => {
 
       <button
         onClick={goToContact}
-        className="inline-flex items-center justify-center bg-green-600 text-white font-semibold px-7 py-3.5 rounded-xl hover:bg-green-700 hover:shadow-lg transition-all"
+        className="inline-flex items-center justify-center text-white font-semibold px-7 py-3.5 rounded-xl shadow-lg transition-all"
+        style={{
+          background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+        onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
       >
         Discuss a Partnership
       </button>
@@ -284,7 +302,12 @@ const Franchise: React.FC = () => {
 
         <button
           onClick={goToContact}
-          className="w-full mt-6 bg-green-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-green-700 transition-all"
+          className="w-full mt-6 text-white font-semibold px-6 py-3 rounded-xl transition-all"
+          style={{
+            background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+          onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
         >
           Request Partnership Details
         </button>
@@ -372,7 +395,15 @@ const Franchise: React.FC = () => {
           <h2 className="text-2xl font-bold mb-3">Don't Just Watch the EV Revolution — Lead It</h2>
           <p className="text-gray-300 text-sm mb-6">Limited opportunities available. Secure your exclusive territory and become a pioneer in India's EV service industry.</p>
           <div className="flex flex-wrap justify-center gap-3">
-            <button onClick={goToContact} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
+            <button 
+              onClick={goToContact} 
+              className="text-white font-semibold px-6 py-3 rounded-lg transition-all text-sm"
+              style={{
+                background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+              onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
+            >
               Contact Us
             </button>           
           </div>

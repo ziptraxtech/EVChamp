@@ -234,7 +234,12 @@ const SellEV: React.FC = () => {
               </button>
               <button
                 onClick={() => document.getElementById('marketplace')?.scrollIntoView({ behavior: 'smooth' })}
-                className="bg-green-500 text-white font-semibold px-8 py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+                className="text-white font-semibold px-8 py-3 rounded-lg shadow-lg transform hover:-translate-y-1 transition-all"
+                style={{
+                  background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+                onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
               >
                 Browse EVs
               </button>
@@ -349,7 +354,15 @@ const SellEV: React.FC = () => {
                 <button type="button" onClick={() => setShowListingForm(false)} className="flex-1 px-6 py-3 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50 transition-colors">
                   Cancel
                 </button>
-                <button type="submit" className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
+                <button 
+                  type="submit" 
+                  className="flex-1 px-6 py-3 text-white rounded-lg font-semibold transform hover:-translate-y-0.5 transition-all"
+                  style={{
+                    background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
+                >
                   Submit Listing
                 </button>
               </div>
