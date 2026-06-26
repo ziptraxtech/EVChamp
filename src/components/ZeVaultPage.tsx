@@ -99,7 +99,7 @@ const ZeVaultPage: React.FC = () => {
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
 
         {/* Balance Card */}
-        <section className="rounded-3xl border border-violet-700/50 bg-gradient-to-br from-violet-900/60 via-slate-950 to-indigo-900/60 p-6 sm:p-8 shadow-lg shadow-violet-900/40">
+        <section className="rounded-3xl border border-orange-700/50 bg-gradient-to-br from-orange-900/60 via-slate-950 to-red-900/60 p-6 sm:p-8 shadow-lg shadow-orange-900/40">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
             <div>
               <p className="text-sm font-semibold text-violet-200 uppercase tracking-[0.2em] mb-2">Wallet Balance</p>
@@ -197,7 +197,7 @@ const ZeVaultPage: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
               {/* First Time Trial */}
-              <div className="relative rounded-2xl border-2 border-emerald-400 bg-gradient-to-br from-emerald-50 to-white p-6 hover:shadow-lg transition-all">
+              <div className="relative rounded-2xl border-2 border-emerald-400 bg-gradient-to-br from-emerald-50 to-white p-6 hover:shadow-lg transition-all flex flex-col">
                 <div className="absolute -top-3 right-4">
                   <span className="inline-block rounded-full bg-emerald-500 px-3 py-1 text-xs font-bold text-white shadow-md">
                     TRIAL
@@ -211,9 +211,9 @@ const ZeVaultPage: React.FC = () => {
                   <div className="flex items-baseline gap-1">
                     <span className="text-4xl font-extrabold text-emerald-700">₹199</span>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">₹199/test</p>
+                  <p className="text-xs text-gray-600 mt-1">₹199/test • Valid for one time use only</p>
                 </div>
-                <ul className="space-y-3 mb-6">
+                <ul className="space-y-3 mb-6 flex-grow">
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-emerald-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
                     <span>1 complete 20-min diagnostic</span>
@@ -230,6 +230,10 @@ const ZeVaultPage: React.FC = () => {
                     <svg className="text-emerald-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
                     <span>Basic recommendations</span>
                   </li>
+                  <li className="flex items-start gap-2 text-sm text-gray-700">
+                    <svg className="text-emerald-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                    <span>No credit card required</span>
+                  </li>
                 </ul>
                 <button
                   onClick={() => {
@@ -243,7 +247,7 @@ const ZeVaultPage: React.FC = () => {
               </div>
 
               {/* 4 Tests Pack */}
-              <div className="relative rounded-2xl border-2 border-indigo-400 bg-gradient-to-br from-indigo-50 to-white p-6 hover:shadow-lg hover:border-indigo-500 transition-all">
+              <div className="relative rounded-2xl border-2 border-indigo-400 bg-gradient-to-br from-indigo-50 to-white p-6 hover:shadow-lg hover:border-indigo-500 transition-all flex flex-col">
                 <div className="mb-4">
                   <h3 className="text-xl font-bold text-gray-900">Starter Pack</h3>
                   <p className="text-sm text-gray-600 mt-1">Regular monitoring</p>
@@ -252,9 +256,9 @@ const ZeVaultPage: React.FC = () => {
                   <div className="flex items-baseline gap-1">
                     <span className="text-4xl font-extrabold text-gray-900">₹1499</span>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">8 tests • ₹187/test • Valid 1 year</p>
+                  <p className="text-xs text-gray-600 mt-1">8 tests • ₹187/test • Valid for 1 year</p>
                 </div>
-                <ul className="space-y-3 mb-6">
+                <ul className="space-y-3 mb-6 flex-grow">
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
                     <span>8 AI diagnostic tests</span>
@@ -271,20 +275,28 @@ const ZeVaultPage: React.FC = () => {
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
                     <span>Email support</span>
                   </li>
+                  <li className="flex items-start gap-2 text-sm text-gray-700">
+                    <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                    <span>Monthly health check-ins</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm text-gray-700">
+                    <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                    <span>Easy renewal option</span>
+                  </li>
                 </ul>
                 <button
                   onClick={() => {
                     console.log('📋 Starter Plan Selected:', { plan: 'starter', tests: 4, months: 12, price: 1499, amountInPaise: 149900 });
                     navigate('/checkout?plan=starter&tests=4&months=12&price=1499');
                   }}
-                  className="block w-full text-center rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold px-4 py-2.5 hover:from-blue-700 hover:to-cyan-700 shadow-md transition-all"
+                  className="block w-full text-center rounded-lg bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 hover:from-green-600 hover:via-teal-600 hover:to-blue-600 active:from-green-700 active:via-teal-700 active:to-blue-700 text-white font-semibold px-4 py-2.5 shadow-md transition-all"
                 >
                   Get Started
                 </button>
               </div>
 
               {/* 8 Tests Pack - Popular */}
-              <div className="relative rounded-2xl border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-white p-6 shadow-xl hover:shadow-2xl transition-all">
+              <div className="relative rounded-2xl border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-white p-6 shadow-xl hover:shadow-2xl transition-all flex flex-col">
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                   <span className="inline-block rounded-full bg-gradient-to-r from-blue-600 to-cyan-600 px-4 py-1 text-xs font-bold text-white shadow-md">
                     MOST POPULAR
@@ -298,9 +310,9 @@ const ZeVaultPage: React.FC = () => {
                   <div className="flex items-baseline gap-1">
                     <span className="text-4xl font-extrabold text-blue-700">₹2,499</span>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">12 tests • ₹208/test • Valid 1 year</p>
+                  <p className="text-xs text-gray-600 mt-1">12 tests • ₹208/test • Valid for 1 year</p>
                 </div>
-                <ul className="space-y-3 mb-6">
+                <ul className="space-y-3 mb-6 flex-grow">
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
                     <span>12 AI diagnostic tests</span>
@@ -320,6 +332,14 @@ const ZeVaultPage: React.FC = () => {
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
                     <span>Priority support</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm text-gray-700">
+                    <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                    <span>Quarterly performance reports</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm text-gray-700">
+                    <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                    <span>Free battery optimization tips</span>
                   </li>
                 </ul>
                 <button

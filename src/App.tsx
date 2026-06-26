@@ -33,7 +33,7 @@ import ZeVaultCheckout from './components/ZeVaultCheckout';
 import Blog from './components/Blog';
 import ZeflashPlans from './components/ZeflashPlans';
 import { initializePushNotifications } from './components/FirebaseNotification';
-import { scheduleLocalNotifications, setupLocalNotificationTapHandler, sendTestNotification } from './components/LocalNotifications';
+import { scheduleLocalNotifications, setupLocalNotificationTapHandler } from './components/LocalNotifications';
 import AdminNotificationPanel from './components/AdminNotificationPanel';
 
 
@@ -101,7 +101,7 @@ function HomePage() {
   >
     <button
       onClick={scrollToTopServices}
-      className="bg-violet-500 hover:bg-violet-600 text-white font-semibold px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg transition-all text-xs sm:text-sm shadow-md whitespace-nowrap"
+      className="bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 hover:from-green-600 hover:via-teal-600 hover:to-blue-600 active:from-green-700 active:via-teal-700 active:to-blue-700 text-white font-semibold px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg transition-all text-xs sm:text-sm shadow-md whitespace-nowrap"
     >
       Explore Platform
     </button>
@@ -117,7 +117,7 @@ function HomePage() {
           }
         }, 100);
       }}
-      className="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg transition-all text-xs sm:text-sm shadow-md whitespace-nowrap"
+      className="bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 hover:from-green-600 hover:via-teal-600 hover:to-blue-600 active:from-green-700 active:via-teal-700 active:to-blue-700 text-white font-semibold px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg transition-all text-xs sm:text-sm shadow-md whitespace-nowrap"
     >
       EVChamp Super Plans
     </button>
@@ -227,7 +227,7 @@ function HomePage() {
           <h2 className="text-2xl sm:text-3xl font-bold mb-4">Join the EVChamp Network</h2>
           <p className="text-gray-300 text-base mb-8">Be part of the next generation of electric mobility in India.</p>
           <div className="flex flex-wrap justify-center gap-3">
-            <button onClick={() => goTo('/sign-up')} className="bg-green-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-600 transition-all text-sm">
+            <button onClick={() => goTo('/sign-up')} className="bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 hover:from-green-600 hover:via-teal-600 hover:to-blue-600 active:from-green-700 active:via-teal-700 active:to-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-all text-sm shadow-lg hover:shadow-xl">
               Get Started Free
             </button>
             <button onClick={() => goTo('https://play.google.com/apps/internaltest/4701215861025087123')} className="border border-white/30 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/10 transition-all text-sm">
@@ -299,14 +299,15 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function App() {
   useEffect(() => {
+    // Initialize Firebase notifications (if available)
     initializePushNotifications();
-    // Hardcoded local notifications at random time slots (no Firebase needed).
-    setupLocalNotificationTapHandler();
+    
+    // Schedule local notifications at 11 AM and 7 PM daily
+    // These will work even when the app is closed
     scheduleLocalNotifications();
-    // 🔔 TEMP TEST: fire one notification ~6s after launch so you can verify
-    // it works on production without waiting for 11 AM / 7 PM. Remove after
-    // confirming notifications work.
-    sendTestNotification(6);
+    
+    // Handle when user taps a notification
+    setupLocalNotificationTapHandler();
   }, []);
   return (
     <Router>

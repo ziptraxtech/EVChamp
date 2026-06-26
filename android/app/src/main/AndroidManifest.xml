@@ -24,6 +24,27 @@
 
         </activity>
 
+        <service
+            android:name=".NotificationService"
+            android:exported="false" />
+
+        <receiver
+            android:name=".NotificationReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.evchamp.ALARM" />
+            </intent-filter>
+        </receiver>
+
+        <!-- BootReceiver: Reschedule alarms after device reboot -->
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -34,16 +55,13 @@
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
 
-        <!-- Firebase Cloud Messaging: default notification channel + icon/color -->
+        <!-- Local Notifications: default notification channel -->
         <meta-data
-            android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="evchamp_default" />
+            android:name="com.capacitor.LOCAL_NOTIFICATIONS_CHANNEL_ID"
+            android:value="evchamp_notifications" />
         <meta-data
-            android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@mipmap/ic_launcher" />
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/ic_launcher_background" />
+            android:name="com.capacitor.LOCAL_NOTIFICATIONS_CHANNEL_NAME"
+            android:value="EVChamp Notifications" />
     </application>
 
     <!-- Permissions -->
@@ -52,4 +70,9 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <!-- Required for push notifications on Android 13 (API 33) and above -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Required for scheduling alarms -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- Required to reschedule alarms after device reboot -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 </manifest>

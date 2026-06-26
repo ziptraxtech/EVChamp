@@ -2,8 +2,6 @@
 include ':capacitor-android'
 project(':capacitor-android').projectDir = new File('../node_modules/@capacitor/android/capacitor')
 
-include ':capacitor-firebase-messaging'
-project(':capacitor-firebase-messaging').projectDir = new File('../node_modules/@capacitor-firebase/messaging/android')
-
-include ':capacitor-local-notifications'
-project(':capacitor-local-notifications').projectDir = new File('../node_modules/@capacitor/local-notifications/android')
+// Removed local-notifications - using custom notification system
+// include ':capacitor-local-notifications'
+// project(':capacitor-local-notifications').projectDir = new File('../node_modules/@capacitor/local-notifications/android')

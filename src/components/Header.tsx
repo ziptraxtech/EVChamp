@@ -69,10 +69,16 @@ const Header: React.FC = () => {
     <header className="bg-white/95 backdrop-blur-lg sticky top-0 z-50 border-b border-gray-100 w-full max-w-[100vw]">
       <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-3 flex justify-between items-center min-w-0">
         {/* Logo */}
-        <Link to="/" className="flex items-center space-x-2 cursor-pointer">
+        <button 
+          onClick={() => {
+            navigate('/');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity"
+        >
           <img src={EVChampLogo} alt="EVChamp Logo" className="h-7 w-7 sm:h-8 sm:w-8" />
           <span className="text-lg sm:text-2xl font-bold font-serif text-gray-900 truncate">EVChamp</span>
-        </Link>
+        </button>
 
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center space-x-1">
@@ -129,7 +135,7 @@ const Header: React.FC = () => {
           )}
           <button
             onClick={() => goTo('/buy-plans')}
-            className="bg-green-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-green-600 transition-all text-sm"
+            className="bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 hover:from-green-600 hover:via-teal-600 hover:to-blue-600 active:from-green-700 active:via-teal-700 active:to-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-all text-sm shadow-md"
           >
             Get Started
           </button>
@@ -219,7 +225,7 @@ const Header: React.FC = () => {
           <div className="px-4 py-4 space-y-1">
             {/* Primary CTAs */}
             <div className="flex gap-2 pb-3 border-b border-gray-100">
-              <button onClick={() => goTo('/buy-plans')} className="flex-1 text-center bg-gray-900 text-white font-medium px-3 py-2.5 rounded-lg text-sm">
+              <button onClick={() => goTo('/buy-plans')} className="flex-1 text-center bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 hover:from-green-600 hover:via-teal-600 hover:to-blue-600 active:from-green-700 active:via-teal-700 active:to-blue-700 text-white font-medium px-3 py-2.5 rounded-lg text-sm shadow-md transition-all">
                 Get Started
               </button>
             </div>

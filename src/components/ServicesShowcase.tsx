@@ -11,22 +11,92 @@ import tiagoevImg from '../assets/tiagoev.jpg';
 const ArrowButton: React.FC<{ onClick: (e: React.MouseEvent) => void }> = ({ onClick }) => (
   <button
     onClick={onClick}
-    className="service-tile-arrow w-9 h-9 rounded-full border-2 border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-all duration-300 flex-shrink-0 group-hover:translate-x-1 group-hover:border-sky-400"
-    aria-label="Explore"
+    className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-green-500 hover:text-white hover:border-green-500 transition-all duration-300 flex-shrink-0 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+    aria-label="View service details"
   >
-    <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
     </svg>
   </button>
 );
 
 const CheckBadge: React.FC<{ text: string; colorClass?: string }> = ({ text, colorClass = 'bg-green-100 text-green-700' }) => (
-  <span className={`service-tile-badge inline-flex items-center gap-1.5 ${colorClass} font-medium text-xs sm:text-sm px-3 py-1 rounded-full`}>
-    <svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+  <span className={`inline-flex items-center gap-1.5 ${colorClass} font-semibold text-xs px-3 py-1.5 rounded-full`}>
+    <svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
     </svg>
-    {text}
+    <span>{text}</span>
   </span>
+);
+
+interface ServiceCardProps {
+  title: string;
+  subtitle: string;
+  description: string;
+  image: string;
+  badge: string;
+  bgGradient: string;
+  badgeColor: string;
+  onClick: () => void;
+  features?: string[];
+}
+
+const ServiceCard: React.FC<ServiceCardProps> = ({ 
+  title, 
+  subtitle, 
+  description, 
+  image, 
+  badge, 
+  bgGradient, 
+  badgeColor, 
+  onClick,
+  features = []
+}) => (
+  <article
+    onClick={onClick}
+    role="button"
+    tabIndex={0}
+    onKeyPress={(e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        onClick();
+      }
+    }}
+    className={`${bgGradient} rounded-xl p-5 flex flex-col justify-between cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 border border-white/50 backdrop-blur-sm h-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2`}
+  >
+    <div>
+      <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1 leading-tight">
+        {title}
+      </h3>
+      <p className="font-semibold text-sm mb-2" style={{ color: badgeColor }}>
+        {subtitle}
+      </p>
+      <p className="text-gray-600 text-xs leading-relaxed mb-3">
+        {description}
+      </p>
+      {features.length > 0 && (
+        <ul className="text-gray-700 text-xs space-y-1 mb-3">
+          {features.map((feature, idx) => (
+            <li key={idx} className="flex items-start gap-2">
+              <span className="text-green-600 mt-0.5">✓</span>
+              <span>{feature}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+    <div className="flex items-end justify-between mt-4 gap-3">
+      <img 
+        src={image} 
+        alt={`${title} vehicle`} 
+        className="w-20 h-14 object-cover rounded-lg"
+        loading="lazy"
+      />
+      <ArrowButton onClick={(e) => { e.stopPropagation(); onClick(); }} />
+    </div>
+    <div className="mt-3">
+      <CheckBadge text={badge} colorClass={badgeColor} />
+    </div>
+  </article>
 );
 
 const ServicesShowcase: React.FC = () => {
@@ -48,223 +118,204 @@ const ServicesShowcase: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'auto' });
   };
 
+  const services = [
+    {
+      title: 'Charging Stations',
+      subtitle: '⚡ Find EV chargers near you',
+      description: 'Locate nearby EV charging points, check real-time availability, and plan your route with confidence.',
+      features: ['Live availability tracking', 'Route navigation', '500k+ chargers nationwide'],
+      image: cometevImg,
+      badge: 'Live map & navigation',
+      bgGradient: 'bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50',
+      badgeColor: 'bg-amber-100 text-amber-700',
+      route: '/find-ev-chargers'
+    },
+    {
+      title: 'Service Centres',
+      subtitle: '🔧 Verified workshops near you',
+      description: 'Access trusted EV repair, diagnostics, battery service, and professional support across major cities.',
+      features: ['Verified technicians', 'Free diagnostics', 'Pan-India coverage'],
+      image: mgzsevImg,
+      badge: 'Pan-India support network',
+      bgGradient: 'bg-gradient-to-br from-purple-50 via-violet-50 to-indigo-50',
+      badgeColor: 'bg-purple-100 text-purple-700',
+      route: '/service-centres'
+    },
+    {
+      title: 'Zeflash',
+      subtitle: '🔋 Rapid AI battery diagnostics',
+      description: '20-minute field diagnostics with advanced SoP, SoF analysis, and instant health reports during charging.',
+      features: ['AI-powered analysis', '20-minute service', 'Instant reports'],
+      image: punchImg,
+      badge: 'Visit zeflash.app',
+      bgGradient: 'bg-gradient-to-br from-blue-50 via-sky-50 to-cyan-50',
+      badgeColor: 'bg-blue-100 text-blue-700',
+      route: '/zeflash'
+    },
+    {
+      title: 'Smart EV Telematics',
+      subtitle: '📍 Real-time GPS & AI diagnostics',
+      description: 'India\'s most advanced IoT tracking and fleet management platform built for electric vehicles.',
+      features: ['Real-time tracking', 'AI diagnostics', 'Fleet management'],
+      image: mockupImg,
+      badge: 'Plans starting at ₹4,999/yr',
+      bgGradient: 'bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50',
+      badgeColor: 'bg-green-100 text-green-700',
+      route: '/buy-plans'
+    },
+    {
+      title: 'Rent an EV',
+      subtitle: '🚗 Flexible & affordable',
+      description: 'Rent electric vehicles by the day or month with zero fuel costs, zero emissions, and zero hassle.',
+      features: ['Hourly to monthly rentals', 'Insurance included', 'Free charging'],
+      image: nexonImg,
+      badge: 'From ₹499/day',
+      bgGradient: 'bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50',
+      badgeColor: 'bg-teal-100 text-teal-700',
+      route: '/rent-ev'
+    },
+    {
+      title: 'RSA Plans',
+      subtitle: '🚨 24×7 roadside support',
+      description: 'Get towing, battery assistance, tyre support, and emergency EV help anywhere, anytime.',
+      features: ['24/7 support availability', 'Quick response time', 'Nationwide coverage'],
+      image: cometevImg,
+      badge: 'Plans from ₹999/yr',
+      bgGradient: 'bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50',
+      badgeColor: 'bg-orange-100 text-orange-700',
+      route: '/rsa-plans'
+    },
+    {
+      title: 'Sell Your EV',
+      subtitle: '💰 Best price & fast verification',
+      description: 'List your electric vehicle and connect with thousands of genuine buyers instantly with zero commission.',
+      features: ['Zero commission fees', 'Instant verification', '1000+ monthly buyers'],
+      image: nexonImg,
+      badge: 'Zero commission listing',
+      bgGradient: 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50',
+      badgeColor: 'bg-blue-100 text-blue-700',
+      route: '/sell-ev'
+    },
+    {
+      title: 'ZipBattery',
+      subtitle: '⚙️ AI-powered battery health',
+      description: 'Extend your EV battery lifespan using our patented AI diagnostic technology and smart optimization.',
+      features: ['Extend battery life', 'Reduce costs', 'Patented technology'],
+      image: tiagoevImg,
+      badge: 'Patented technology',
+      bgGradient: 'bg-gradient-to-br from-rose-50 via-pink-50 to-orange-50',
+      badgeColor: 'bg-red-100 text-red-700',
+      route: '/zipbattery'
+    }
+  ];
+
   return (
-    <section className="py-12 sm:py-16 bg-[#f0f0f0]">
-      <div className="container mx-auto px-4 sm:px-6">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-8">
-          Explore Our Top Services
-        </h2>
-
-        <div className="flex flex-col lg:flex-row gap-4">
-
-          {/* ── Left Side: 2 equal stacked cards ── */}
-          <div className="lg:w-[32%] flex flex-col gap-4">
-
-            {/* Charging Stations — TOP */}
-            <div
-              onClick={() => goTo('/find-ev-chargers')}
-              style={{ '--tile-delay': '0.05s' } as React.CSSProperties}
-              className="service-tile group flex-1 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-2xl p-5 sm:p-6 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
-            >
-              <div>
-                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight mb-2">
-                  Charging Stations
-                </h3>
-                <p className="text-amber-600 font-semibold text-sm mb-1">
-                  Find EV chargers near you.
-                </p>
-                <p className="text-gray-500 text-xs mb-4">
-                  Locate nearby EV charging points, check availability, and plan your route with ease.
-                </p>
-                <CheckBadge text="Live map & navigation" colorClass="bg-amber-50 text-amber-700" />
-              </div>
-              <div className="flex items-end justify-between mt-4">
-                <img src={cometevImg} alt="Charging Stations" className="w-24 h-16 object-cover rounded-lg" />
-                <ArrowButton onClick={e => { e.stopPropagation(); goTo('/find-ev-chargers'); }} />
-              </div>
+    <section 
+      className="py-16 sm:py-20 bg-gradient-to-b from-gray-50 to-white"
+      aria-labelledby="services-heading"
+    >
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header Section with improved SEO and structure */}
+        <header className="text-center mb-12 sm:mb-16">
+          <h2 
+            id="services-heading"
+            className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 leading-tight"
+          >
+            Explore Our Top <span className="bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 bg-clip-text text-transparent">EV Services</span>
+          </h2>
+          <p className="text-gray-600 text-sm sm:text-base max-w-3xl mx-auto leading-relaxed">
+            Complete electric vehicle solutions — from charging infrastructure and maintenance to rentals and battery diagnostics. Everything you need on your EV journey.
+          </p>
+          
+          {/* Trust/Stats Section */}
+          <div className="mt-8 flex flex-wrap justify-center gap-6 sm:gap-8">
+            <div className="flex flex-col items-center">
+              <p className="text-xl sm:text-2xl font-bold text-green-600">500+</p>
+              <p className="text-gray-600 text-xs sm:text-sm">Charging Points</p>
             </div>
-
-            {/* Find EV Service Centres — BOTTOM */}
-            <div
-              onClick={() => goTo('/service-centres')}
-              style={{ '--tile-delay': '0.08s' } as React.CSSProperties}
-              className="service-tile group flex-1 bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl p-5 sm:p-6 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
-            >
-              <div>
-                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight mb-2">
-                  Find EV Service Centres
-                </h3>
-                <p className="text-purple-600 font-semibold text-sm mb-1">
-                  Verified workshops near you.
-                </p>
-                <p className="text-gray-500 text-xs mb-4">
-                  Locate trusted EV repair, diagnostics, and battery service support across major cities.
-                </p>
-                <CheckBadge text="Pan-India support network" colorClass="bg-purple-50 text-purple-700" />
-              </div>
-              <div className="flex items-end justify-between mt-4">
-                <img src={mgzsevImg} alt="Find EV Service Centres" className="w-24 h-16 object-cover rounded-lg" />
-                <ArrowButton onClick={e => { e.stopPropagation(); goTo('/service-centres'); }} />
-              </div>
+            <div className="flex flex-col items-center">
+              <p className="text-xl sm:text-2xl font-bold text-green-600">100+</p>
+              <p className="text-gray-600 text-xs sm:text-sm">Service Centres</p>
             </div>
-
+            <div className="flex flex-col items-center">
+              <p className="text-xl sm:text-2xl font-bold text-green-600">50K+</p>
+              <p className="text-gray-600 text-xs sm:text-sm">Happy Users</p>
+            </div>
           </div>
+        </header>
 
-          {/* ── Right Side: top-row (2 cards) + bottom-row (3 cards) ── */}
-          <div className="lg:w-[68%] flex flex-col gap-4">
+        {/* Services Grid - Responsive Layout */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          {services.map((service, index) => (
+            <ServiceCard
+              key={`service-${service.title.toLowerCase().replace(/\s+/g, '-')}`}
+              title={service.title}
+              subtitle={service.subtitle}
+              description={service.description}
+              features={service.features}
+              image={service.image}
+              badge={service.badge}
+              bgGradient={service.bgGradient}
+              badgeColor={service.badgeColor}
+              onClick={() => goTo(service.route)}
+            />
+          ))}
+        </div>
 
-            {/* Top row: 3 medium cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-
-              {/* Sell EV */}
-              <div
-                onClick={() => goTo('/zeflash')}
-                style={{ '--tile-delay': '0.10s' } as React.CSSProperties}
-                className="service-tile group bg-gradient-to-br from-sky-50 to-blue-50 rounded-2xl p-5 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
+        {/* CTA Section with improved messaging */}
+        <div className="mt-16 sm:mt-20 text-center">
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-8 sm:p-12 border border-green-200">
+            <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
+              Ready to Transform Your <span className="bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 bg-clip-text text-transparent">EV Experience?</span>
+            </h3>
+            <p className="text-gray-600 text-sm sm:text-base mb-6 max-w-2xl mx-auto">
+              Join thousands of EV owners who trust EVChamp for their complete electric vehicle needs
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={() => goTo('/find-ev-chargers')}
+                className="bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 hover:from-green-600 hover:via-teal-600 hover:to-blue-600 active:from-green-700 active:via-teal-700 active:to-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
               >
-                <div>
-                  <img src="/zeflash-logo.png" alt="Zeflash" className="h-7 w-auto mb-2 object-contain" />
-                  <p className="text-sky-600 font-semibold text-sm mb-2">Rapid AI battery diagnostics.</p>
-                  <p className="text-gray-500 text-xs leading-snug">
-                    20-minute field diagnostics with SoP, SoF, and instant health reports during charging.
-                  </p>
-                </div>
-                <div className="flex items-end justify-between mt-4">
-                  <img src={punchImg} alt="Zeflash" className="w-24 h-16 object-cover rounded-lg" />
-                  <ArrowButton onClick={e => { e.stopPropagation(); goTo('/zeflash'); }} />
-                </div>
-                <div className="mt-3">
-                  <CheckBadge text="Visit zeflash.app" colorClass="bg-sky-50 text-sky-700" />
-                </div>
-              </div>
-
-              {/* Smart EV Telematics */}
-              <div
-                onClick={() => goTo('/buy-plans')}
-                style={{ '--tile-delay': '0.15s' } as React.CSSProperties}
-                className="service-tile group bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-2xl p-5 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
+                Start Exploring
+              </button>
+              <button
+                onClick={() => navigate('/about')}
+                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-transparent bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 bg-clip-text font-semibold px-8 py-3 rounded-lg border-2 border-gradient-to-r from-green-500 via-teal-500 to-blue-500 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
               >
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">Smart EV Telematics &amp; Fleet Plans</h3>
-                  <p className="text-green-600 font-semibold text-sm mb-2">Real-time GPS. AI diagnostics.</p>
-                  <p className="text-gray-500 text-xs leading-snug">
-                    India's most advanced IoT tracking & fleet management platform built for electric vehicles.
-                  </p>
-                </div>
-                <div className="flex items-end justify-between mt-4">
-                  <img src={mockupImg} alt="EV Telematics App" className="w-24 h-16 object-contain rounded-lg bg-white" />
-                  <ArrowButton onClick={e => { e.stopPropagation(); goTo('/buy-plans'); }} />
-                </div>
-                <div className="mt-3">
-                  <CheckBadge text="Plans starting at ₹4,999/yr" colorClass="bg-green-100 text-green-700" />
-                </div>
-              </div>
-
-              {/* Rent an EV */}
-              <div
-                onClick={() => goTo('/rent-ev')}
-                style={{ '--tile-delay': '0.20s' } as React.CSSProperties}
-                className="service-tile group bg-gradient-to-br from-teal-50 to-cyan-50 rounded-2xl p-5 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
-              >
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">Rent an EV</h3>
-                  <p className="text-teal-600 font-semibold text-sm mb-2">Flexible. Affordable. Green.</p>
-                  <p className="text-gray-500 text-xs leading-snug">
-                    Rent electric vehicles by the day or month with zero fuel costs and zero hassle.
-                  </p>
-                </div>
-                <div className="flex items-end justify-between mt-4">
-                  <img src={nexonImg} alt="Rent EV" className="w-24 h-16 object-cover rounded-lg" />
-                  <ArrowButton onClick={e => { e.stopPropagation(); goTo('/rent-ev'); }} />
-                </div>
-                <div className="mt-3">
-                  <CheckBadge text="From ₹499/day" colorClass="bg-teal-50 text-teal-700" />
-                </div>
-              </div>
+                Learn More
+              </button>
             </div>
+          </div>
+        </div>
 
-            {/* Bottom row: 3 smaller cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-
-              {/* RSA Plans */}
-              <div
-                onClick={() => goTo('/rsa-plans')}
-                style={{ '--tile-delay': '0.20s' } as React.CSSProperties}
-                className="service-tile group bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-5 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
-              >
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">RSA Plans</h3>
-                  <p className="text-orange-500 font-semibold text-sm mb-2">24×7 roadside support.</p>
-                  <p className="text-gray-500 text-xs leading-snug">
-                    Get towing, battery help, tyre support, and emergency EV assistance anywhere.
-                  </p>
-                </div>
-                <div className="flex items-end justify-between mt-4">
-                  <img
-                    src={cometevImg}
-                    alt="RSA Plans"
-                    className="w-24 h-16 object-cover rounded-lg"
-                  />
-                  <ArrowButton onClick={e => { e.stopPropagation(); goTo('/rsa-plans'); }} />
-                </div>
-                <div className="mt-3">
-                  <CheckBadge text="Plans from ₹999/yr" colorClass="bg-orange-50 text-orange-700" />
-                </div>
-              </div>
-
-              {/* Sell Your EV */}
-              <div
-                onClick={() => goTo('/sell-ev')}
-                style={{ '--tile-delay': '0.25s' } as React.CSSProperties}
-                className="service-tile group bg-gradient-to-br from-blue-50 to-sky-50 rounded-2xl p-5 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
-              >
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">Sell Your EV</h3>
-                  <p className="text-blue-600 font-semibold text-sm mb-2">Best price. Fast &amp; verified.</p>
-                  <p className="text-gray-500 text-xs leading-snug">
-                    List your electric vehicle and reach thousands of genuine buyers instantly.
-                  </p>
-                </div>
-                <div className="flex items-end justify-between mt-4">
-                  <img
-                    src={nexonImg}
-                    alt="Sell EV"
-                    className="w-24 h-16 object-cover rounded-lg"
-                  />
-                  <ArrowButton onClick={e => { e.stopPropagation(); goTo('/sell-ev'); }} />
-                </div>
-                <div className="mt-3">
-                  <CheckBadge text="Zero commission listing" colorClass="bg-blue-50 text-blue-700" />
-                </div>
-              </div>
-
-              {/* ZipBattery */}
-              <div
-                onClick={() => goTo('/zipbattery')}
-                style={{ '--tile-delay': '0.30s' } as React.CSSProperties}
-                className="service-tile group bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl p-5 flex flex-col justify-between cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
-              >
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">ZipBattery</h3>
-                  <p className="text-red-600 font-semibold text-sm mb-2">AI-powered battery health.</p>
-                  <p className="text-gray-500 text-xs leading-snug">
-                    Extend EV battery lifespan using our patented AI diagnostic technology.
-                  </p>
-                </div>
-                <div className="flex items-end justify-between mt-4">
-                  <img
-                    src={tiagoevImg}
-                    alt="ZipBattery"
-                    className="w-24 h-16 object-cover rounded-lg"
-                  />
-                  <ArrowButton onClick={e => { e.stopPropagation(); goTo('/zipbattery'); }} />
-                </div>
-                <div className="mt-3">
-                  <CheckBadge text="Patented technology" colorClass="bg-red-50 text-red-600" />
-                </div>
-              </div>
-
+        {/* Benefits Section */}
+        <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 text-green-600 rounded-full mb-4">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
             </div>
+            <h4 className="font-bold text-gray-900 mb-2">Trusted & Verified</h4>
+            <p className="text-gray-600 text-sm">All partners verified with strict quality standards</p>
+          </div>
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 text-green-600 rounded-full mb-4">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <h4 className="font-bold text-gray-900 mb-2">Real-Time Data</h4>
+            <p className="text-gray-600 text-sm">Live availability, pricing, and support 24/7</p>
+          </div>
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 text-green-600 rounded-full mb-4">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h4 className="font-bold text-gray-900 mb-2">Best Value</h4>
+            <p className="text-gray-600 text-sm">Competitive pricing with exclusive member benefits</p>
           </div>
         </div>
       </div>
