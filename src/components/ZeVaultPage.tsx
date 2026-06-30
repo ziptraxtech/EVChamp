@@ -230,8 +230,8 @@ const ZeVaultPage: React.FC = () => {
                 </ul>
                 <button
                   onClick={() => {
-                    console.log('📋 Trial Plan Selected:', { plan: 'trial', tests: 1, months: 0, price: 199, amountInPaise: 19900 });
-                    navigate('/checkout?plan=trial&tests=1&months=0&price=199');
+                    console.log('📋 Trial Plan Selected:', { plan: 'trial', tests: 1, months: 0, price: 200, amountInPaise: 20000 });
+                    navigate('/checkout?plan=trial&tests=1&months=0&price=200');
                   }}
                   className="block w-full text-center rounded-lg bg-emerald-600 text-white font-semibold px-4 py-2.5 hover:bg-emerald-700 transition-colors shadow-sm"
                 >
@@ -279,8 +279,8 @@ const ZeVaultPage: React.FC = () => {
                 </ul>
                 <button
                   onClick={() => {
-                    console.log('📋 Starter Plan Selected:', { plan: 'starter', tests: 4, months: 12, price: 1499, amountInPaise: 149900 });
-                    navigate('/checkout?plan=starter&tests=4&months=12&price=1499');
+                    console.log('📋 Starter Plan Selected:', { plan: 'starter', tests: 8, months: 12, price: 2000, amountInPaise: 200000 });
+                    navigate('/checkout?plan=starter&tests=8&months=12&price=2000');
                   }}
                   className="block w-full text-center rounded-lg bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 hover:from-green-600 hover:via-teal-600 hover:to-blue-600 active:from-green-700 active:via-teal-700 active:to-blue-700 text-white font-semibold px-4 py-2.5 shadow-md transition-all"
                 >
@@ -329,8 +329,8 @@ const ZeVaultPage: React.FC = () => {
                 </ul>
                 <button
                   onClick={() => {
-                    console.log('📋 Value Pack Plan Selected:', { plan: 'value', tests: 12, months: 12, price: 2499, amountInPaise: 249900 });
-                    navigate('/checkout?plan=value&tests=12&months=12&price=2499');
+                    console.log('📋 Value Pack Plan Selected:', { plan: 'value', tests: 12, months: 12, price: 3000, amountInPaise: 300000 });
+                    navigate('/checkout?plan=value&tests=12&months=12&price=3000');
                   }}
                   className="block w-full text-center rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold px-4 py-2.5 hover:from-blue-700 hover:to-cyan-700 shadow-md transition-all"
                 >
@@ -385,8 +385,8 @@ const ZeVaultPage: React.FC = () => {
                 </ul>
                 <button
                   onClick={() => {
-                    console.log('📋 Value Pack Plan Selected:', { plan: 'value', tests: 12, months: 12, price: 2499, amountInPaise: 249900 });
-                    navigate('/checkout?plan=value&tests=12&months=12&price=2499');
+                    console.log('📋 Smart Pack Plan Selected:', { plan: 'smart', tests: 24, months: 24, price: 6000, amountInPaise: 600000 });
+                    navigate('/checkout?plan=smart&tests=24&months=24&price=6000');
                   }}
                   className="block w-full text-center rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold px-4 py-2.5 hover:from-blue-700 hover:to-cyan-700 shadow-md transition-all"
                 >
