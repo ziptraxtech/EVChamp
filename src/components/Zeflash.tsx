@@ -1,11 +1,29 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import Footer from '../Footer';
 
+interface LocationState {
+  plan?: string;
+  tests?: number;
+  months?: number;
+  price?: number;
+  openCheckout?: boolean;
+}
+
 const Zeflash: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const state = location.state as LocationState;
   const [iframeKey, setIframeKey] = useState(0);
+  const [iframeSrc, setIframeSrc] = useState('https://zeflash.app');
+
+  useEffect(() => {
+    if (state?.openCheckout && state?.plan) {
+      const checkoutUrl = `https://zeflash.app/checkout?plan=${state.plan}&tests=${state.tests}&months=${state.months}&price=${state.price}`;
+      setIframeSrc(checkoutUrl);
+    }
+  }, [state]);
 
   const goTo = (route: string) => {
     navigate(route);
@@ -46,7 +64,7 @@ const Zeflash: React.FC = () => {
           <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-lg w-full bg-gray-50" style={{ height: '80vh', minHeight: '500px' }}>
             <iframe
               key={iframeKey}
-              src="https://zeflash.app"
+              src={iframeSrc}
               title="Zeflash Website"
               className="w-full h-full"
               style={{ border: 'none', width: '100%', height: '100%' }}

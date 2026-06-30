@@ -9,9 +9,10 @@ android {
 
 apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
 dependencies {
-    implementation project(':capacitor-firebase-messaging')
-    implementation project(':capacitor-local-notifications')
-
+    // Firebase messaging requires Java 21, commenting out for now
+    // implementation project(':capacitor-firebase-messaging')
+    // Local notifications also requires Java 21
+    // implementation project(':capacitor-local-notifications')
 }
 
 

@@ -307,9 +307,75 @@ const ServicesShowcase: React.FC = () => {
             <p className="text-gray-600 text-sm sm:text-base mb-6 max-w-2xl mx-auto">
               Join thousands of EV owners who trust EVChamp for their complete electric vehicle needs
             </p>
+            {/* One Time Trial - Grid Container */}
+            <div className="flex justify-center mb-6">
+              <div className="relative rounded-2xl border-2 border-emerald-400 bg-gradient-to-br from-emerald-50 to-white p-6 hover:shadow-lg transition-all flex flex-col w-full max-w-sm">
+                <div className="absolute -top-3 right-4">
+                  <span className="inline-block rounded-full bg-emerald-500 px-3 py-1 text-xs font-bold text-white shadow-md">
+                    TRIAL
+                  </span>
+                </div>
+                <div className="mb-4">
+                  <h3 className="text-xl font-bold text-gray-900">One Time</h3>
+                  <p className="text-sm text-gray-600 mt-1">Try it once</p>
+                </div>
+                <div className="mb-6">
+                  <div className="flex items-center gap-2">
+                    <span className="text-4xl font-extrabold text-emerald-700">₹200</span>
+                    <p className="text-xs text-gray-600"> -Valid for one time use only</p>
+                  </div>
+                </div>
+                <ul className="space-y-3 mb-6 flex-grow">
+                  <li className="flex items-start gap-2 text-sm text-gray-700">
+                    <svg className="text-emerald-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                    <span>1 complete 20-min diagnostic</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm text-gray-700">
+                    <svg className="text-emerald-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                    <span>Instant health report</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm text-gray-700">
+                    <svg className="text-emerald-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                    <span>PDF download</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm text-gray-700">
+                    <svg className="text-emerald-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                    <span>Basic recommendations</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm text-gray-700">
+                    <svg className="text-emerald-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                    <span>No credit card required</span>
+                  </li>
+                </ul>
+                <button
+                  onClick={() => {
+                    console.log('📋 Trial Plan Selected:', { plan: 'trial', tests: 1, months: 0, price: 299, amountInPaise: 29900 });
+                    navigate('/zeflash', { state: { plan: 'trial', tests: 1, months: 0, price: 299, openCheckout: true } });
+                    window.scrollTo({ top: 0, behavior: 'auto' });
+                  }}
+                  className="block w-full text-center rounded-lg bg-emerald-600 text-white font-semibold px-4 py-2.5 hover:bg-emerald-700 transition-colors shadow-sm"
+                >
+                  Start Trial
+                </button>
+              </div>
+            </div>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
-                onClick={() => goTo('/find-ev-chargers')}
+                onClick={() => {
+                  if (!isSignedIn) {
+                    navigate('/sign-in');
+                  } else {
+                    navigate('/zevault');
+                    // Scroll to pricing section after navigation
+                    setTimeout(() => {
+                      const pricingSection = document.getElementById('pricing-section');
+                      if (pricingSection) {
+                        pricingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }
+                    }, 500);
+                  }
+                  window.scrollTo({ top: 0, behavior: 'auto' });
+                }}
                 className="text-white font-semibold px-8 py-3 rounded-lg transition-all duration-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
                 style={{
                   background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
@@ -317,19 +383,7 @@ const ServicesShowcase: React.FC = () => {
                 onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
                 onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
               >
-                Start Exploring
-              </button>
-              <button
-                onClick={() => navigate('/about')}
-                className="text-white font-semibold px-8 py-3 rounded-lg border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2"
-                style={{
-                  background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
-                  borderColor: 'transparent',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
-                onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
-              >
-                Learn More
+                 Explore Annual Plans
               </button>
             </div>
           </div>
