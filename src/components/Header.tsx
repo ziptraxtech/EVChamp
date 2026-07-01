@@ -54,13 +54,13 @@ const Header: React.FC = () => {
   };
 
   const platformLinks = [
-    { label: 'EV Marketplace', route: '/ev-marketplace' },
+    { label: 'EV Showcase & Test drive', route: '/ev-marketplace' },
     { label: 'Find EV Chargers', route: '/find-ev-chargers' },
     { label: 'Find EV Service Centres', route: '/service-centres' },
     { label: 'ZipsureAI & IOT Plans', route: '/buy-plans' },
     { label: 'Rent EV', route: '/rent-ev' },
     { label: 'Roadside Assistance', route: '/rsa-plans' },
-    { label: 'ZeVault', route: '/zevault' },
+    { label: 'Ze.Xperience', route: '/ze-xperience' },
     { label: 'Zeflash', route: '/zeflash' },
     { label: 'ZipBattery', route: '/zipbattery' },
   ];

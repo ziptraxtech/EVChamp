@@ -40,6 +40,7 @@ import AdminNotificationPanel from './components/AdminNotificationPanel';
 import PartnersCarousel from './components/PartnersCarousel';
 import ChatbotPopup from './components/ChatbotPopup';
 import EVMarketplace from './components/marketplace/EVMarketplace';
+import ZeXperience from './components/experience/ZeXperience';
 
 function HomePage() {
   const navigate = useNavigate();
@@ -392,6 +393,7 @@ function App() {
           } />
           <Route path="/zeflash" element={<Zeflash />} />
           <Route path="/zevault" element={<ZeVaultPage />} />
+          <Route path="/ze-xperience" element={<ZeXperience />} />
           <Route path="/checkout" element={<ZeVaultCheckout />} />
           <Route path="/find-ev-chargers" element={<FindEVChargers />} />
           <Route path="/investyz" element={<FindEVChargers />} />
