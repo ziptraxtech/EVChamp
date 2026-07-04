@@ -298,7 +298,7 @@ const Header: React.FC = () => {
               ) : (
                 <SignInButton mode="modal">
                   <button 
-                    className="w-full text-center text-white font-medium px-4 py-2.5 rounded-lg text-sm" 
+                    className="w-full text-center text-white font-medium px-4 py-2.5 rounded-lg text-sm shadow-md transition-all" 
                     onClick={() => setIsMobileMenuOpen(false)}
                     style={{
                       background: 'linear-gradient(120deg, #0a8a52, #1257c4)',

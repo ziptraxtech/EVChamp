@@ -349,11 +349,16 @@ const ServicesShowcase: React.FC = () => {
                 </ul>
                 <button
                   onClick={() => {
-                    console.log('📋 Trial Plan Selected:', { plan: 'trial', tests: 1, months: 0, price: 299, amountInPaise: 29900 });
-                    navigate('/zeflash', { state: { plan: 'trial', tests: 1, months: 0, price: 299, openCheckout: true } });
+                    console.log('📋 Trial Plan Selected:', { plan: 'trial', tests: 1, months: 0, price: 200, amountInPaise: 20000 });
+                    navigate('/zeflash', { state: { plan: 'trial', tests: 1, months: 0, price: 200, openCheckout: true } });
                     window.scrollTo({ top: 0, behavior: 'auto' });
                   }}
-                  className="block w-full text-center rounded-lg bg-emerald-600 text-white font-semibold px-4 py-2.5 hover:bg-emerald-700 transition-colors shadow-sm"
+                  className="block w-full text-center rounded-lg text-white font-semibold px-4 py-2.5 transition-all shadow-sm"
+                  style={{
+                    background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
                 >
                   Start Trial
                 </button>

@@ -233,7 +233,12 @@ const ZeVaultPage: React.FC = () => {
                     console.log('📋 Trial Plan Selected:', { plan: 'trial', tests: 1, months: 0, price: 200, amountInPaise: 20000 });
                     navigate('/checkout?plan=trial&tests=1&months=0&price=200');
                   }}
-                  className="block w-full text-center rounded-lg bg-emerald-600 text-white font-semibold px-4 py-2.5 hover:bg-emerald-700 transition-colors shadow-sm"
+                  className="block w-full text-center rounded-lg text-white font-semibold px-4 py-2.5 shadow-md transition-all"
+                  style={{
+                    background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
                 >
                   Start Trial
                 </button>
@@ -247,14 +252,14 @@ const ZeVaultPage: React.FC = () => {
                 </div>
                 <div className="mb-6">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-gray-900">₹2,000</span>
+                    <span className="text-4xl font-extrabold text-gray-900">₹1,500</span>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">8 tests  • Valid for 1 year</p>
+                  <p className="text-xs text-gray-600 mt-1">6 tests  • Valid for 1 year</p>
                 </div>
                 <ul className="space-y-3 mb-6 flex-grow">
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>8 AI diagnostic tests</span>
+                    <span>6 AI diagnostic tests</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
@@ -279,10 +284,15 @@ const ZeVaultPage: React.FC = () => {
                 </ul>
                 <button
                   onClick={() => {
-                    console.log('📋 Starter Plan Selected:', { plan: 'starter', tests: 8, months: 12, price: 2000, amountInPaise: 200000 });
-                    navigate('/checkout?plan=starter&tests=8&months=12&price=2000');
+                    console.log('📋 Starter Plan Selected:', { plan: 'starter', tests: 6, months: 12, price: 1500, amountInPaise: 150000 });
+                    navigate('/checkout?plan=starter&tests=6&months=12&price=1500');
                   }}
-                  className="block w-full text-center rounded-lg bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 hover:from-green-600 hover:via-teal-600 hover:to-blue-600 active:from-green-700 active:via-teal-700 active:to-blue-700 text-white font-semibold px-4 py-2.5 shadow-md transition-all"
+                  className="block w-full text-center rounded-lg text-white font-semibold px-4 py-2.5 shadow-md transition-all"
+                  style={{
+                    background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
                 >
                   Get Started
                 </button>
@@ -332,7 +342,12 @@ const ZeVaultPage: React.FC = () => {
                     console.log('📋 Value Pack Plan Selected:', { plan: 'value', tests: 12, months: 12, price: 3000, amountInPaise: 300000 });
                     navigate('/checkout?plan=value&tests=12&months=12&price=3000');
                   }}
-                  className="block w-full text-center rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold px-4 py-2.5 hover:from-blue-700 hover:to-cyan-700 shadow-md transition-all"
+                  className="block w-full text-center rounded-lg text-white font-semibold px-4 py-2.5 shadow-md transition-all"
+                  style={{
+                    background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
                 >
                   Get Value Pack
                 </button>
@@ -388,7 +403,12 @@ const ZeVaultPage: React.FC = () => {
                     console.log('📋 Smart Pack Plan Selected:', { plan: 'smart', tests: 24, months: 24, price: 6000, amountInPaise: 600000 });
                     navigate('/checkout?plan=smart&tests=24&months=24&price=6000');
                   }}
-                  className="block w-full text-center rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold px-4 py-2.5 hover:from-blue-700 hover:to-cyan-700 shadow-md transition-all"
+                  className="block w-full text-center rounded-lg text-white font-semibold px-4 py-2.5 shadow-md transition-all"
+                  style={{
+                    background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
                 >
                   Get Smart Pack
                 </button>
