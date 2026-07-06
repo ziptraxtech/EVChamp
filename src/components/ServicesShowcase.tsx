@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
 import mockupImg from '../assets/mockuo.png';
@@ -11,18 +11,7 @@ import tiagoevImg from '../assets/tiagoev.jpg';
 const ArrowButton: React.FC<{ onClick: (e: React.MouseEvent) => void }> = ({ onClick }) => (
   <button
     onClick={onClick}
-    className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-white transition-all duration-300 flex-shrink-0 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
-    style={{
-      '--hover-bg': 'linear-gradient(120deg, #0a8a52, #1257c4)',
-    } as React.CSSProperties}
-    onMouseEnter={(e) => {
-      (e.currentTarget as HTMLButtonElement).style.background = 'linear-gradient(120deg, #0a8a52, #1257c4)';
-      (e.currentTarget as HTMLButtonElement).style.borderColor = 'transparent';
-    }}
-    onMouseLeave={(e) => {
-      (e.currentTarget as HTMLButtonElement).style.background = 'white';
-      (e.currentTarget as HTMLButtonElement).style.borderColor = '#e5e7eb';
-    }}
+    className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 flex-shrink-0 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
     aria-label="View service details"
   >
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -73,7 +62,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
           onClick();
         }
       }}
-      className={`${bgGradient} rounded-xl p-5 flex flex-col justify-between cursor-pointer shadow-md border border-white/50 backdrop-blur-sm h-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 hover:shadow-xl hover:scale-105 hover:-translate-y-1 transition-all duration-300 active:shadow-lg active:scale-95`}
+      className={`${bgGradient} rounded-xl p-5 flex flex-col justify-between cursor-pointer shadow-md border border-white/50 h-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 hover:shadow-lg active:shadow-md`}
     >
       <div>
         <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1 leading-tight">
@@ -116,6 +105,15 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
 const ServicesShowcase: React.FC = () => {
   const navigate = useNavigate();
   const { isSignedIn } = useUser();
+
+  // Ensure component is immediately visible
+  useEffect(() => {
+    document.body.style.visibility = 'visible';
+    const section = document.getElementById('services-heading');
+    if (section) {
+      section.closest('section')?.style.setProperty('visibility', 'visible', 'important');
+    }
+  }, []);
 
   const protectedRoutes = [
     '/charging-network', '/service-centres', '/buy-plans', '/buy-used-ev',
@@ -225,8 +223,9 @@ const ServicesShowcase: React.FC = () => {
 
   return (
     <section 
-      className="py-16 sm:py-20 bg-gradient-to-b from-gray-50 to-white"
+      className="py-16 sm:py-20 bg-gradient-to-b from-gray-50 to-white w-full block"
       aria-labelledby="services-heading"
+      style={{ minHeight: '100vh', display: 'block', visibility: 'visible' }}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section with improved SEO and structure */}
@@ -279,7 +278,7 @@ const ServicesShowcase: React.FC = () => {
         </header>
 
         {/* Services Grid - Responsive Layout */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5" style={{ willChange: 'auto' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           {services.map((service) => (
             <ServiceCard
               key={`service-${service.title.toLowerCase().replace(/\s+/g, '-')}`}
@@ -312,7 +311,7 @@ const ServicesShowcase: React.FC = () => {
             </p>
             {/* One Time Trial - Grid Container */}
             <div className="flex justify-center mb-6">
-              <div className="relative rounded-2xl border-2 border-emerald-400 bg-gradient-to-br from-emerald-50 to-white p-6 hover:shadow-lg transition-all flex flex-col w-full max-w-sm">
+              <div className="relative rounded-2xl border-2 border-emerald-400 bg-gradient-to-br from-emerald-50 to-white p-6 flex flex-col w-full max-w-sm shadow-md">
                 <div className="absolute -top-3 right-4">
                   <span className="inline-block rounded-full bg-emerald-500 px-3 py-1 text-xs font-bold text-white shadow-md">
                     TRIAL
@@ -356,12 +355,10 @@ const ServicesShowcase: React.FC = () => {
                     navigate('/zeflash', { state: { plan: 'trial', tests: 1, months: 0, price: 200, openCheckout: true } });
                     window.scrollTo({ top: 0, behavior: 'auto' });
                   }}
-                  className="block w-full text-center rounded-lg text-white font-semibold px-4 py-2.5 transition-all shadow-sm"
+                  className="block w-full text-center rounded-lg text-white font-semibold px-4 py-2.5 shadow-sm"
                   style={{
                     background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
                 >
                   Start Trial
                 </button>
@@ -384,12 +381,10 @@ const ServicesShowcase: React.FC = () => {
                   }
                   window.scrollTo({ top: 0, behavior: 'auto' });
                 }}
-                className="text-white font-semibold px-8 py-3 rounded-lg transition-all duration-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
+                className="text-white font-semibold px-8 py-3 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
                 style={{
                   background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
-                onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
               >
                  Explore Annual Plans
               </button>
