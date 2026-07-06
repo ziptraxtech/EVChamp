@@ -61,54 +61,57 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   bgGradient, 
   badgeColor, 
   onClick,
-  features = []
-}) => (
-  <article
-    onClick={onClick}
-    role="button"
-    tabIndex={0}
-    onKeyPress={(e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        onClick();
-      }
-    }}
-    className={`${bgGradient} rounded-xl p-5 flex flex-col justify-between cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 border border-white/50 backdrop-blur-sm h-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2`}
-  >
-    <div>
-      <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1 leading-tight">
-        {title}
-      </h3>
-      <p className="font-semibold text-sm mb-2" style={{ color: badgeColor }}>
-        {subtitle}
-      </p>
-      <p className="text-gray-600 text-xs leading-relaxed mb-3">
-        {description}
-      </p>
-      {features.length > 0 && (
-        <ul className="text-gray-700 text-xs space-y-1 mb-3">
-          {features.map((feature, idx) => (
-            <li key={idx} className="flex items-start gap-2">
-              <span className="text-green-600 mt-0.5">✓</span>
-              <span>{feature}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-    <div className="flex items-end justify-between mt-4 gap-3">
-      <img 
-        src={image} 
-        alt={`${title} vehicle`} 
-        className="w-20 h-14 object-cover rounded-lg"
-        loading="lazy"
-      />
-      <ArrowButton onClick={(e) => { e.stopPropagation(); onClick(); }} />
-    </div>
-    <div className="mt-3">
-      <CheckBadge text={badge} colorClass={badgeColor} />
-    </div>
-  </article>
-);
+  features = [],
+}) => {
+  return (
+    <article
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyPress={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          onClick();
+        }
+      }}
+      className={`${bgGradient} rounded-xl p-5 flex flex-col justify-between cursor-pointer shadow-md border border-white/50 backdrop-blur-sm h-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 hover:shadow-xl hover:scale-105 hover:-translate-y-1 transition-all duration-300 active:shadow-lg active:scale-95`}
+    >
+      <div>
+        <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1 leading-tight">
+          {title}
+        </h3>
+        <p className="font-semibold text-sm mb-2" style={{ color: badgeColor }}>
+          {subtitle}
+        </p>
+        <p className="text-gray-600 text-xs leading-relaxed mb-3">
+          {description}
+        </p>
+        {features.length > 0 && (
+          <ul className="text-gray-700 text-xs space-y-1 mb-3">
+            {features.map((feature, idx) => (
+              <li key={idx} className="flex items-start gap-2">
+                <span className="text-green-600 mt-0.5">✓</span>
+                <span>{feature}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+      <div className="flex items-end justify-between mt-4 gap-3">
+        <img 
+          src={image} 
+          alt={`${title} vehicle`} 
+          className="w-20 h-14 object-cover rounded-lg"
+          loading="eager"
+          decoding="async"
+        />
+        <ArrowButton onClick={(e) => { e.stopPropagation(); onClick(); }} />
+      </div>
+      <div className="mt-3">
+        <CheckBadge text={badge} colorClass={badgeColor} />
+      </div>
+    </article>
+  );
+};
 
 const ServicesShowcase: React.FC = () => {
   const navigate = useNavigate();
@@ -276,8 +279,8 @@ const ServicesShowcase: React.FC = () => {
         </header>
 
         {/* Services Grid - Responsive Layout */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          {services.map((service, index) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5" style={{ willChange: 'auto' }}>
+          {services.map((service) => (
             <ServiceCard
               key={`service-${service.title.toLowerCase().replace(/\s+/g, '-')}`}
               title={service.title}
