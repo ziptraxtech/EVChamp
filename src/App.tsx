@@ -377,7 +377,7 @@ function App() {
           } />
           <Route path="/rent-ev" element={
             <ProtectedRoute>
-              <RentEV />
+              <BuyUsedEV />
             </ProtectedRoute>
           } />
           <Route path="/terms" element={<TermsOfUse />} />

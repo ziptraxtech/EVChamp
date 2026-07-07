@@ -176,15 +176,15 @@ const ServicesShowcase: React.FC = () => {
       route: '/buy-plans'
     },
     {
-      title: 'Rent an EV',
-      subtitle: '🚗 Flexible & affordable',
-      description: 'Rent electric vehicles by the day or month with zero fuel costs, zero emissions, and zero hassle.',
-      features: ['Hourly to monthly rentals', 'Insurance included', 'Free charging'],
+      title: 'Buy Used EV',
+      subtitle: '🚗 Certified pre-owned vehicles',
+      description: 'Browse certified pre-owned electric vehicles with complete vehicle history, warranty, and instant financing options.',
+      features: ['Vehicle history included', 'Certified pre-owned', 'Easy financing'],
       image: nexonImg,
-      badge: 'From ₹499/day',
+      badge: 'Verified quality & history',
       bgGradient: 'bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50',
       badgeColor: 'bg-teal-100 text-teal-700',
-      route: '/rent-ev'
+      route: '/buy-used-ev'
     },
     {
       title: 'RSA Plans',
