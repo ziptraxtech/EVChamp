@@ -34,8 +34,8 @@ const Header: React.FC = () => {
   const { isSignedIn, user } = useUser();
 
   const protectedRoutes = [
-    '/charging-network', '/service-centres', '/buy-plans', '/buy-used-ev',
-    '/rsa-plans', '/sell-ev', '/rent-ev', '/advance-analysis', '/delete-account',
+    '/charging-network', '/service-centres', '/buy-plans', '/sell-ev',
+    '/rsa-plans', '/rent-ev', '/advance-analysis', '/delete-account',
     '/ev-marketplace',
   ];
 
@@ -58,7 +58,7 @@ const Header: React.FC = () => {
     { label: 'Find EV Chargers', route: '/find-ev-chargers' },
     { label: 'Find EV Service Centres', route: '/service-centres' },
     { label: 'ZipsureAI & IOT Plans', route: '/buy-plans' },
-    { label: 'Buy Used EV', route: '/buy-used-ev' },
+    { label: 'Sell EV', route: '/sell-ev' },
     { label: 'Roadside Assistance', route: '/rsa-plans' },
     { label: 'Ze.Xperience', route: '/ze-xperience' },
     { label: 'Zeflash', route: '/zeflash' },

@@ -198,7 +198,7 @@ function HomePage() {
               <h3 className="text-lg font-bold text-gray-900 mb-2">For Individuals</h3>
               <p className="text-sm text-gray-600 leading-relaxed mb-4">Buy or sell EVs with confidence, access battery diagnostics, get help when needed, and discover nearby charging support.</p>
               <button 
-                onClick={() => goTo('/buy-used-ev')} 
+                onClick={() => goTo('/sell-ev')} 
                 className="text-sm font-medium transition-colors"
                 style={{
                   background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
@@ -375,11 +375,12 @@ function App() {
               <BuyPlans />
             </ProtectedRoute>
           } />
-          <Route path="/rent-ev" element={
+          {/* Disabled: /rent-ev route */}
+          {/* <Route path="/rent-ev" element={
             <ProtectedRoute>
               <BuyUsedEV />
             </ProtectedRoute>
-          } />
+          } /> */}
           <Route path="/terms" element={<TermsOfUse />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/refund" element={<RefundPolicy />} />
@@ -407,11 +408,12 @@ function App() {
               <AdvanceAnalysis />
             </ProtectedRoute>
           } />
-          <Route path="/buy-used-ev" element={
+          {/* Disabled: /buy-used-ev route */}
+          {/* <Route path="/buy-used-ev" element={
             <ProtectedRoute>
               <BuyUsedEV />
             </ProtectedRoute>
-          } />
+          } /> */}
           <Route path="/service-centres" element={
             <ProtectedRoute>
               <ServiceCentres />
