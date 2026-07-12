@@ -116,8 +116,8 @@ const ServicesShowcase: React.FC = () => {
   }, []);
 
   const protectedRoutes = [
-    '/charging-network', '/service-centres', '/buy-plans', '/sell-ev',
-    '/rsa-plans', '/rent-ev', '/advance-analysis',
+    '/charging-network', '/service-centres', '/buy-plans', '/buy-used-ev',
+    '/rsa-plans', '/sell-ev', '/rent-ev', '/advance-analysis',
   ];
 
   const goTo = (route: string) => {
@@ -176,15 +176,15 @@ const ServicesShowcase: React.FC = () => {
       route: '/buy-plans'
     },
     {
-      title: 'Sell EV',
-      subtitle: '🚗 Sell your electric vehicle',
-      description: 'List and sell your certified electric vehicle with complete vehicle history, warranty, and instant financing options.',
-      features: ['Vehicle history included', 'Certified evaluation', 'Easy process'],
+      title: 'Rent an EV',
+      subtitle: '🚗 Flexible & affordable',
+      description: 'Rent electric vehicles by the day or month with zero fuel costs, zero emissions, and zero hassle.',
+      features: ['Hourly to monthly rentals', 'Insurance included', 'Free charging'],
       image: nexonImg,
-      badge: 'Verified quality & history',
+      badge: 'From ₹499/day',
       bgGradient: 'bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50',
       badgeColor: 'bg-teal-100 text-teal-700',
-      route: '/sell-ev'
+      route: '/rent-ev'
     },
     {
       title: 'RSA Plans',

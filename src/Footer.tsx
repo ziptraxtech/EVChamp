@@ -30,10 +30,10 @@ const Footer: React.FC = () => {
 
               <li>
                 <a
-                  href="/sell-ev"
+                  href="/buy-used-ev"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
-                  Sell EV
+                  EV Marketplace
                 </a>
               </li>
 

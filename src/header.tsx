@@ -18,8 +18,8 @@ const Header: React.FC = () => (
       <a href="https://evchamp.in/plans" className="cta-gradient text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-green-500 to-green-700">
         Buy Plans
       </a>
-      <a href="/sell-ev" className="cta-gradient text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-blue-500 to-blue-700 ml-4">
-        Sell EV
+      <a href="/rent-ev" className="cta-gradient text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-blue-500 to-blue-700 ml-4">
+        Rent EV
       </a>
     </div>
   </header>
