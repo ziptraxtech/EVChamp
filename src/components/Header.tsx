@@ -58,7 +58,7 @@ const Header: React.FC = () => {
     { label: 'Find EV Chargers', route: '/find-ev-chargers' },
     { label: 'Find EV Service Centres', route: '/service-centres' },
     { label: 'ZipsureAI & IOT Plans', route: '/buy-plans' },
-    { label: 'Rent EV', route: '/rent-ev' },
+    { label: 'Sell Your EV', route: '/sell-ev' },
     { label: 'Roadside Assistance', route: '/rsa-plans' },
     { label: 'Ze.Xperience', route: '/ze-xperience' },
     { label: 'Zeflash', route: '/zeflash' },
