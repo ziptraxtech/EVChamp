@@ -164,27 +164,27 @@ const ServicesShowcase: React.FC = () => {
       badgeColor: 'bg-blue-100 text-blue-700',
       route: '/zeflash'
     },
+    // {
+    //   title: 'Smart EV Telematics',
+    //   subtitle: '📍 Real-time GPS & AI diagnostics',
+    //   description: 'India\'s most advanced IoT tracking and fleet management platform built for electric vehicles.',
+    //   features: ['Real-time tracking', 'AI diagnostics', 'Fleet management'],
+    //   image: mockupImg,
+    //   badge: 'Plans starting at ₹4,999/yr',
+    //   bgGradient: 'bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50',
+    //   badgeColor: 'bg-green-100 text-green-700',
+    //   route: '/buy-plans'
+    // },
     {
-      title: 'Smart EV Telematics',
-      subtitle: '📍 Real-time GPS & AI diagnostics',
-      description: 'India\'s most advanced IoT tracking and fleet management platform built for electric vehicles.',
-      features: ['Real-time tracking', 'AI diagnostics', 'Fleet management'],
-      image: mockupImg,
-      badge: 'Plans starting at ₹4,999/yr',
-      bgGradient: 'bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50',
-      badgeColor: 'bg-green-100 text-green-700',
-      route: '/buy-plans'
-    },
-    {
-      title: 'Rent an EV',
-      subtitle: '🚗 Flexible & affordable',
-      description: 'Rent electric vehicles by the day or month with zero fuel costs, zero emissions, and zero hassle.',
-      features: ['Hourly to monthly rentals', 'Insurance included', 'Free charging'],
+      title: 'Sell Your EV',
+      subtitle: '� Best price & fast verification',
+      description: 'List your electric vehicle and connect with thousands of genuine buyers instantly with zero commission.',
+      features: ['Zero commission fees', 'Instant verification', '1000+ monthly buyers'],
       image: nexonImg,
-      badge: 'From ₹499/day',
-      bgGradient: 'bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50',
-      badgeColor: 'bg-teal-100 text-teal-700',
-      route: '/rent-ev'
+      badge: 'Zero commission listing',
+      bgGradient: 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50',
+      badgeColor: 'bg-blue-100 text-blue-700',
+      route: '/sell-ev'
     },
     {
       title: 'RSA Plans',
@@ -196,17 +196,6 @@ const ServicesShowcase: React.FC = () => {
       bgGradient: 'bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50',
       badgeColor: 'bg-orange-100 text-orange-700',
       route: '/rsa-plans'
-    },
-    {
-      title: 'Sell Your EV',
-      subtitle: '💰 Best price & fast verification',
-      description: 'List your electric vehicle and connect with thousands of genuine buyers instantly with zero commission.',
-      features: ['Zero commission fees', 'Instant verification', '1000+ monthly buyers'],
-      image: nexonImg,
-      badge: 'Zero commission listing',
-      bgGradient: 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50',
-      badgeColor: 'bg-blue-100 text-blue-700',
-      route: '/sell-ev'
     },
     {
       title: 'ZipBattery',
@@ -277,22 +266,24 @@ const ServicesShowcase: React.FC = () => {
           </div>
         </header>
 
-        {/* Services Grid - Responsive Layout */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          {services.map((service) => (
-            <ServiceCard
-              key={`service-${service.title.toLowerCase().replace(/\s+/g, '-')}`}
-              title={service.title}
-              subtitle={service.subtitle}
-              description={service.description}
-              features={service.features}
-              image={service.image}
-              badge={service.badge}
-              bgGradient={service.bgGradient}
-              badgeColor={service.badgeColor}
-              onClick={() => goTo(service.route)}
-            />
-          ))}
+        {/* Services Grid - 3 Cards Per Row, Centered */}
+        <div className="flex justify-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
+            {services.map((service) => (
+              <ServiceCard
+                key={`service-${service.title.toLowerCase().replace(/\s+/g, '-')}`}
+                title={service.title}
+                subtitle={service.subtitle}
+                description={service.description}
+                features={service.features}
+                image={service.image}
+                badge={service.badge}
+                bgGradient={service.bgGradient}
+                badgeColor={service.badgeColor}
+                onClick={() => goTo(service.route)}
+              />
+            ))}
+          </div>
         </div>
 
         {/* CTA Section with improved messaging */}
@@ -323,7 +314,7 @@ const ServicesShowcase: React.FC = () => {
                 </div>
                 <div className="mb-6">
                   <div className="flex items-center gap-2">
-                    <span className="text-4xl font-extrabold text-emerald-700">₹200</span>
+                    <span className="text-4xl font-extrabold text-emerald-700">₹300</span>
                     <p className="text-xs text-gray-600"> -Valid for one time use only</p>
                   </div>
                 </div>
@@ -351,8 +342,8 @@ const ServicesShowcase: React.FC = () => {
                 </ul>
                 <button
                   onClick={() => {
-                    console.log('📋 Trial Plan Selected:', { plan: 'trial', tests: 1, months: 0, price: 200, amountInPaise: 20000 });
-                    navigate('/zeflash', { state: { plan: 'trial', tests: 1, months: 0, price: 200, openCheckout: true } });
+                    console.log('📋 Trial Plan Selected:', { plan: 'trial', tests: 1, months: 0, price: 300, amountInPaise: 30000, autoPay: true });
+                    navigate('/zeflash', { state: { plan: 'trial', tests: 1, months: 0, price: 300, openCheckout: true, autoPay: true } });
                     window.scrollTo({ top: 0, behavior: 'auto' });
                   }}
                   className="block w-full text-center rounded-lg text-white font-semibold px-4 py-2.5 shadow-sm"
