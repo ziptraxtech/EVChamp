@@ -768,6 +768,69 @@ function generateBatteryFromSerial(serialNumber) {
   };
 }
 
+// ============ OpenChargeMap Proxy ============
+// Public EV charger locations across India, layered on the /find-ev-chargers
+// map alongside EVChamp's own network (public/device_locations_api-stations.csv).
+// Fetched server-side so the API key stays secret and the browser isn't
+// subject to OpenChargeMap's anonymous rate limits. Cached in-memory for an
+// hour (per warm serverless instance) since charger locations rarely change.
+let ocmCache = { data: null, fetchedAt: 0 };
+const OCM_CACHE_TTL_MS = 60 * 60 * 1000;
+
+app.get('/api/ocm-chargers', async (req, res) => {
+  const now = Date.now();
+  if (ocmCache.data && (now - ocmCache.fetchedAt) < OCM_CACHE_TTL_MS) {
+    return res.json(ocmCache.data);
+  }
+  if (!process.env.OPENCHARGEMAP_API_KEY) {
+    console.warn('[ocm-chargers] OPENCHARGEMAP_API_KEY not set; skipping public charger layer');
+    return res.json({ stations: [], source: 'openchargemap', configured: false });
+  }
+  try {
+    const url = new URL('https://api.openchargemap.io/v3/poi/');
+    url.searchParams.set('output', 'json');
+    url.searchParams.set('countrycode', 'IN');
+    url.searchParams.set('maxresults', '3000');
+    url.searchParams.set('compact', 'true');
+    url.searchParams.set('verbose', 'false');
+    url.searchParams.set('key', process.env.OPENCHARGEMAP_API_KEY);
+
+    const response = await fetch(url.toString());
+    if (!response.ok) {
+      throw new Error(`OpenChargeMap responded ${response.status}`);
+    }
+    const raw = await response.json();
+    const stations = raw
+      .filter((poi) => poi.AddressInfo?.Latitude && poi.AddressInfo?.Longitude)
+      .map((poi) => ({
+        id: `ocm-${poi.ID}`,
+        name: poi.AddressInfo.Title || 'Charging Station',
+        address: poi.AddressInfo.AddressLine1 || '',
+        city: poi.AddressInfo.Town || '',
+        state: poi.AddressInfo.StateOrProvince || '',
+        lat: poi.AddressInfo.Latitude,
+        lng: poi.AddressInfo.Longitude,
+        operator: poi.OperatorInfo?.Title || 'Unknown Operator',
+        connections: (poi.Connections || []).map((c) => ({
+          type: c.ConnectionType?.Title || 'Unknown',
+          powerKW: c.PowerKW || null,
+          status: c.StatusType?.Title || 'Unknown',
+        })),
+        numPoints: poi.NumberOfPoints || (poi.Connections || []).length || 1,
+      }));
+
+    const payload = { stations, source: 'openchargemap', configured: true, fetchedAt: new Date().toISOString() };
+    ocmCache = { data: payload, fetchedAt: now };
+    res.json(payload);
+  } catch (err) {
+    console.error('[ocm-chargers] Fetch failed:', err.message);
+    if (ocmCache.data) {
+      return res.json(ocmCache.data); // Serve stale cache rather than failing hard
+    }
+    res.status(502).json({ error: 'Could not fetch OpenChargeMap data', stations: [] });
+  }
+});
+
 // ============ Battery API Routes ============
 
 app.get('/api/batteries/:serialNumber', (req, res) => {
