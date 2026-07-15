@@ -7,6 +7,9 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import L from 'leaflet';
 import 'leaflet-routing-machine';
+import MarkerClusterGroup from 'react-leaflet-cluster';
+import 'react-leaflet-cluster/dist/assets/MarkerCluster.css';
+import 'react-leaflet-cluster/dist/assets/MarkerCluster.Default.css';
 
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -15,6 +18,26 @@ L.Icon.Default.mergeOptions({
   iconUrl: require('leaflet/dist/images/marker-icon.png'),
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
+
+// Distinct pin for OpenChargeMap's public charger layer, so it's visually
+// separate from EVChamp's own network (default blue Leaflet pin).
+const OCM_COLOR = '#f59e0b';
+const ocmChargerIcon = L.divIcon({
+  className: '',
+  html: `<div style="width:20px;height:20px;background:${OCM_COLOR};border:2px solid #fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 1px 4px rgba(0,0,0,0.45);"></div>`,
+  iconSize: [20, 20],
+  iconAnchor: [10, 20],
+  popupAnchor: [0, -18],
+});
+
+const createOcmClusterIcon = (cluster: any) => {
+  const count = cluster.getChildCount();
+  return L.divIcon({
+    html: `<div style="background:${OCM_COLOR};color:#fff;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.35);">${count}</div>`,
+    className: '',
+    iconSize: L.point(34, 34, true),
+  });
+};
 
 // ── Routing control component (renders inside MapContainer) ──
 interface RoutingProps {
@@ -222,8 +245,28 @@ interface Station {
   stationStatus: string;
   evses: { id: string; status: string }[];
 }
+interface OcmConnection {
+  type: string;
+  powerKW: number | null;
+  status: string;
+}
+interface OcmStation {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  lat: number;
+  lng: number;
+  operator: string;
+  connections: OcmConnection[];
+  numPoints: number;
+}
+
+// Accepts either Station or OcmStation (and combined arrays of both) — only
+// lat/lng are needed to compute map bounds.
 interface FitMapToStationsProps {
-  stations: Station[];
+  stations: { lat: number; lng: number }[];
 }
 
 const FitMapToStations: React.FC<FitMapToStationsProps> = ({
@@ -283,8 +326,22 @@ const FindEVChargers: React.FC = () => {
   const navigate = useNavigate();
   const [stations, setStations] = useState<Station[]>([]);
   const [loading, setLoading] = useState(true);
+  const [ocmStations, setOcmStations] = useState<OcmStation[]>([]);
   const mapRef = useRef<any>(null);
   const [routeDestination, setRouteDestination] = useState<[number, number] | null>(null);
+
+  useEffect(() => {
+    // Public chargers (OpenChargeMap) are an extra layer on top of EVChamp's
+    // own network — fail silently if the proxy/API key isn't configured.
+    fetch('/api/ocm-chargers')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data?.stations)) {
+          setOcmStations(data.stations);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const parseCsvLine = (line: string) => {
@@ -411,47 +468,103 @@ const FindEVChargers: React.FC = () => {
                 ref={mapRef}
               >
                 <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Charger data &copy; <a href="https://openchargemap.org">Open Charge Map</a> contributors'
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                <FitMapToStations stations={stations} />
+                <FitMapToStations stations={[...stations, ...ocmStations]} />
                 <RoutingControl
                   destination={routeDestination}
                   onClear={() => setRouteDestination(null)}
                 />
-                {stations.map((station, idx) => (
-                  <Marker key={idx} position={[station.lat, station.lng]}>
-                    <Popup>
-                      <div style={{ minWidth: 180 }}>
-                        <strong style={{ fontSize: 13 }}>{station.name}</strong><br />
-                        {station.address && <span style={{ fontSize: 11, color: '#555' }}>{station.address}<br /></span>}
-                        <span style={{ fontSize: 11, color: '#555' }}>
-                          {station.city && <>{station.city}, </>}{station.state}
-                        </span><br />
-                        <span style={{ color: station.stationStatus === 'Available' ? '#16a34a' : '#888', fontSize: 11, fontWeight: 600 }}>
-                          {station.stationStatus}
-                        </span>
-                        <span style={{ fontSize: 11, color: '#555', marginLeft: 8 }}>{station.evses.length} EVSE(s)</span>
-                        <br />
-                        <button
-                          onClick={() => setRouteDestination([station.lat, station.lng])}
-                          style={{
-                            marginTop: 8, width: '100%', background: '#22c55e', color: 'white',
-                            border: 'none', borderRadius: 6, padding: '6px 0', fontSize: 12,
-                            fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center',
-                            justifyContent: 'center', gap: 5,
-                          }}
-                        >
-                          ⚡ Get Directions
-                        </button>
-                      </div>
-                    </Popup>
-                  </Marker>
-                ))}
+                <MarkerClusterGroup chunkedLoading>
+                  {stations.map((station, idx) => (
+                    <Marker key={`evc-${idx}`} position={[station.lat, station.lng]}>
+                      <Popup>
+                        <div style={{ minWidth: 180 }}>
+                          <strong style={{ fontSize: 13 }}>{station.name}</strong><br />
+                          {station.address && <span style={{ fontSize: 11, color: '#555' }}>{station.address}<br /></span>}
+                          <span style={{ fontSize: 11, color: '#555' }}>
+                            {station.city && <>{station.city}, </>}{station.state}
+                          </span><br />
+                          <span style={{ color: station.stationStatus === 'Available' ? '#16a34a' : '#888', fontSize: 11, fontWeight: 600 }}>
+                            {station.stationStatus}
+                          </span>
+                          <span style={{ fontSize: 11, color: '#555', marginLeft: 8 }}>{station.evses.length} EVSE(s)</span>
+                          <br />
+                          <button
+                            onClick={() => setRouteDestination([station.lat, station.lng])}
+                            style={{
+                              marginTop: 8, width: '100%', background: '#22c55e', color: 'white',
+                              border: 'none', borderRadius: 6, padding: '6px 0', fontSize: 12,
+                              fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center',
+                              justifyContent: 'center', gap: 5,
+                            }}
+                          >
+                            ⚡ Get Directions
+                          </button>
+                        </div>
+                      </Popup>
+                    </Marker>
+                  ))}
+                </MarkerClusterGroup>
+                <MarkerClusterGroup chunkedLoading iconCreateFunction={createOcmClusterIcon}>
+                  {ocmStations.map((station) => (
+                    <Marker key={station.id} position={[station.lat, station.lng]} icon={ocmChargerIcon}>
+                      <Popup>
+                        <div style={{ minWidth: 190 }}>
+                          <strong style={{ fontSize: 13 }}>{station.name}</strong><br />
+                          {station.address && <span style={{ fontSize: 11, color: '#555' }}>{station.address}<br /></span>}
+                          <span style={{ fontSize: 11, color: '#555' }}>
+                            {station.city && <>{station.city}, </>}{station.state}
+                          </span><br />
+                          <span style={{ color: OCM_COLOR, fontSize: 11, fontWeight: 600 }}>
+                            Public Charger · {station.operator}
+                          </span>
+                          <span style={{ fontSize: 11, color: '#555', marginLeft: 8 }}>{station.numPoints} point(s)</span>
+                          {station.connections.length > 0 && (
+                            <>
+                              <br />
+                              <span style={{ fontSize: 11, color: '#555' }}>
+                                {station.connections.slice(0, 3).map((c, i) => (
+                                  <React.Fragment key={i}>
+                                    {i > 0 && ', '}{c.type}{c.powerKW ? ` (${c.powerKW}kW)` : ''}
+                                  </React.Fragment>
+                                ))}
+                              </span>
+                            </>
+                          )}
+                          <br />
+                          <button
+                            onClick={() => setRouteDestination([station.lat, station.lng])}
+                            style={{
+                              marginTop: 8, width: '100%', background: OCM_COLOR, color: 'white',
+                              border: 'none', borderRadius: 6, padding: '6px 0', fontSize: 12,
+                              fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center',
+                              justifyContent: 'center', gap: 5,
+                            }}
+                          >
+                            ⚡ Get Directions
+                          </button>
+                          <div style={{ fontSize: 9, color: '#999', marginTop: 4, textAlign: 'center' }}>via OpenChargeMap</div>
+                        </div>
+                      </Popup>
+                    </Marker>
+                  ))}
+                </MarkerClusterGroup>
               </MapContainer>
             </div>
           )}
-          <p className="text-center text-xs text-gray-400 mt-3">{stations.length} stations loaded across India &nbsp;·&nbsp; Click any pin → <strong>Get Directions</strong> to route from your location</p>
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1 mt-3 text-xs text-gray-500">
+            <span className="flex items-center gap-1.5">
+              <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#3388ff', display: 'inline-block' }} />
+              EVChamp Network ({stations.length})
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span style={{ width: 10, height: 10, borderRadius: '50%', background: OCM_COLOR, display: 'inline-block' }} />
+              Public Chargers via OpenChargeMap ({ocmStations.length})
+            </span>
+          </div>
+          <p className="text-center text-xs text-gray-400 mt-1">Click any pin → <strong>Get Directions</strong> to route from your location</p>
         </div>
       </section>
 
