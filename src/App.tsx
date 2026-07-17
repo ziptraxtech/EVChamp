@@ -422,11 +422,7 @@ function App() {
               <DeleteAccount />
             </ProtectedRoute>
           } />
-          <Route path="/rsa-plans" element={
-            <ProtectedRoute>
-              <RSAPlans />
-            </ProtectedRoute>
-          } />
+          <Route path="/rsa-plans" element={<RSAPlans />} />
           <Route path="/admin/notifications" element={<AdminNotificationPanel />} />
         </Routes>
 
