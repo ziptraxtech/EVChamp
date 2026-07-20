@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 // Load env from the project root (.env.local / .env) as well as server/.env, so
 // a single DATABASE_URL in the root .env.local is picked up regardless of cwd.
 require('dotenv').config({
@@ -58,67 +59,275 @@ app.get('/api/health', (req, res) => {
 });
 
 // ── OpenChargeMap proxy ──────────────────────────────────────────────────────
-// Public EV charger locations across India, layered on the /find-ev-chargers
-// map alongside EVChamp's own network (public/device_locations_api-stations.csv).
-// Fetched server-side so the API key stays secret and the browser isn't
-// subject to OpenChargeMap's anonymous rate limits. Cached in-memory for an
-// hour since charger locations rarely change.
+// Public EV charger locations, layered on the /find-ev-chargers map alongside
+// EVChamp's own network (public/device_locations_api-stations.csv). Fetched
+// server-side so the API key stays secret and the browser isn't subject to
+// OpenChargeMap's anonymous rate limits. Nationwide results are cached in
+// memory for an hour; location-scoped requests (from "Use my location") are
+// user-specific and infrequent, so they skip the cache.
 let ocmCache = { data: null, fetchedAt: 0 };
 const OCM_CACHE_TTL_MS = 60 * 60 * 1000;
 
-app.get('/api/ocm-chargers', async (req, res) => {
-  const now = Date.now();
-  if (ocmCache.data && (now - ocmCache.fetchedAt) < OCM_CACHE_TTL_MS) {
-    return res.json(ocmCache.data);
+// OCM's `compact=true` mode omits nested ConnectionType/CurrentType/StatusType
+// title objects (numeric IDs only), so we request compact=false instead — the
+// response is cached server-side, so the extra payload never reaches the
+// browser. connLabel/mapOcmPoi mirror the design handoff's resolution logic
+// (falls back to a PowerKW threshold when a title is still missing).
+function connLabel(c) {
+  const type = (c.ConnectionType && c.ConnectionType.Title) || (c.PowerKW >= 40 ? 'DC Fast' : 'AC Type 2');
+  const kw = c.PowerKW ? `${Math.round(c.PowerKW * 10) / 10} kW` : '';
+  const dc = c.CurrentType ? /DC/i.test(c.CurrentType.Title || '') : (c.PowerKW >= 40);
+  return { label: kw ? `${type} · ${kw}` : type, dc };
+}
+
+function mapOcmPoi(poi) {
+  const ai = poi.AddressInfo || {};
+  const conns = (poi.Connections || [])
+    .filter((c) => c.ConnectionType || c.PowerKW)
+    .map(connLabel);
+  const total = poi.NumberOfPoints || conns.length || 1;
+  // OCM has no reliable real-time occupancy; treat anything not explicitly
+  // marked non-operational as available (per design handoff guidance).
+  const status = (poi.StatusType && poi.StatusType.IsOperational === false) ? 'offline' : 'available';
+  const free = status === 'offline' ? 0 : total;
+  return {
+    id: `ocm-${poi.ID}`,
+    name: (poi.OperatorInfo && poi.OperatorInfo.Title) || ai.Title || 'Charging Station',
+    area: ai.AddressLine1 || ai.Title || '',
+    city: ai.Town || ai.StateOrProvince || '',
+    lat: ai.Latitude,
+    lng: ai.Longitude,
+    status,
+    free,
+    total,
+    cost: (poi.UsageCost && poi.UsageCost.trim()) ? poi.UsageCost.trim() : 'Tariff on site',
+    conns: conns.length ? conns : [{ label: 'Charging point', dc: false }],
+  };
+}
+
+async function fetchOcmStations({ lat, lng, radiusKm } = {}) {
+  const url = new URL('https://api.openchargemap.io/v3/poi/');
+  url.searchParams.set('output', 'json');
+  url.searchParams.set('countrycode', 'IN');
+  url.searchParams.set('maxresults', lat != null ? '500' : '3000');
+  url.searchParams.set('compact', 'false');
+  url.searchParams.set('verbose', 'false');
+  url.searchParams.set('key', process.env.OPENCHARGEMAP_API_KEY);
+  if (lat != null && lng != null) {
+    url.searchParams.set('latitude', String(lat));
+    url.searchParams.set('longitude', String(lng));
+    url.searchParams.set('distance', String(radiusKm || 50));
+    url.searchParams.set('distanceunit', 'KM');
   }
+  const response = await fetch(url.toString());
+  if (!response.ok) {
+    throw new Error(`OpenChargeMap responded ${response.status}`);
+  }
+  const raw = await response.json();
+  return raw
+    .filter((poi) => poi.AddressInfo?.Latitude && poi.AddressInfo?.Longitude)
+    .map(mapOcmPoi);
+}
+
+app.get('/api/ocm-chargers', async (req, res) => {
   if (!process.env.OPENCHARGEMAP_API_KEY) {
     console.warn('[ocm-chargers] OPENCHARGEMAP_API_KEY not set; skipping public charger layer');
     return res.json({ stations: [], source: 'openchargemap', configured: false });
   }
-  try {
-    const url = new URL('https://api.openchargemap.io/v3/poi/');
-    url.searchParams.set('output', 'json');
-    url.searchParams.set('countrycode', 'IN');
-    url.searchParams.set('maxresults', '3000');
-    url.searchParams.set('compact', 'true');
-    url.searchParams.set('verbose', 'false');
-    url.searchParams.set('key', process.env.OPENCHARGEMAP_API_KEY);
 
-    const response = await fetch(url.toString());
-    if (!response.ok) {
-      throw new Error(`OpenChargeMap responded ${response.status}`);
+  const { lat, lng, radiusKm } = req.query;
+  const isLocationScoped = lat !== undefined && lng !== undefined;
+
+  if (!isLocationScoped) {
+    const now = Date.now();
+    if (ocmCache.data && (now - ocmCache.fetchedAt) < OCM_CACHE_TTL_MS) {
+      return res.json(ocmCache.data);
     }
-    const raw = await response.json();
-    const stations = raw
-      .filter((poi) => poi.AddressInfo?.Latitude && poi.AddressInfo?.Longitude)
-      .map((poi) => ({
-        id: `ocm-${poi.ID}`,
-        name: poi.AddressInfo.Title || 'Charging Station',
-        address: poi.AddressInfo.AddressLine1 || '',
-        city: poi.AddressInfo.Town || '',
-        state: poi.AddressInfo.StateOrProvince || '',
-        lat: poi.AddressInfo.Latitude,
-        lng: poi.AddressInfo.Longitude,
-        operator: poi.OperatorInfo?.Title || 'Unknown Operator',
-        connections: (poi.Connections || []).map((c) => ({
-          type: c.ConnectionType?.Title || 'Unknown',
-          powerKW: c.PowerKW || null,
-          status: c.StatusType?.Title || 'Unknown',
-        })),
-        numPoints: poi.NumberOfPoints || (poi.Connections || []).length || 1,
-      }));
+  }
 
+  try {
+    const stations = await fetchOcmStations(
+      isLocationScoped ? { lat: Number(lat), lng: Number(lng), radiusKm: Number(radiusKm) || 50 } : {}
+    );
     const payload = { stations, source: 'openchargemap', configured: true, fetchedAt: new Date().toISOString() };
-    ocmCache = { data: payload, fetchedAt: now };
+    if (!isLocationScoped) {
+      ocmCache = { data: payload, fetchedAt: Date.now() };
+    }
     res.json(payload);
   } catch (err) {
     console.error('[ocm-chargers] Fetch failed:', err.message);
-    if (ocmCache.data) {
+    if (!isLocationScoped && ocmCache.data) {
       return res.json(ocmCache.data); // Serve stale cache rather than failing hard
     }
     res.status(502).json({ error: 'Could not fetch OpenChargeMap data', stations: [] });
   }
 });
+
+// ── EVChamp live charging status (charjkaro CMS) ─────────────────────────────
+// EVChamp's own network runs on charjkaro's CMS, whose `time_lapsed` endpoint
+// reports live OCPP telemetry for ONE evse_id+connector at a time — there is
+// no endpoint to list/discover all chargers. So we read EVChamp's own EVSE
+// IDs from the CSV export (public/device_locations_api-stations.csv) and poll
+// charjkaro per-ID to detect which are actively mid-session right now. When a
+// connector is idle, charjkaro returns a canned "no charging" message with no
+// data; when it's charging, it returns a raw MeterValues telemetry entry with
+// a `createdat` timestamp, so "charging now" is inferred from how recent that
+// timestamp is. Results are cached in memory and refreshed lazily (same TTL
+// pattern as the OCM cache above) so page views stay fast.
+const CHARJKARO_BASE = 'https://cms.charjkaro.in';
+const CHARJKARO_STATUS_TTL_MS = 5 * 60 * 1000; // how long cached results are served before a refresh
+const CHARJKARO_ACTIVE_WINDOW_MS = 10 * 60 * 1000; // telemetry newer than this = "charging now"
+const CHARJKARO_TOKEN_TTL_MS = 5 * 24 * 60 * 60 * 1000; // token is valid ~7 days; refresh a bit early
+const CHARJKARO_POLL_CONCURRENCY = 20; // simultaneous upstream calls per refresh
+const CSV_PATH = path.resolve(__dirname, '../public/device_locations_api-stations.csv');
+
+let charjkaroTokenCache = { token: null, fetchedAt: 0 };
+let charjkaroStatusCache = { data: {}, fetchedAt: 0, refreshing: false };
+
+// Mirrors the quoted-field CSV parsing used client-side in FindEVChargers.tsx.
+function parseCsvLine(line) {
+  const cols = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+      else inQuotes = !inQuotes;
+    } else if (ch === ',' && !inQuotes) { cols.push(current.trim()); current = ''; }
+    else current += ch;
+  }
+  cols.push(current.trim());
+  return cols;
+}
+
+function getCsvEvseIds() {
+  let text;
+  try {
+    text = fs.readFileSync(CSV_PATH, 'utf8');
+  } catch (err) {
+    console.error('[charjkaro] Could not read station CSV:', err.message);
+    return [];
+  }
+  const lines = text.replace(/\r/g, '').split('\n').filter((l) => l.trim());
+  if (lines.length <= 1) return [];
+  const headers = parseCsvLine(lines[0]);
+  const evseIdx = headers.indexOf('EVSE ID');
+  if (evseIdx === -1) return [];
+  const ids = new Set();
+  for (let i = 1; i < lines.length; i++) {
+    const id = parseCsvLine(lines[i])[evseIdx];
+    if (id) ids.add(id);
+  }
+  return Array.from(ids);
+}
+
+async function getCharjkaroToken() {
+  const now = Date.now();
+  if (charjkaroTokenCache.token && (now - charjkaroTokenCache.fetchedAt) < CHARJKARO_TOKEN_TTL_MS) {
+    return charjkaroTokenCache.token;
+  }
+  const res = await fetch(`${CHARJKARO_BASE}/admin/api/v1/zipbolt/token`);
+  if (!res.ok) throw new Error(`charjkaro token endpoint responded ${res.status}`);
+  const body = await res.json();
+  if (!body.token) throw new Error('charjkaro token missing in response');
+  charjkaroTokenCache = { token: body.token, fetchedAt: now };
+  return body.token;
+}
+
+// Infers connector type (AC vs DC) and instantaneous power from a charjkaro
+// MeterValues telemetry entry. charjkaro's API has no explicit connector-type
+// field, so this relies on a heuristic confirmed against live EVChamp
+// sessions: DC fast chargers talk to the vehicle's BMS (CCS/CHAdeMO) and
+// report a "SoC" (State of Charge) measurand, while AC sessions instead
+// report AC-only concepts like "Power.Factor"/"Power.Reactive.Import" and
+// never SoC. Returns { dc: null, approxKw: null } when telemetry is missing
+// or unrecognized, so callers can fall back to a generic label.
+function extractConnectorInfo(entry) {
+  const payload = Array.isArray(entry.payload) ? entry.payload : [];
+  const meterValueEntry = payload.find((p) => p.Key === 'meterValue');
+  const samples = meterValueEntry?.Value?.[0]?.[0]?.Value;
+  if (!Array.isArray(samples)) return { dc: null, approxKw: null };
+
+  const measurands = new Set();
+  let powerW = null;
+  for (const group of samples) {
+    const kv = {};
+    for (const pair of group) kv[pair.Key] = pair.Value;
+    if (kv.measurand) measurands.add(kv.measurand);
+    if (kv.measurand === 'Power.Active.Import' && kv.value != null) {
+      powerW = parseFloat(kv.value);
+    }
+  }
+  if (measurands.size === 0) return { dc: null, approxKw: null };
+  const dc = measurands.has('SoC');
+  const approxKw = Number.isFinite(powerW) ? Math.round((powerW / 1000) * 10) / 10 : null;
+  return { dc, approxKw };
+}
+
+async function fetchChargerLiveStatus(evseId, token) {
+  const url = `${CHARJKARO_BASE}/commands/secure/api/v1/get/charger/time_lapsed?role=Admin&operator=All&evse_id=${encodeURIComponent(evseId)}&connector_id=1&page=1&limit=1`;
+  const res = await fetch(url, { headers: { Authorization: `basic ${token}` } });
+  if (!res.ok) return null; // treat upstream errors as "unknown", not "busy"
+  const body = await res.json();
+  const entry = Array.isArray(body.data) ? body.data[0] : null;
+  if (!entry || !entry.createdat) return { charging: false, dc: null, approxKw: null };
+  const ageMs = Date.now() - new Date(entry.createdat).getTime();
+  const charging = ageMs >= 0 && ageMs < CHARJKARO_ACTIVE_WINDOW_MS;
+  const { dc, approxKw } = extractConnectorInfo(entry);
+  return { charging, lastSeen: entry.createdat, dc, approxKw };
+}
+
+async function refreshCharjkaroStatuses() {
+  if (charjkaroStatusCache.refreshing) return;
+  charjkaroStatusCache.refreshing = true;
+  try {
+    const token = await getCharjkaroToken();
+    const ids = getCsvEvseIds();
+    // Seed with the previous cache so a charger's last-known connector
+    // type/power survives once it goes idle (idle polls carry no telemetry).
+    const results = { ...charjkaroStatusCache.data };
+    for (let i = 0; i < ids.length; i += CHARJKARO_POLL_CONCURRENCY) {
+      const batch = ids.slice(i, i + CHARJKARO_POLL_CONCURRENCY);
+      const settled = await Promise.allSettled(batch.map((id) => fetchChargerLiveStatus(id, token)));
+      batch.forEach((id, idx) => {
+        const r = settled[idx];
+        if (r.status !== 'fulfilled' || !r.value) return;
+        const prev = results[id];
+        const fresh = r.value;
+        results[id] = {
+          charging: fresh.charging,
+          lastSeen: fresh.lastSeen ?? prev?.lastSeen ?? null,
+          dc: fresh.dc !== null ? fresh.dc : (prev?.dc ?? null),
+          approxKw: fresh.approxKw !== null ? fresh.approxKw : (prev?.approxKw ?? null),
+        };
+      });
+    }
+    charjkaroStatusCache = { data: results, fetchedAt: Date.now(), refreshing: false };
+  } catch (err) {
+    console.error('[charjkaro] Status refresh failed:', err.message);
+    charjkaroStatusCache.refreshing = false;
+  }
+}
+
+app.get('/api/evchamp-live-status', async (req, res) => {
+  const isStale = (Date.now() - charjkaroStatusCache.fetchedAt) > CHARJKARO_STATUS_TTL_MS;
+  if (isStale) {
+    await refreshCharjkaroStatuses();
+  }
+  res.json({
+    statuses: charjkaroStatusCache.data,
+    fetchedAt: charjkaroStatusCache.fetchedAt ? new Date(charjkaroStatusCache.fetchedAt).toISOString() : null,
+  });
+});
+
+// Local dev server is a long-running process, so it can also poll proactively
+// in the background — first-time visitors then get fresh data immediately
+// instead of waiting on the lazy refresh above. (Not used on Vercel, where
+// each serverless invocation is short-lived; there the lazy refresh above is
+// the only mechanism.)
+refreshCharjkaroStatuses();
+setInterval(refreshCharjkaroStatuses, CHARJKARO_STATUS_TTL_MS);
 
 // ── EV Marketplace ──────────────────────────────────────────────────────────
 // Test-drive booking (from the marketplace BookingModal)
