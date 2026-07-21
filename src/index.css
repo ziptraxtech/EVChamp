@@ -15,9 +15,23 @@
   z-index: 4 !important;
 }
 
-/* ── Hide leaflet-routing-machine instruction panel ── */
-.leaflet-routing-container {
-  display: none !important;
+/* ── EV Charger Finder map (src/components/FindEVChargers.tsx) ── */
+.ev-pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ev-cluster {
+  background: transparent;
+}
+.leaflet-popup-content {
+  margin: 0 !important;
+  width: 268px !important;
+}
+.leaflet-popup-content-wrapper {
+  padding: 0;
+  border-radius: 14px;
+  overflow: hidden;
 }
 
 /* ── Global mobile safety ── */

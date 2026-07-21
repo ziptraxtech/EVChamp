@@ -6,6 +6,10 @@
     "api/chat.py": {
       "includeFiles": "Chatbot2.0/app/**",
       "maxDuration": 60
+    },
+    "api/index.js": {
+      "includeFiles": "public/device_locations_api-stations.csv",
+      "maxDuration": 30
     }
   },
   "rewrites": [
@@ -79,6 +83,10 @@
     },
     {
       "source": "/api/ocm-chargers",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/api/evchamp-live-status",
       "destination": "/api/index.js"
     },
     {
