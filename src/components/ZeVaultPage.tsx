@@ -287,7 +287,7 @@ const ZeVaultPage: React.FC = () => {
                 <button
                   onClick={() => {
                     console.log('📋 Starter Plan Selected:', { plan: 'starter', tests: 6, months: 12, price: 1500, amountInPaise: 150000 });
-                    navigate('/checkout?plan=starter&tests=6&months=12&price=1500');
+                    navigate('/checkout?plan=starter&tests=6&months=12&price=1500', { replace: false });
                   }}
                   className="block w-full text-center rounded-lg text-white font-semibold px-4 py-2.5 shadow-md transition-all"
                   style={{
@@ -342,7 +342,7 @@ const ZeVaultPage: React.FC = () => {
                 <button
                   onClick={() => {
                     console.log('📋 Value Pack Plan Selected:', { plan: 'value', tests: 12, months: 12, price: 3000, amountInPaise: 300000 });
-                    navigate('/checkout?plan=value&tests=12&months=12&price=3000');
+                    navigate('/checkout?plan=value&tests=12&months=12&price=3000', { replace: false });
                   }}
                   className="block w-full text-center rounded-lg text-white font-semibold px-4 py-2.5 shadow-md transition-all"
                   style={{
@@ -403,7 +403,7 @@ const ZeVaultPage: React.FC = () => {
                 <button
                   onClick={() => {
                     console.log('📋 Smart Pack Plan Selected:', { plan: 'smart', tests: 24, months: 24, price: 6000, amountInPaise: 600000 });
-                    navigate('/checkout?plan=smart&tests=24&months=24&price=6000');
+                    navigate('/checkout?plan=smart&tests=24&months=24&price=6000', { replace: false });
                   }}
                   className="block w-full text-center rounded-lg text-white font-semibold px-4 py-2.5 shadow-md transition-all"
                   style={{

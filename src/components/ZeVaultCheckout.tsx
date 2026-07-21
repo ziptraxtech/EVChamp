@@ -22,6 +22,11 @@ const ZeVaultCheckout: React.FC = () => {
   const price = parseInt(searchParams.get('price') || '0');
 
   useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     // Redirect to sign-in if not authenticated
     if (!isSignedIn) {
       navigate('/sign-in', { replace: true });
@@ -214,13 +219,13 @@ const ZeVaultCheckout: React.FC = () => {
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-slate-400">GST (18%)</span>
-                <span className="text-white font-semibold">₹{paymentBreakdown?.gstAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="text-white font-semibold">₹{paymentBreakdown?.gstAmount % 1 === 0 ? Math.floor(paymentBreakdown.gstAmount).toLocaleString('en-IN') : paymentBreakdown?.gstAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
 
               <div className="border-t border-slate-700 pt-3 flex items-center justify-between">
                 <span className="font-semibold text-slate-100">Total Amount</span>
                 <span className="text-2xl font-bold text-yellow-300">
-                  ₹{paymentBreakdown?.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  ₹{paymentBreakdown?.totalAmount % 1 === 0 ? Math.floor(paymentBreakdown.totalAmount).toLocaleString('en-IN') : paymentBreakdown?.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
               
@@ -339,7 +344,7 @@ const ZeVaultCheckout: React.FC = () => {
                   <path d="M21 12a9 9 0 1 1-6.219-8.56" />
                 </svg>
               )}
-              <span>{loading ? 'Processing...' : `Pay ₹${paymentBreakdown?.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}</span>
+              <span>{loading ? 'Processing...' : `Pay ₹${paymentBreakdown?.totalAmount % 1 === 0 ? Math.floor(paymentBreakdown.totalAmount).toLocaleString('en-IN') : paymentBreakdown?.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}</span>
             </button>
 
             {/* Help Text */}
