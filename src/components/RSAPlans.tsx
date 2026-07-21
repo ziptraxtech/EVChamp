@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
 import razorpayService from '../services/razorpayService';
+import { getPaymentBreakdown } from '../utils/gstCalculator';
 
 interface RSAPlan {
   id: number;
@@ -177,10 +178,11 @@ const RSAPlans: React.FC = () => {
     if (!selectedPlan) return;
     setIsProcessing(true);
     try {
+      const breakdown = getPaymentBreakdown(selectedPlan.price);
       await razorpayService.initializePayment(
-        selectedPlan.price,
+        breakdown.totalAmount,
         `${selectedPlan.provider} RSA Plan: ${selectedPlan.name}`,
-        `Roadside Assistance - ${selectedPlan.name} (${selectedPlan.duration})`,
+        `Roadside Assistance - ${selectedPlan.name} (${selectedPlan.duration}) | Base: ₹${breakdown.baseAmount} + GST (18%): ₹${breakdown.gstAmount} = Total: ₹${breakdown.totalAmount}`,
         user.primaryEmailAddress?.emailAddress || undefined,
         user.firstName || user.username || undefined
       );
@@ -611,8 +613,7 @@ const RSAPlans: React.FC = () => {
                         : 'bg-gradient-to-r from-orange-500 to-red-600'
                     }`}>₹{plan.price.toLocaleString()}</span>
                     <span className="text-gray-600 text-sm font-semibold">/ {plan.duration}</span>
-                  </div>
-                  <p className="text-xs text-gray-600 font-medium">Per vehicle · GST included</p>
+                  </div>                 
                 </div>
 
                 <p className="text-sm text-gray-700 mb-6 pb-6 border-b border-gray-200">
@@ -802,6 +803,31 @@ const RSAPlans: React.FC = () => {
                   : 'bg-gradient-to-r from-orange-500 to-red-600'
               }`}>₹{selectedPlan.price.toLocaleString()}</div>
             </div>
+            
+            {/* GST Breakdown in Order Summary */}
+            <div className={`mb-6 p-4 rounded-xl border-l-4 space-y-2 text-sm ${
+              selectedPlan.provider === 'ReadyAssist'
+                ? 'bg-yellow-50 border-yellow-400'
+                : 'bg-orange-50 border-orange-400'
+            }`}>
+              <div className="flex justify-between">
+                <span className="text-gray-700 font-medium">Base Amount</span>
+                <span className="font-semibold text-gray-900">₹{getPaymentBreakdown(selectedPlan.price).baseAmount.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-700 font-medium">GST (18%)</span>
+                <span className="font-semibold text-gray-900">+ ₹{getPaymentBreakdown(selectedPlan.price).gstAmount.toLocaleString()}</span>
+              </div>
+              <div className={`flex justify-between pt-2 border-t-2 font-bold ${
+                selectedPlan.provider === 'ReadyAssist'
+                  ? 'border-yellow-200 text-yellow-700'
+                  : 'border-orange-200 text-orange-700'
+              }`}>
+                <span>Total (Inc. GST)</span>
+                <span>₹{getPaymentBreakdown(selectedPlan.price).totalAmount.toLocaleString()}</span>
+              </div>
+            </div>
+
             <button
               onClick={handleOrderClick}
               className={`w-full font-bold text-lg px-10 py-4 rounded-2xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 active:scale-95 text-white ${
@@ -844,6 +870,38 @@ const RSAPlans: React.FC = () => {
                   ? 'bg-gradient-to-r from-yellow-600 to-amber-600'
                   : 'bg-gradient-to-r from-orange-600 to-red-600'
               }`}>₹{selectedPlan.price.toLocaleString()} / {selectedPlan.duration}</p>
+              
+              {/* GST Breakdown */}
+              <div className={`mt-5 pt-5 border-t-2 space-y-2 ${
+                selectedPlan.provider === 'ReadyAssist'
+                  ? 'border-yellow-300'
+                  : 'border-orange-300'
+              }`}>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-700 font-medium">Base Amount</span>
+                  <span className="font-semibold text-gray-900">₹{getPaymentBreakdown(selectedPlan.price).baseAmount.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-700 font-medium">GST (18%)</span>
+                  <span className="font-semibold text-gray-900">+ ₹{getPaymentBreakdown(selectedPlan.price).gstAmount.toLocaleString()}</span>
+                </div>
+                <div className={`flex justify-between text-base pt-3 border-t-2 ${
+                  selectedPlan.provider === 'ReadyAssist'
+                    ? 'border-yellow-300'
+                    : 'border-orange-300'
+                }`}>
+                  <span className={`font-bold ${
+                    selectedPlan.provider === 'ReadyAssist'
+                      ? 'text-yellow-700'
+                      : 'text-orange-700'
+                  }`}>Total Amount (After GST)</span>
+                  <span className={`font-black text-lg ${
+                    selectedPlan.provider === 'ReadyAssist'
+                      ? 'text-yellow-600'
+                      : 'text-orange-600'
+                  }`}>₹{getPaymentBreakdown(selectedPlan.price).totalAmount.toLocaleString()}</span>
+                </div>
+              </div>
             </div>
             <form className="space-y-5">
               <div>
@@ -902,7 +960,7 @@ const RSAPlans: React.FC = () => {
                     Processing Payment...
                   </span>
                 ) : (
-                  `Pay ₹${selectedPlan.price.toLocaleString()}`
+                  `Pay ₹${getPaymentBreakdown(selectedPlan.price).totalAmount.toLocaleString()}`
                 )}
               </button>
             </form>

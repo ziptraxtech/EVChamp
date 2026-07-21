@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth, useUser } from '@clerk/clerk-react';
 import razorpayServiceInstance from '../services/razorpayService';
+import { getPaymentBreakdown } from '../utils/gstCalculator';
 
 const ZeVaultCheckout: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -12,6 +13,7 @@ const ZeVaultCheckout: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [planDetails, setPlanDetails] = useState<any>(null);
+  const [paymentBreakdown, setPaymentBreakdown] = useState<any>(null);
 
   // Extract params
   const plan = searchParams.get('plan');
@@ -42,6 +44,7 @@ const ZeVaultCheckout: React.FC = () => {
     };
 
     setPlanDetails(planData);
+    setPaymentBreakdown(getPaymentBreakdown(price));
   }, [isSignedIn, plan, tests, months, price, navigate]);
 
   const getPlanName = (planId: string) => {
@@ -62,7 +65,7 @@ const ZeVaultCheckout: React.FC = () => {
   };
 
   const handlePayment = async () => {
-    if (!planDetails || !user?.primaryEmailAddress?.emailAddress) {
+    if (!planDetails || !paymentBreakdown || !user?.primaryEmailAddress?.emailAddress) {
       setError('Unable to process payment. Missing required information.');
       return;
     }
@@ -76,15 +79,17 @@ const ZeVaultCheckout: React.FC = () => {
         planName: planDetails.planName,
         tests: planDetails.tests,
         months: planDetails.months,
-        priceInRupees: planDetails.price,
-        priceInPaise: planDetails.price * 100,
+        basePrice: planDetails.price,
+        gstAmount: paymentBreakdown.gstAmount,
+        totalWithGST: paymentBreakdown.totalAmount,
+        totalInPaise: Math.round(paymentBreakdown.totalAmount * 100),
         description: planDetails.description,
         user: user.primaryEmailAddress.emailAddress,
       });
 
-      // Initialize Razorpay payment
+      // Initialize Razorpay payment with GST-inclusive amount
       await razorpayServiceInstance.initializePayment(
-        planDetails.price, // Amount in INR
+        paymentBreakdown.totalAmount, // Amount in INR (including GST)
         planDetails.planName,
         planDetails.description,
         user.primaryEmailAddress.emailAddress,
@@ -208,23 +213,19 @@ const ZeVaultCheckout: React.FC = () => {
                 <span className="text-white font-semibold">₹{planDetails.price.toLocaleString('en-IN')}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-400">Processing Fee</span>
-                <span className="text-white font-semibold">₹0</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-400">Taxes (GST)</span>
-                <span className="text-white font-semibold">Included</span>
+                <span className="text-slate-400">GST (18%)</span>
+                <span className="text-white font-semibold">₹{paymentBreakdown?.gstAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
 
               <div className="border-t border-slate-700 pt-3 flex items-center justify-between">
                 <span className="font-semibold text-slate-100">Total Amount</span>
                 <span className="text-2xl font-bold text-yellow-300">
-                  ₹{planDetails.price.toLocaleString('en-IN')}
+                  ₹{paymentBreakdown?.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
               
               <div className="border-t border-slate-700 pt-3">
-                <p className="text-xs text-slate-500">Amount in Paise: <span className="text-slate-300 font-mono">{(planDetails.price * 100).toLocaleString('en-IN')}</span></p>
+                <p className="text-xs text-slate-500">Amount in Paise: <span className="text-slate-300 font-mono">{Math.round(paymentBreakdown?.totalAmount * 100).toLocaleString('en-IN')}</span></p>
               </div>
             </div>
 
@@ -338,7 +339,7 @@ const ZeVaultCheckout: React.FC = () => {
                   <path d="M21 12a9 9 0 1 1-6.219-8.56" />
                 </svg>
               )}
-              <span>{loading ? 'Processing...' : `Pay ₹${planDetails.price.toLocaleString('en-IN')}`}</span>
+              <span>{loading ? 'Processing...' : `Pay ₹${paymentBreakdown?.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}</span>
             </button>
 
             {/* Help Text */}

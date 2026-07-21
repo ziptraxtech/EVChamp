@@ -1,11 +1,12 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "EVChamp",
+  "name": "EVChamp - AI & IoT-driven EV Fleet Management Platform",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "evchamp_icon.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "logo192.png",
