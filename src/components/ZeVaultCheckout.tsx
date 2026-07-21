@@ -228,10 +228,6 @@ const ZeVaultCheckout: React.FC = () => {
                   ₹{paymentBreakdown?.totalAmount % 1 === 0 ? Math.floor(paymentBreakdown.totalAmount).toLocaleString('en-IN') : paymentBreakdown?.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
-              
-              <div className="border-t border-slate-700 pt-3">
-                <p className="text-xs text-slate-500">Amount in Paise: <span className="text-slate-300 font-mono">{Math.round(paymentBreakdown?.totalAmount * 100).toLocaleString('en-IN')}</span></p>
-              </div>
             </div>
 
             {/* Benefits */}

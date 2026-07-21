@@ -134,46 +134,17 @@ const ZeVaultPage: React.FC = () => {
         </section>
 
         {/* How it works */}
-        <section className="grid gap-4 sm:grid-cols-2">
-          <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-5 sm:p-6">
-            <div className="flex items-center gap-2 mb-3">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-300"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
-              <h2 className="text-base sm:text-lg font-semibold text-white">How ZeVault works</h2>
-            </div>
-            <ul className="mt-2 space-y-2 text-sm text-slate-200">
-              <li>• Add money via Razorpay — your balance appears instantly.</li>
-              <li>• Use balance for any EVChamp service without re-entering payment details.</li>
-              <li>• One wallet, every service — diagnostics, RSA, rentals, and more.</li>
-              <li>• All transactions are tracked and visible in your Razorpay receipt.</li>
-            </ul>
+        <section className="rounded-2xl border border-slate-800 bg-slate-950/70 p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-3">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-300"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
+            <h2 className="text-base sm:text-lg font-semibold text-white">How ZeVault works</h2>
           </div>
-          <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-5 sm:p-6">
-            <div className="flex items-center gap-2 mb-3">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-              <h2 className="text-base sm:text-lg font-semibold text-white">Service pricing</h2>
-            </div>
-            <ul className="mt-2 space-y-2 text-sm text-slate-200">
-              <li>• EV Battery Diagnostic — <span className="text-yellow-300 font-semibold">₹299</span></li>
-              <li>• RSA (Roadside Assistance) — <span className="text-yellow-300 font-semibold">₹199</span></li>
-              <li>• Rental EV — <span className="text-yellow-300 font-semibold">per booking</span></li>
-              <li>• More services coming soon.</li>
-            </ul>
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section className="rounded-2xl border border-slate-800 bg-slate-950/80 p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-base sm:text-lg font-semibold text-white mb-1">Top up and start using services</h2>
-            <p className="text-sm text-slate-400">Add money to ZeVault once and pay seamlessly across all EVChamp services.</p>
-          </div>
-          <button onClick={() => {
-            const pricingSection = document.getElementById('pricing-section');
-            pricingSection?.scrollIntoView({ behavior: 'smooth' });
-          }} className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-gradient-to-r from-red-500 to-orange-600 text-white text-sm font-semibold px-4 py-3 hover:from-red-600 hover:to-orange-700 shadow-lg shadow-cyan-500/40">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-            Add Money Now
-          </button>
+          <ul className="mt-2 space-y-2 text-sm text-slate-200">
+            <li>• Add money via Razorpay — your balance appears instantly.</li>
+            <li>• Use balance for any EVChamp service without re-entering payment details.</li>
+            <li>• One wallet, every service — diagnostics, RSA, rentals, and more.</li>
+            <li>• All transactions are tracked and visible in your Razorpay receipt.</li>
+          </ul>
         </section>
           
         {/* Pricing Section */}
