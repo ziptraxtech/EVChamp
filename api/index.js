@@ -778,8 +778,18 @@ function generateBatteryFromSerial(serialNumber) {
 // memory for an hour (per warm serverless instance); location-scoped requests
 // (from "Use my location") are user-specific and infrequent, so they skip the
 // cache.
-let ocmCache = { data: null, fetchedAt: 0 };
+const ocmCacheByRegion = new Map();
 const OCM_CACHE_TTL_MS = 60 * 60 * 1000;
+
+// Country codes per region — GCC/SEA counts confirmed live against OCM's public
+// API (Indonesia's ~2k is the largest single-country count seen, comfortably
+// under the maxresults=3000 per-country cap below).
+const REGION_COUNTRY_CODES = {
+  IN: ['IN'],
+  GCC: ['AE', 'SA', 'QA', 'OM', 'KW', 'BH'],
+  SEA: ['MY', 'TH', 'ID', 'VN', 'PH', 'SG'],
+};
+const DEFAULT_REGION = 'IN';
 
 // OCM's `compact=true` mode omits nested ConnectionType/CurrentType/StatusType
 // title objects (numeric IDs only), so we request compact=false instead — the
@@ -818,25 +828,49 @@ function mapOcmPoi(poi) {
   };
 }
 
-async function fetchOcmStations({ lat, lng, radiusKm } = {}) {
-  const url = new URL('https://api.openchargemap.io/v3/poi/');
-  url.searchParams.set('output', 'json');
-  url.searchParams.set('countrycode', 'IN');
-  url.searchParams.set('maxresults', lat != null ? '500' : '3000');
-  url.searchParams.set('compact', 'false');
-  url.searchParams.set('verbose', 'false');
-  url.searchParams.set('key', process.env.OPENCHARGEMAP_API_KEY);
-  if (lat != null && lng != null) {
-    url.searchParams.set('latitude', String(lat));
-    url.searchParams.set('longitude', String(lng));
-    url.searchParams.set('distance', String(radiusKm || 50));
-    url.searchParams.set('distanceunit', 'KM');
-  }
-  const response = await fetch(url.toString());
-  if (!response.ok) {
-    throw new Error(`OpenChargeMap responded ${response.status}`);
-  }
-  const raw = await response.json();
+async function fetchOcmStations({ lat, lng, radiusKm, region } = {}) {
+  const isLocationScoped = lat != null && lng != null;
+  // A region can span multiple countries, and OCM's `countrycode` param only
+  // accepts one code per request — for a nationwide/region snapshot we fetch
+  // once per country code and merge. For "Use my location" we drop the
+  // country filter entirely: the user's real coordinates + radius are a
+  // better filter than a country boundary (also sidesteps border edge-cases).
+  const countryCodes = isLocationScoped ? [null] : (REGION_COUNTRY_CODES[region] || REGION_COUNTRY_CODES[DEFAULT_REGION]);
+  const maxresults = isLocationScoped ? '500' : '3000';
+
+  const fetchOne = async (countrycode) => {
+    const url = new URL('https://api.openchargemap.io/v3/poi/');
+    url.searchParams.set('output', 'json');
+    if (countrycode) url.searchParams.set('countrycode', countrycode);
+    url.searchParams.set('maxresults', maxresults);
+    url.searchParams.set('compact', 'false');
+    url.searchParams.set('verbose', 'false');
+    url.searchParams.set('key', process.env.OPENCHARGEMAP_API_KEY);
+    if (isLocationScoped) {
+      url.searchParams.set('latitude', String(lat));
+      url.searchParams.set('longitude', String(lng));
+      url.searchParams.set('distance', String(radiusKm || 50));
+      url.searchParams.set('distanceunit', 'KM');
+    }
+    const response = await fetch(url.toString());
+    if (!response.ok) {
+      throw new Error(`OpenChargeMap responded ${response.status}`);
+    }
+    return response.json();
+  };
+
+  // allSettled, not all: one bad country code in a multi-country region
+  // shouldn't blank the whole region's results.
+  const settled = await Promise.allSettled(countryCodes.map(fetchOne));
+  const seen = new Set();
+  const raw = settled
+    .filter((r) => r.status === 'fulfilled')
+    .flatMap((r) => r.value)
+    .filter((poi) => {
+      if (seen.has(poi.ID)) return false;
+      seen.add(poi.ID);
+      return true;
+    });
   return raw
     .filter((poi) => poi.AddressInfo?.Latitude && poi.AddressInfo?.Longitude)
     .map(mapOcmPoi);
@@ -849,28 +883,30 @@ app.get('/api/ocm-chargers', async (req, res) => {
   }
 
   const { lat, lng, radiusKm } = req.query;
+  const region = REGION_COUNTRY_CODES[req.query.region] ? req.query.region : DEFAULT_REGION;
   const isLocationScoped = lat !== undefined && lng !== undefined;
 
   if (!isLocationScoped) {
-    const now = Date.now();
-    if (ocmCache.data && (now - ocmCache.fetchedAt) < OCM_CACHE_TTL_MS) {
-      return res.json(ocmCache.data);
+    const cached = ocmCacheByRegion.get(region);
+    if (cached && (Date.now() - cached.fetchedAt) < OCM_CACHE_TTL_MS) {
+      return res.json(cached.data);
     }
   }
 
   try {
     const stations = await fetchOcmStations(
-      isLocationScoped ? { lat: Number(lat), lng: Number(lng), radiusKm: Number(radiusKm) || 50 } : {}
+      isLocationScoped ? { lat: Number(lat), lng: Number(lng), radiusKm: Number(radiusKm) || 50 } : { region }
     );
-    const payload = { stations, source: 'openchargemap', configured: true, fetchedAt: new Date().toISOString() };
+    const payload = { stations, source: 'openchargemap', configured: true, region, fetchedAt: new Date().toISOString() };
     if (!isLocationScoped) {
-      ocmCache = { data: payload, fetchedAt: Date.now() };
+      ocmCacheByRegion.set(region, { data: payload, fetchedAt: Date.now() });
     }
     res.json(payload);
   } catch (err) {
     console.error('[ocm-chargers] Fetch failed:', err.message);
-    if (!isLocationScoped && ocmCache.data) {
-      return res.json(ocmCache.data); // Serve stale cache rather than failing hard
+    if (!isLocationScoped) {
+      const cached = ocmCacheByRegion.get(region);
+      if (cached) return res.json(cached.data); // Serve stale cache rather than failing hard
     }
     res.status(502).json({ error: 'Could not fetch OpenChargeMap data', stations: [] });
   }

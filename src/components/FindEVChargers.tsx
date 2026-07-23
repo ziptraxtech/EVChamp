@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useDeferredValue } from 'react';
+import { createPortal } from 'react-dom';
 import { Helmet } from 'react-helmet-async';
 import Footer from '../Footer';
 import { MapContainer, TileLayer, Marker, Popup, CircleMarker, Tooltip, useMap } from 'react-leaflet';
@@ -7,6 +8,7 @@ import L from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'react-leaflet-cluster/dist/assets/MarkerCluster.css';
 import 'react-leaflet-cluster/dist/assets/MarkerCluster.Default.css';
+import { REGIONS, DEFAULT_REGION, type RegionId } from '../config/regions';
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -39,9 +41,6 @@ interface Station {
   cost: string;
   conns: StationConn[];
 }
-
-const INDIA_CENTER: [number, number] = [20.5937, 78.9629];
-const INDIA_DEFAULT_ZOOM = 5;
 
 // ── Theme tokens (light / dark) ───────────────────────────────────────────
 interface ThemeTokens {
@@ -147,9 +146,9 @@ function buildClusterIconFactory(tokens: ThemeTokens) {
 
 // ── Rich popup content ────────────────────────────────────────────────────
 const STATUS_LABELS: Record<StationStatus, string> = { available: 'Available', busy: 'Busy', offline: 'Offline' };
+const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
-const StationPopup: React.FC<{ station: Station; tokens: ThemeTokens }> = ({ station, tokens }) => {
-  const dirs = `https://www.google.com/maps/dir/?api=1&destination=${station.lat},${station.lng}`;
+const StationPopup: React.FC<{ station: Station; tokens: ThemeTokens; onPreview: () => void }> = ({ station, tokens, onPreview }) => {
   const openInMaps = `https://www.google.com/maps/search/?api=1&query=${station.lat},${station.lng}`;
   const pillColors: Record<StationStatus, [string, string]> = {
     available: [tokens.pillAvailBg, tokens.pillAvailText],
@@ -198,22 +197,18 @@ const StationPopup: React.FC<{ station: Station; tokens: ThemeTokens }> = ({ sta
         ))}
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginTop: 14 }}>
-        <a
-          href={dirs}
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          onClick={onPreview}
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', background: tokens.accentBtn,
             color: tokens.accentBtnText, borderRadius: 9, padding: '10px 14px', fontSize: 13.5, fontWeight: 800,
-            textDecoration: 'none',
+            border: 'none', cursor: 'pointer', fontFamily: "'Manrope', sans-serif",
           }}
         >
           Get directions in Google Maps
-        </a>
+        </button>
         <a
           href={openInMaps}
-          target="_blank"
-          rel="noopener noreferrer"
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: tokens.accent, fontSize: 13, fontWeight: 700, textDecoration: 'none' }}
         >
           Open location in Google Maps ↗
@@ -223,8 +218,148 @@ const StationPopup: React.FC<{ station: Station; tokens: ThemeTokens }> = ({ sta
   );
 };
 
+// ── In-page directions preview modal ──────────────────────────────────────
+// Shows an embedded Google Maps preview before committing to leave the page.
+// Uses Maps Embed API "directions" mode (a real driving route) once an origin
+// is known — from the page's existing "Use my location" state, or requested
+// fresh on open — and falls back to "place" mode (just a pin, no route) if
+// geolocation isn't available/granted. Rendered via portal so it escapes
+// Leaflet's popup stacking context and sits above the whole app.
+const DirectionsModal: React.FC<{
+  station: Station;
+  tokens: ThemeTokens;
+  userLocation: { lat: number; lng: number } | null;
+  onClose: () => void;
+}> = ({ station, tokens, userLocation, onClose }) => {
+  const dirs = `https://www.google.com/maps/dir/?api=1&destination=${station.lat},${station.lng}`;
+  const openInMaps = `https://www.google.com/maps/search/?api=1&query=${station.lat},${station.lng}`;
+
+  const [origin, setOrigin] = useState(userLocation);
+  const [locating, setLocating] = useState(false);
+  const [locateFailed, setLocateFailed] = useState(false);
+
+  useEffect(() => {
+    if (origin || !navigator.geolocation) return;
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setOrigin({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setLocating(false);
+      },
+      () => {
+        setLocateFailed(true);
+        setLocating(false);
+      },
+      { timeout: 8000 }
+    );
+    // Only ever attempt this once per modal open — `origin` is intentionally
+    // excluded so a successful fetch doesn't retrigger the effect.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const embedSrc = origin
+    ? `https://www.google.com/maps/embed/v1/directions?key=${GOOGLE_MAPS_API_KEY}&origin=${origin.lat},${origin.lng}&destination=${station.lat},${station.lng}&mode=driving`
+    : `https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_API_KEY}&q=${station.lat},${station.lng}&zoom=15`;
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [onClose]);
+
+  return createPortal(
+    <div
+      style={{
+        position: 'fixed', inset: 0, zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: 20, background: 'rgba(9,9,11,0.6)', backdropFilter: 'blur(4px)',
+      }}
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: '100%', maxWidth: 480, background: tokens.surface, borderRadius: 16,
+          border: `1px solid ${tokens.border}`, boxShadow: '0 24px 60px rgba(0,0,0,0.4)', overflow: 'hidden',
+          fontFamily: "'Manrope', sans-serif",
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10, padding: '16px 16px 0' }}>
+          <div style={{ fontSize: 15.5, fontWeight: 800, color: tokens.text, lineHeight: 1.3 }}>{station.name}</div>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, flexShrink: 0,
+              background: tokens.chipBg, color: tokens.sub, border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 15,
+            }}
+          >
+            ✕
+          </button>
+        </div>
+        <div style={{ fontSize: 12.5, fontWeight: 500, color: tokens.sub, padding: '3px 16px 0' }}>
+          {station.area}{station.area && station.city ? ', ' : ''}{station.city}
+        </div>
+        {locating && (
+          <div style={{ fontSize: 12, fontWeight: 600, color: tokens.accent, padding: '6px 16px 0' }}>
+            Locating you for turn-by-turn directions…
+          </div>
+        )}
+        {locateFailed && (
+          <div style={{ fontSize: 12, fontWeight: 600, color: tokens.sub, padding: '6px 16px 0' }}>
+            Showing location only — enable location access for a driving route preview.
+          </div>
+        )}
+
+        {GOOGLE_MAPS_API_KEY ? (
+          <iframe
+            title={origin ? `Directions preview — ${station.name}` : `Map preview — ${station.name}`}
+            width="100%"
+            height="260"
+            style={{ border: 0, display: 'block', marginTop: 14 }}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            src={embedSrc}
+          />
+        ) : (
+          <div style={{ height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', color: tokens.muted, fontSize: 13, fontWeight: 600, marginTop: 14 }}>
+            Map preview unavailable
+          </div>
+        )}
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 7, padding: 16 }}>
+          <a
+            href={dirs}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', background: tokens.accentBtn,
+              color: tokens.accentBtnText, borderRadius: 9, padding: '10px 14px', fontSize: 13.5, fontWeight: 800,
+              textDecoration: 'none',
+            }}
+          >
+            Get directions in Google Maps
+          </a>
+          <a
+            href={openInMaps}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: tokens.accent, fontSize: 13, fontWeight: 700, textDecoration: 'none' }}
+          >
+            Open location in Google Maps ↗
+          </a>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+};
+
 // ── Map lifecycle helper (runs inside MapContainer) ───────────────────────
-const MapViewController: React.FC<{ userLocation: { lat: number; lng: number } | null }> = ({ userLocation }) => {
+const MapViewController: React.FC<{
+  userLocation: { lat: number; lng: number } | null;
+  regionCenter: [number, number];
+  regionZoom: number;
+}> = ({ userLocation, regionCenter, regionZoom }) => {
   const map = useMap();
 
   // Drop Leaflet's own "Leaflet" flag-credit prefix from the attribution bar —
@@ -232,6 +367,14 @@ const MapViewController: React.FC<{ userLocation: { lat: number; lng: number } |
   useEffect(() => {
     map.attributionControl?.setPrefix(false);
   }, [map]);
+
+  // MapContainer's center/zoom props are only read once at mount by
+  // react-leaflet, so switching regions has to go through setView — kept as
+  // its own effect (independent from the userLocation one below) so a region
+  // switch always recenters even if a stale userLocation lingers.
+  useEffect(() => {
+    map.setView(regionCenter, regionZoom, { animate: true });
+  }, [regionCenter, regionZoom, map]);
 
   useEffect(() => {
     if (userLocation) {
@@ -331,6 +474,8 @@ const FindEVChargers: React.FC = () => {
 
   const [csvGroups, setCsvGroups] = useState<CsvGroup[]>([]);
   const [ocmStations, setOcmStations] = useState<Station[]>([]);
+  const [regionId, setRegionId] = useState<RegionId>(DEFAULT_REGION);
+  const currentRegion = useMemo(() => REGIONS.find((r) => r.id === regionId) ?? REGIONS[0], [regionId]);
   // Live per-EVSE telemetry from EVChamp's charjkaro CMS — used to infer real
   // AC/DC connector type + power for EVChamp's own network, since the CSV
   // export itself has no connector-type column (see extractConnectorInfo on
@@ -458,9 +603,10 @@ const FindEVChargers: React.FC = () => {
   }), [csvGroups, liveStatus]);
 
   useEffect(() => {
-    // Nationwide OpenChargeMap listing, proxied server-side (cached ~1hr) so
-    // the API key stays secret and we're not subject to anonymous rate limits.
-    fetch('/api/ocm-chargers')
+    // Regional OpenChargeMap listing, proxied server-side (cached ~1hr per
+    // region) so the API key stays secret and we're not subject to anonymous
+    // rate limits. Re-runs whenever the selected region changes.
+    fetch(`/api/ocm-chargers?region=${regionId}`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data?.stations)) {
@@ -469,12 +615,15 @@ const FindEVChargers: React.FC = () => {
         }
       })
       .catch(() => {});
-  }, []);
+  }, [regionId]);
 
   // "Use my location"
   const [locating, setLocating] = useState(false);
   const [located, setLocated] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+
+  // Station whose directions preview modal is open (null = closed)
+  const [previewStation, setPreviewStation] = useState<Station | null>(null);
 
   const handleLocateMe = () => {
     if (!navigator.geolocation) return;
@@ -487,6 +636,9 @@ const FindEVChargers: React.FC = () => {
         setLocating(false);
         // Refetch OCM scoped to the user's location so nearby public
         // chargers outside the cached nationwide snapshot also show up.
+        // Location-scoped requests drop the country/region filter entirely
+        // on the backend (lat/lng + radius is a better filter than a
+        // country boundary), so no `region` param is needed here.
         fetch(`/api/ocm-chargers?lat=${lat}&lng=${lng}&radiusKm=50`)
           .then((res) => res.json())
           .then((data) => {
@@ -508,7 +660,25 @@ const FindEVChargers: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
 
-  const allStations = useMemo(() => [...csvStations, ...ocmStations], [csvStations, ocmStations]);
+  // Region switch resets search/filters (stale text or an out-of-region
+  // location pin would look broken when browsing a different region) and
+  // always deterministically recenters the map to the new region.
+  const handleRegionChange = (id: RegionId) => {
+    if (id === regionId) return;
+    setRegionId(id);
+    setQuery('');
+    setStatusFilter('all');
+    setTypeFilter('all');
+    setUserLocation(null);
+    setLocated(false);
+  };
+
+  // EVChamp's own network (CSV) is India-only — only include it for regions
+  // that have EVChamp coverage; other regions show OpenChargeMap data only.
+  const allStations = useMemo(
+    () => (currentRegion.hasEvchampNetwork ? [...csvStations, ...ocmStations] : ocmStations),
+    [csvStations, ocmStations, currentRegion]
+  );
 
   const filteredStations = useMemo(() => {
     const q = deferredQuery.trim().toLowerCase();
@@ -547,13 +717,91 @@ const FindEVChargers: React.FC = () => {
         <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       </Helmet>
 
+      {/* Announcement bar — mirrors the Ze.Xperience F77 announcement strip style.
+          Rendered outside the padded page wrapper below so it's truly full-bleed
+          edge-to-edge, matching Ze.Xperience (whose bar sits outside its padded
+          content too), rather than inheriting the page's horizontal padding. */}
+      <style>{`
+        @keyframes evc-announce-pulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.4; transform: scale(0.72); }
+        }
+        @keyframes evc-marquee {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+      `}</style>
+      <div
+        style={{
+          width: '100%',
+          display: 'flex',
+          flexWrap: 'nowrap',
+          alignItems: 'center',
+          overflow: 'hidden',
+          padding: mobile ? '9px 0' : '9px 0',
+          color: '#ffffff',
+          background: 'linear-gradient(100deg, #13267a, #1f4fd0 60%, #2a6fe0)',
+          boxShadow: 'inset 0 -1px 0 rgba(0,0,0,0.12)',
+          fontFamily: "'Manrope', sans-serif",
+        }}
+      >
+        {/* Always a flowing ticker, on every screen size — the combined
+            message + pill + CPO line is long enough that no single-line
+            width can hold it, so it flows instead of wrapping. Two identical
+            copies back to back + translateX(-50%) is the standard
+            seamless-loop marquee trick: each copy (incl. its own trailing
+            margin) is exactly half the track's width, so the loop point
+            shows no jump. */}
+        <div style={{ display: 'flex', width: 'max-content', animation: 'evc-marquee 26s linear infinite' }}>
+          {[0, 1].map((i) => (
+            <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 10, whiteSpace: 'nowrap', marginRight: 36, paddingLeft: 16 }}>
+              <span
+                style={{
+                  width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
+                  background: 'rgba(255,255,255,0.92)', boxShadow: '0 0 0 3px rgba(255,255,255,0.25)',
+                  animation: 'evc-announce-pulse 2.2s ease-in-out infinite',
+                }}
+              />
+              <span style={{ opacity: 0.95, fontSize: mobile ? 12.5 : 13.5, fontWeight: 700, letterSpacing: '0.2px' }}>
+                EVChamp-Pay coming soon for fast and secure payment with just a QR code — using credit cards or UPI.
+              </span>
+              <span
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap',
+                  borderRadius: 999, border: '1px solid rgba(130,190,240,0.35)',
+                  background: 'linear-gradient(180deg, rgba(50,95,145,0.95) 0%, rgba(12,30,52,0.95) 100%)',
+                  boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.28), inset 0 -8px 14px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.35)',
+                  color: '#bfe3ff', padding: '5px 16px', fontSize: mobile ? 12 : 12.5, fontWeight: 700,
+                }}
+              >
+                <span aria-hidden style={{ fontSize: 12 }}>✦</span> Launching Soon
+              </span>
+              <span aria-hidden style={{ opacity: 0.5 }}>•</span>
+              <span style={{ opacity: 0.95, fontSize: mobile ? 12.5 : 13.5, fontWeight: 700, letterSpacing: '0.2px' }}>
+                CPOs — contact us to list your charger locations and register for EVChamp-Pay.
+              </span>
+              <a
+                href="/contact"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap',
+                  borderRadius: 20, background: '#ffffff', color: '#1f4fd0',
+                  padding: '4px 13px', fontSize: mobile ? 12 : 12.5, fontWeight: 800, textDecoration: 'none',
+                }}
+              >
+                Contact us <span aria-hidden>›</span>
+              </a>
+            </span>
+          ))}
+        </div>
+      </div>
+
       <div
         style={{
           minHeight: '100vh',
           background: tokens.bg,
           fontFamily: "'Manrope', sans-serif",
           color: tokens.text,
-          padding: mobile ? '20px 16px 40px' : tablet ? '28px 24px 48px' : '40px 32px 56px',
+          padding: mobile ? '16px 16px 40px' : tablet ? '20px 24px 48px' : '24px 32px 56px',
           transition: 'background .25s, color .25s',
         }}
       >
@@ -576,6 +824,11 @@ const FindEVChargers: React.FC = () => {
                   {filteredStations.length} of {allStations.length} stations
                 </span>
               </h1>
+              {!currentRegion.hasEvchampNetwork && (
+                <div style={{ fontSize: 12.5, fontWeight: 600, color: tokens.sub, marginTop: 4 }}>
+                  Showing public OpenChargeMap listings only — EVChamp's own network isn't live in this region yet.
+                </div>
+              )}
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
@@ -617,11 +870,20 @@ const FindEVChargers: React.FC = () => {
             </div>
           </div>
 
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 14, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: tokens.sub, marginRight: 4 }}>Region:</span>
+            {REGIONS.map((r) => (
+              <button key={r.id} onClick={() => handleRegionChange(r.id)} style={chipStyle(regionId === r.id, tokens)}>
+                {r.label}
+              </button>
+            ))}
+          </div>
+
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center', marginBottom: 16 }}>
             <div
               style={{
                 display: 'flex', alignItems: 'center', gap: 10, background: tokens.surface, border: `1px solid ${tokens.border}`,
-                borderRadius: 10, padding: '9px 14px', width: mobile ? '100%' : 260, flex: mobile ? '1 1 100%' : '0 0 auto',
+                borderRadius: 10, padding: '9px 14px', width: mobile ? '100%' : 'calc(40ch + 64px)', flex: mobile ? '1 1 100%' : '0 0 auto',
                 boxSizing: 'border-box',
               }}
             >
@@ -632,7 +894,7 @@ const FindEVChargers: React.FC = () => {
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search city or station…"
+                placeholder="Search country, city or charger company…"
                 style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none', color: tokens.text, fontFamily: "'Manrope', sans-serif", fontSize: 16, fontWeight: 500 }}
               />
             </div>
@@ -671,13 +933,13 @@ const FindEVChargers: React.FC = () => {
               boxShadow: tokens.dark ? '0 24px 60px rgba(0,0,0,0.5)' : '0 20px 50px rgba(15,33,51,0.14)',
             }}
           >
-            <MapContainer center={INDIA_CENTER} zoom={INDIA_DEFAULT_ZOOM} style={{ height: '100%', width: '100%' }}>
+            <MapContainer center={REGIONS[0].center} zoom={REGIONS[0].zoom} style={{ height: '100%', width: '100%' }}>
               <TileLayer
                 key={tokens.dark ? 'dark-tiles' : 'light-tiles'}
                 url={tokens.tiles}
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a> | Charger data &copy; <a href="https://openchargemap.org">Open Charge Map</a> contributors'
               />
-              <MapViewController userLocation={userLocation} />
+              <MapViewController userLocation={userLocation} regionCenter={currentRegion.center} regionZoom={currentRegion.zoom} />
               <MarkerClusterGroup
                 key={clusterKey}
                 showCoverageOnHover={false}
@@ -692,7 +954,7 @@ const FindEVChargers: React.FC = () => {
                 {filteredStations.map((st) => (
                   <Marker key={st.id} position={[st.lat, st.lng]} icon={pinIcons[st.status]}>
                     <Popup minWidth={268} maxWidth={268} closeButton>
-                      <StationPopup station={st} tokens={tokens} />
+                      <StationPopup station={st} tokens={tokens} onPreview={() => setPreviewStation(st)} />
                     </Popup>
                   </Marker>
                 ))}
@@ -730,8 +992,98 @@ const FindEVChargers: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* Below-map info section — creative recap of what makes this map worth trusting */}
+          <div style={{ marginTop: 32 }}>
+            <div style={{ textAlign: 'center', marginBottom: 20 }}>
+              <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: '2.5px', color: tokens.accent }}>
+                WHY EVCHAMP
+              </span>
+              <h2 style={{ fontSize: mobile ? 18 : 22, fontWeight: 800, margin: '8px 0 6px', color: tokens.text, letterSpacing: '-0.4px' }}>
+                More than pins on a map.
+              </h2>
+              <p style={{ fontSize: 13.5, fontWeight: 500, color: tokens.sub, maxWidth: 560, margin: '0 auto', lineHeight: 1.6 }}>
+                Every charger here is live data, not a static listing — so what you see is what you'll actually find when you arrive.
+              </p>
+            </div>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: mobile ? '1fr' : tablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+                gap: 14,
+              }}
+            >
+              {[
+                {
+                  title: 'Live, not static',
+                  desc: "Pins update from real charger telemetry — green means genuinely free right now, not just listed.",
+                  icon: (
+                    <path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" />
+                  ),
+                },
+                {
+                  title: 'One tap to arrive',
+                  desc: 'Every station opens straight into Google Maps for turn-by-turn directions — no copy-pasting addresses.',
+                  icon: (
+                    <>
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M16.2 7.8l-2.1 6.3-6.3 2.1 2.1-6.3z" />
+                    </>
+                  ),
+                },
+                {
+                  title: 'Filter your way',
+                  desc: 'Narrow down by availability or connector type — DC fast for a quick top-up, AC for an overnight charge.',
+                  icon: (
+                    <>
+                      <path d="M4 6h16M4 12h16M4 18h16" />
+                      <circle cx="9" cy="6" r="1.6" fill={tokens.accent} stroke="none" />
+                      <circle cx="16" cy="12" r="1.6" fill={tokens.accent} stroke="none" />
+                      <circle cx="10" cy="18" r="1.6" fill={tokens.accent} stroke="none" />
+                    </>
+                  ),
+                },
+                {
+                  title: 'Three regions and growing',
+                  desc: "From India to the Gulf and Southeast Asia — we're mapping the charging world one plug at a time.",
+                  icon: (
+                    <>
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="M3 12h18M12 3c2.5 2.5 3.8 5.7 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.7-3.8-9s1.3-6.5 3.8-9z" />
+                    </>
+                  ),
+                },
+              ].map((card) => (
+                <div
+                  key={card.title}
+                  style={{
+                    background: tokens.surface, border: `1px solid ${tokens.border}`, borderRadius: 14,
+                    padding: '18px 16px', transition: 'transform .2s, box-shadow .2s',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 34, height: 34, borderRadius: 10, background: tokens.chipBg,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12,
+                    }}
+                  >
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={tokens.accent} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                      {card.icon}
+                    </svg>
+                  </div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: tokens.text, marginBottom: 4 }}>{card.title}</div>
+                  <div style={{ fontSize: 12.5, fontWeight: 500, color: tokens.sub, lineHeight: 1.55 }}>{card.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
+
+      {previewStation && (
+        <DirectionsModal station={previewStation} tokens={tokens} userLocation={userLocation} onClose={() => setPreviewStation(null)} />
+      )}
 
       <Footer />
     </>

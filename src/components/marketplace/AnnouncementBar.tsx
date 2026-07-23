@@ -19,7 +19,7 @@ export default function AnnouncementBar() {
           <Tag size={11} strokeWidth={2.4} />
         </span>
         {/* lead text — hidden on the smallest screens to keep the bar one line */}
-        <span className="hidden opacity-95 sm:inline">June EV offers are live</span>
+        <span className="hidden opacity-95 sm:inline">July EV offers are live</span>
         <b className="font-display font-extrabold">Benefits up to {fmtMoney(total, cur)}</b>
       </span>
       {/* full pill on desktop */}
