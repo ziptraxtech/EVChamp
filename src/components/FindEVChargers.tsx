@@ -9,6 +9,7 @@ import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'react-leaflet-cluster/dist/assets/MarkerCluster.css';
 import 'react-leaflet-cluster/dist/assets/MarkerCluster.Default.css';
 import { REGIONS, DEFAULT_REGION, type RegionId } from '../config/regions';
+import { Geolocation } from '@capacitor/geolocation';
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -239,19 +240,17 @@ const DirectionsModal: React.FC<{
   const [locateFailed, setLocateFailed] = useState(false);
 
   useEffect(() => {
-    if (origin || !navigator.geolocation) return;
+    if (origin) return;
     setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
+    Geolocation.getCurrentPosition({ timeout: 8000 })
+      .then((pos) => {
         setOrigin({ lat: pos.coords.latitude, lng: pos.coords.longitude });
         setLocating(false);
-      },
-      () => {
+      })
+      .catch(() => {
         setLocateFailed(true);
         setLocating(false);
-      },
-      { timeout: 8000 }
-    );
+      });
     // Only ever attempt this once per modal open — `origin` is intentionally
     // excluded so a successful fetch doesn't retrigger the effect.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -626,10 +625,9 @@ const FindEVChargers: React.FC = () => {
   const [previewStation, setPreviewStation] = useState<Station | null>(null);
 
   const handleLocateMe = () => {
-    if (!navigator.geolocation) return;
     setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
+    Geolocation.getCurrentPosition({ timeout: 8000 })
+      .then((pos) => {
         const { latitude: lat, longitude: lng } = pos.coords;
         setUserLocation({ lat, lng });
         setLocated(true);
@@ -648,10 +646,8 @@ const FindEVChargers: React.FC = () => {
             }
           })
           .catch(() => {});
-      },
-      () => setLocating(false),
-      { timeout: 8000 }
-    );
+      })
+      .catch(() => setLocating(false));
   };
 
   // Search + filters
