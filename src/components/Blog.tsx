@@ -151,12 +151,12 @@ const articleSections: ArticleSection[] = [
         ],
       },
       {
-        title: '6. ZipBattery – AI-Powered Battery Health Management',
+        title: '6. EVTruLife – AI-Powered Battery Health Management',
         paragraphs: [
-          'ZipBattery is another innovative service offered through EV Champ. It helps EV owners understand battery performance, degradation, and long-term health.',
+          'EVTruLife is another innovative service offered through EV Champ. It helps EV owners understand battery performance, degradation, and long-term health.',
           'The battery accounts for a significant portion of an EV\'s total cost. Monitoring battery health helps owners avoid expensive replacements, improve performance, increase resale value, and extend battery lifespan.',
-          'ZipBattery empowers EV owners with data-driven battery management using patented AI technology. The system continuously monitors battery performance and predicts battery degradation patterns before they become critical issues. This proactive approach improves battery lifespan significantly and extends the overall value of the vehicle.',
-          'ZipBattery generates detailed health reports that provide owners with comprehensive understanding of their battery\'s condition, performance metrics, and longevity predictions. By leveraging advanced analytics and machine learning, ZipBattery enables EV owners to make informed decisions about vehicle maintenance and future usage patterns.',
+          'EVTruLife empowers EV owners with data-driven battery management using patented AI technology. The system continuously monitors battery performance and predicts battery degradation patterns before they become critical issues. This proactive approach improves battery lifespan significantly and extends the overall value of the vehicle.',
+          'EVTruLife generates detailed health reports that provide owners with comprehensive understanding of their battery\'s condition, performance metrics, and longevity predictions. By leveraging advanced analytics and machine learning, EVTruLife enables EV owners to make informed decisions about vehicle maintenance and future usage patterns.',
         ],
       },
     ],
@@ -214,7 +214,7 @@ const Blog: React.FC = () => {
         />
         <meta
           name="keywords"
-          content="EV Champ, EV Service App India, EV fleet management platform, EV service centres, battery diagnostics, Zeflash, ZipBattery, EV roadside assistance, electric vehicle support India"
+          content="EV Champ, EV Service App India, EV fleet management platform, EV service centres, battery diagnostics, Zeflash, EVTruLife, EV roadside assistance, electric vehicle support India"
         />
       </Helmet>
 
@@ -310,7 +310,7 @@ const Blog: React.FC = () => {
                   onClick={() => handleScroll('service-6')}
                   className="bg-gradient-to-br from-yellow-50 to-green-50 border border-yellow-200 rounded-xl p-5 cursor-pointer hover:shadow-lg transition-all hover:scale-105 transform"
                 >
-                  <h3 className="font-bold text-gray-900 mb-2">ZipBattery – AI-Powered Battery Health Management</h3>
+                  <h3 className="font-bold text-gray-900 mb-2">EVTruLife – AI-Powered Battery Health Management</h3>
                   <p className="text-sm text-gray-600 mb-3">Monitor battery performance, predict degradation, and extend vehicle lifespan with AI insights.</p>
                   <span className="text-green-600 font-semibold text-sm">Read full content →</span>
                 </div>

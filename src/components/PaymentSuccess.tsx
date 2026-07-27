@@ -1,12 +1,96 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useUser, useAuth } from '@clerk/clerk-react';
+import autopayManager from '../utils/autopayManager';
 
 const PaymentSuccess: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { user } = useUser();
+  const { getToken } = useAuth();
+  const [autopayStatus, setAutopayStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [autopayError, setAutopayError] = useState<string | null>(null);
   
   const paymentId = searchParams.get('razorpay_payment_id');
   const orderId = searchParams.get('razorpay_order_id');
+
+  // Setup autopay after payment success
+  useEffect(() => {
+    const setupAutopay = async () => {
+      try {
+        // Get auth token from Clerk
+        const token = await getToken();
+        if (!token) {
+          console.log('⚠️ Clerk token not available, skipping autopay setup');
+          return;
+        }
+
+        // Set the token in autopayManager
+        autopayManager.setAuthToken(token);
+
+        // Get pending autopay setup from session storage
+        const pendingSetup = sessionStorage.getItem('pendingAutopaySetup');
+        if (!pendingSetup || !user?.id) {
+          return;
+        }
+
+        const setupData = JSON.parse(pendingSetup);
+        setAutopayStatus('loading');
+
+        // Record coupon usage AFTER payment success
+        if (setupData.coupon) {
+          try {
+            await fetch('/api/coupons/record-usage', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                userId: user.id,
+                planId: setupData.planId,
+                couponCode: setupData.coupon.code,
+                discountAmount: setupData.coupon.discountAmount,
+                originalPrice: setupData.coupon.originalPrice,
+                finalPrice: setupData.coupon.finalPrice,
+              }),
+            });
+            console.log('✅ Coupon usage recorded for user:', user.id);
+          } catch (err) {
+            console.warn('⚠️ Could not record coupon usage:', err);
+            // Don't fail the whole process if coupon recording fails
+          }
+        }
+
+        // Create autopay subscription
+        const result = await autopayManager.createAutopaySubscription(
+          user.id,
+          setupData.planId,
+          setupData.planName,
+          setupData.planDetails
+        );
+
+        if (result.success) {
+          console.log('✅ Autopay subscription created:', result.subscriptionId);
+          setAutopayStatus('success');
+          // Clear session storage
+          sessionStorage.removeItem('pendingAutopaySetup');
+        } else {
+          console.error('❌ Failed to create autopay:', result.error);
+          setAutopayStatus('error');
+          setAutopayError(result.error || 'Failed to setup autopay');
+        }
+      } catch (err: any) {
+        console.error('❌ Error setting up autopay:', err);
+        setAutopayStatus('error');
+        setAutopayError(err.message || 'An error occurred');
+      }
+    };
+
+    if (paymentId && orderId) {
+      setupAutopay();
+    }
+  }, [paymentId, orderId, user?.id, getToken]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center py-12">
@@ -46,6 +130,54 @@ const PaymentSuccess: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* Autopay Status */}
+          {autopayStatus !== 'idle' && (
+            <div className={`rounded-xl p-4 mb-8 ${
+              autopayStatus === 'success'
+                ? 'border border-green-200 bg-green-50'
+                : autopayStatus === 'loading'
+                ? 'border border-blue-200 bg-blue-50'
+                : 'border border-red-200 bg-red-50'
+            }`}>
+              <div className="flex items-start gap-3">
+                {autopayStatus === 'loading' && (
+                  <>
+                    <svg className="animate-spin h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    <div>
+                      <h3 className="font-semibold text-blue-900">Setting up Autopay...</h3>
+                      <p className="text-sm text-blue-700">Your automatic renewal subscription is being created</p>
+                    </div>
+                  </>
+                )}
+                {autopayStatus === 'success' && (
+                  <>
+                    <svg className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <h3 className="font-semibold text-green-900">Autopay Enabled!</h3>
+                      <p className="text-sm text-green-700">Your plan will automatically renew before expiration</p>
+                    </div>
+                  </>
+                )}
+                {autopayStatus === 'error' && (
+                  <>
+                    <svg className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <h3 className="font-semibold text-red-900">Autopay Setup Failed</h3>
+                      <p className="text-sm text-red-700">{autopayError || 'We couldn\'t setup autopay, but your payment was successful'}</p>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Next Steps */}
           <div className="mb-8">

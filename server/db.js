@@ -125,6 +125,64 @@ async function initDB() {
     `;
     console.log('✅ Neon DB: offer_leads table ready');
 
+    // Autopay Subscriptions — automatic plan renewals
+    await sql`
+      CREATE TABLE IF NOT EXISTS autopay_subscriptions (
+        id SERIAL PRIMARY KEY,
+        subscription_id TEXT UNIQUE NOT NULL,
+        clerk_user_id TEXT NOT NULL,
+        plan_id TEXT NOT NULL,
+        plan_name TEXT NOT NULL,
+        plan_details JSONB,
+        razorpay_subscription_id TEXT,
+        status TEXT DEFAULT 'active',
+        start_date TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        next_renewal_date TIMESTAMP WITH TIME ZONE NOT NULL,
+        last_charge_date TIMESTAMP WITH TIME ZONE,
+        failed_attempts INTEGER DEFAULT 0,
+        max_retries INTEGER DEFAULT 3,
+        payment_method JSONB,
+        auto_charge_enabled BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_autopay_clerk_user_id ON autopay_subscriptions(clerk_user_id)
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_autopay_subscription_id ON autopay_subscriptions(subscription_id)
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_autopay_status ON autopay_subscriptions(status)
+    `;
+    console.log('✅ Neon DB: autopay_subscriptions table ready');
+
+    // Coupon Usage Tracking — track first purchase discount usage
+    await sql`
+      CREATE TABLE IF NOT EXISTS coupon_usage (
+        id SERIAL PRIMARY KEY,
+        clerk_user_id TEXT NOT NULL,
+        plan_id TEXT NOT NULL,
+        coupon_code TEXT NOT NULL,
+        discount_amount DECIMAL(10, 2),
+        original_price DECIMAL(10, 2),
+        final_price DECIMAL(10, 2),
+        subscription_id TEXT,
+        payment_id TEXT,
+        used_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        UNIQUE(clerk_user_id, plan_id)
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_coupon_usage_user ON coupon_usage(clerk_user_id)
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_coupon_usage_plan ON coupon_usage(plan_id, clerk_user_id)
+    `;
+    console.log('✅ Neon DB: coupon_usage table ready');
+
     return true;
   } catch (err) {
     console.error('❌ Neon DB init failed:', err.message);
@@ -240,4 +298,155 @@ async function saveOfferLead(l) {
   return result[0];
 }
 
-module.exports = { sql, initDB, saveAudit, getAuditBySerial, getAuditById, getAllAudits, updateCertificate, upsertUser, saveBooking, saveOfferLead };
+// ── Autopay Subscriptions ──────────────────────────────────────────────────
+async function createAutopaySubscription(subscriptionData) {
+  const {
+    subscriptionId, clerkUserId, planId, planName, planDetails,
+    razorpaySubscriptionId, nextRenewalDate, paymentMethod
+  } = subscriptionData;
+
+  const result = await sql`
+    INSERT INTO autopay_subscriptions (
+      subscription_id, clerk_user_id, plan_id, plan_name, plan_details,
+      razorpay_subscription_id, next_renewal_date, payment_method, status
+    ) VALUES (
+      ${subscriptionId}, ${clerkUserId}, ${planId}, ${planName}, ${JSON.stringify(planDetails)},
+      ${razorpaySubscriptionId || null}, ${nextRenewalDate}, ${JSON.stringify(paymentMethod || {})}, 'active'
+    )
+    RETURNING *
+  `;
+  return result[0];
+}
+
+async function getAutopaySubscriptionsByUser(clerkUserId) {
+  const results = await sql`
+    SELECT * FROM autopay_subscriptions 
+    WHERE clerk_user_id = ${clerkUserId}
+    ORDER BY created_at DESC
+  `;
+  return results;
+}
+
+async function getAutopaySubscriptionById(subscriptionId) {
+  const results = await sql`
+    SELECT * FROM autopay_subscriptions 
+    WHERE subscription_id = ${subscriptionId}
+  `;
+  return results[0] || null;
+}
+
+async function updateAutopaySubscriptionStatus(subscriptionId, status) {
+  const result = await sql`
+    UPDATE autopay_subscriptions
+    SET status = ${status}, updated_at = NOW()
+    WHERE subscription_id = ${subscriptionId}
+    RETURNING *
+  `;
+  return result[0] || null;
+}
+
+async function updateAutopayPaymentMethod(subscriptionId, paymentMethod) {
+  const result = await sql`
+    UPDATE autopay_subscriptions
+    SET payment_method = ${JSON.stringify(paymentMethod)}, updated_at = NOW()
+    WHERE subscription_id = ${subscriptionId}
+    RETURNING *
+  `;
+  return result[0] || null;
+}
+
+async function updateAutopayRenewalDate(subscriptionId, nextRenewalDate) {
+  const result = await sql`
+    UPDATE autopay_subscriptions
+    SET next_renewal_date = ${nextRenewalDate}, 
+        last_charge_date = NOW(),
+        failed_attempts = 0,
+        updated_at = NOW()
+    WHERE subscription_id = ${subscriptionId}
+    RETURNING *
+  `;
+  return result[0] || null;
+}
+
+async function getActiveSubscriptionsForRenewal() {
+  const results = await sql`
+    SELECT * FROM autopay_subscriptions 
+    WHERE status = 'active' 
+    AND auto_charge_enabled = true
+    AND next_renewal_date <= NOW() + INTERVAL '1 day'
+    ORDER BY next_renewal_date ASC
+  `;
+  return results;
+}
+
+// ── Coupon Usage Tracking ──────────────────────────────────────────────────
+async function recordCouponUsage(clerkUserId, planId, couponCode, discountAmount, originalPrice, finalPrice, subscriptionId, paymentId) {
+  try {
+    const result = await sql`
+      INSERT INTO coupon_usage (
+        clerk_user_id, plan_id, coupon_code, discount_amount, 
+        original_price, final_price, subscription_id, payment_id
+      ) VALUES (
+        ${clerkUserId}, ${planId}, ${couponCode}, ${discountAmount},
+        ${originalPrice}, ${finalPrice}, ${subscriptionId || null}, ${paymentId || null}
+      )
+      ON CONFLICT (clerk_user_id, plan_id) DO NOTHING
+      RETURNING *
+    `;
+    return result[0] || null;
+  } catch (err) {
+    console.error('❌ Failed to record coupon usage:', err.message);
+    return null;
+  }
+}
+
+async function hasCouponBeenUsed(clerkUserId, planId) {
+  try {
+    const result = await sql`
+      SELECT * FROM coupon_usage 
+      WHERE clerk_user_id = ${clerkUserId} 
+      AND plan_id = ${planId}
+    `;
+    return result.length > 0;
+  } catch (err) {
+    console.error('❌ Failed to check coupon usage:', err.message);
+    return false;
+  }
+}
+
+async function getCouponUsageByUser(clerkUserId) {
+  try {
+    const results = await sql`
+      SELECT * FROM coupon_usage 
+      WHERE clerk_user_id = ${clerkUserId}
+      ORDER BY used_at DESC
+    `;
+    return results || [];
+  } catch (err) {
+    console.error('❌ Failed to fetch user coupon usage:', err.message);
+    return [];
+  }
+}
+
+module.exports = { 
+  sql, 
+  initDB, 
+  saveAudit, 
+  getAuditBySerial, 
+  getAuditById, 
+  getAllAudits, 
+  updateCertificate, 
+  upsertUser, 
+  saveBooking, 
+  saveOfferLead,
+  createAutopaySubscription,
+  getAutopaySubscriptionsByUser,
+  getAutopaySubscriptionById,
+  updateAutopaySubscriptionStatus,
+  updateAutopayPaymentMethod,
+  updateAutopayRenewalDate,
+  getActiveSubscriptionsForRenewal,
+  recordCouponUsage,
+  hasCouponBeenUsed,
+  getCouponUsageByUser
+};

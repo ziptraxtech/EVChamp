@@ -1121,11 +1121,11 @@ const AdvanceAnalysis: React.FC = () => {
         <div className="max-w-3xl mx-auto px-4 py-8">
           {/* Back Button */}
           <Link
-            to="/zipbattery"
+            to="/evtrulife"
             className="inline-flex items-center text-gray-600 hover:text-blue-600 transition-colors mb-6 font-semibold"
           >
             <BackArrow className="mr-2" />
-            Back to ZipBattery
+            Back to EVTruLife
           </Link>
 
           {/* Mode Header */}
@@ -1314,11 +1314,11 @@ const AdvanceAnalysis: React.FC = () => {
         <div className="max-w-2xl mx-auto px-4 py-8">
           {/* Back Button */}
           <Link
-            to="/zipbattery"
+            to="/evtrulife"
             className="inline-flex items-center text-gray-600 hover:text-blue-600 transition-colors mb-8 font-semibold"
           >
             <BackArrow className="mr-2" />
-            Back to ZipBattery
+            Back to EVTruLife
           </Link>
 
           <div className="relative rounded-2xl overflow-hidden">
@@ -1535,11 +1535,11 @@ const AdvanceAnalysis: React.FC = () => {
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Back Button */}
         <Link
-          to="/zipbattery"
+          to="/evtrulife"
           className="inline-flex items-center text-gray-600 hover:text-blue-600 transition-colors mb-6 font-semibold"
         >
           <BackArrow className="mr-2" />
-          Back to ZipBattery
+          Back to EVTruLife
         </Link>
 
         <div className="grid lg:grid-cols-3 gap-6">

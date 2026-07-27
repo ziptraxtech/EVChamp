@@ -198,7 +198,7 @@ const ServicesShowcase: React.FC = () => {
       route: '/rsa-plans'
     },
     {
-      title: 'ZipBattery',
+      title: 'EVTruLife',
       subtitle: '⚙️ AI-powered battery health',
       description: 'Extend your EV battery lifespan using our patented AI diagnostic technology and smart optimization.',
       features: ['Extend battery life', 'Reduce costs', 'Patented technology'],
@@ -206,7 +206,7 @@ const ServicesShowcase: React.FC = () => {
       badge: 'Patented technology',
       bgGradient: 'bg-gradient-to-br from-rose-50 via-pink-50 to-orange-50',
       badgeColor: 'bg-red-100 text-red-700',
-      route: '/zipbattery'
+      route: '/evtrulife'
     }
   ];
 

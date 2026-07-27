@@ -48,10 +48,10 @@ const Footer: React.FC = () => {
 
               <li>
                 <a
-                  href="/zipbattery"
+                  href="/evtrulife"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
-                  ZipBattery
+                  EVTruLife
                 </a>
               </li>
 

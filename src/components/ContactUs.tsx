@@ -10,7 +10,7 @@ const inquiryTypes = [
   'Roadside Assistance',
   'Franchise Partnership',
   'INVESTYZ Investment Inquiry',
-  'ZipBattery & AI Assistance',
+  'EVTruLife & AI Assistance',
   'General Inquiry',
 ];
 
@@ -159,7 +159,7 @@ const ContactUs: React.FC = () => {
                   <li>• Roadside assistance</li>
                   <li>• Franchise partnership requests</li>
                   <li>• INVESTYZ investment inquiries</li>
-                  <li>• ZipBattery & AI assistance support</li>
+                  <li>• EVTruLife & AI assistance support</li>
                 </ul>
               </div>
             </div>

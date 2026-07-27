@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useAuth, useUser } from '@clerk/clerk-react';
+import { useUser, useAuth } from '@clerk/clerk-react';
 import razorpayServiceInstance from '../services/razorpayService';
 import { getPaymentBreakdown } from '../utils/gstCalculator';
+import couponManager from '../utils/couponManager';
 
 const ZeVaultCheckout: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -14,6 +15,9 @@ const ZeVaultCheckout: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [planDetails, setPlanDetails] = useState<any>(null);
   const [paymentBreakdown, setPaymentBreakdown] = useState<any>(null);
+  const [couponApplied, setCouponApplied] = useState<any>(null);
+  const [couponEligible, setCouponEligible] = useState(false);
+  const [checkingCoupon, setCheckingCoupon] = useState(false);
 
   // Extract params
   const plan = searchParams.get('plan');
@@ -69,6 +73,71 @@ const ZeVaultCheckout: React.FC = () => {
     return `${testCount} battery diagnostic tests`;
   };
 
+  // Check coupon eligibility on component mount
+  useEffect(() => {
+    const checkCouponEligibility = async () => {
+      if (!user?.id || !plan) return;
+
+      setCheckingCoupon(true);
+      try {
+        const token = await getToken();
+        
+        if (!token) {
+          console.warn('⚠️ No auth token available for coupon check');
+          setCheckingCoupon(false);
+          return;
+        }
+
+        console.log('🔍 Checking coupon eligibility for user:', user.id, 'plan:', plan);
+        
+        const response = await fetch(
+          `/api/coupons/check-usage?userId=${user.id}&planId=${plan}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+        console.log('📊 Coupon check response:', data);
+
+        if (response.ok) {
+          if (!data.hasUsedCoupon) {
+            // User is eligible - prepare coupon for auto-apply (but don't mark as used yet)
+            console.log('✅ User eligible for coupon');
+            const welcomeCoupon = couponManager.autoApplyWelcomeCoupon(
+              paymentBreakdown?.totalAmount || 0
+            );
+            setCouponApplied(welcomeCoupon);
+            setCouponEligible(true);
+          } else {
+            // User has already used coupon for this plan
+            console.log('❌ User already used coupon for this plan');
+            setCouponApplied(null);
+            setCouponEligible(false);
+          }
+        } else {
+          console.error('❌ Coupon check failed:', data);
+          setCouponApplied(null);
+        }
+      } catch (err) {
+        console.error('❌ Error checking coupon eligibility:', err);
+        // On error, still apply coupon (fail open, not fail safe)
+        if (paymentBreakdown?.totalAmount) {
+          const welcomeCoupon = couponManager.autoApplyWelcomeCoupon(paymentBreakdown.totalAmount);
+          setCouponApplied(welcomeCoupon);
+        }
+      } finally {
+        setCheckingCoupon(false);
+      }
+    };
+
+    if (paymentBreakdown && user?.id && plan) {
+      checkCouponEligibility();
+    }
+  }, [paymentBreakdown, user?.id, plan, getToken]);
+
   const handlePayment = async () => {
     if (!planDetails || !paymentBreakdown || !user?.primaryEmailAddress?.emailAddress) {
       setError('Unable to process payment. Missing required information.');
@@ -80,6 +149,10 @@ const ZeVaultCheckout: React.FC = () => {
 
     try {
       console.log('🚀 Starting ZeVault payment process...');
+      
+      // Calculate final amount with coupon if applied
+      const finalAmount = couponApplied ? couponApplied.finalPrice : paymentBreakdown.totalAmount;
+      
       console.log('📋 Order Summary:', {
         planName: planDetails.planName,
         tests: planDetails.tests,
@@ -87,19 +160,39 @@ const ZeVaultCheckout: React.FC = () => {
         basePrice: planDetails.price,
         gstAmount: paymentBreakdown.gstAmount,
         totalWithGST: paymentBreakdown.totalAmount,
-        totalInPaise: Math.round(paymentBreakdown.totalAmount * 100),
+        coupon: couponApplied ? { code: couponApplied.coupon.code, discount: couponApplied.discountAmount } : null,
+        finalAmount: finalAmount,
+        totalInPaise: Math.round(finalAmount * 100),
         description: planDetails.description,
         user: user.primaryEmailAddress.emailAddress,
       });
 
-      // Initialize Razorpay payment with GST-inclusive amount
+      // Initialize Razorpay payment with final amount (including GST and coupon discount)
       await razorpayServiceInstance.initializePayment(
-        paymentBreakdown.totalAmount, // Amount in INR (including GST)
+        finalAmount,
         planDetails.planName,
         planDetails.description,
         user.primaryEmailAddress.emailAddress,
         user.firstName + (user.lastName ? ' ' + user.lastName : '')
       );
+
+      // Store plan details, coupon info, and user info for post-payment processing
+      sessionStorage.setItem('pendingAutopaySetup', JSON.stringify({
+        userId: user.id,
+        planId: planDetails.plan,
+        planName: planDetails.planName,
+        planDetails: {
+          tests: planDetails.tests,
+          months: planDetails.months,
+          basePrice: planDetails.price,
+        },
+        coupon: couponApplied ? {
+          code: couponApplied.coupon.code,
+          discountAmount: couponApplied.discountAmount,
+          originalPrice: paymentBreakdown.totalAmount,
+          finalPrice: couponApplied.finalPrice,
+        } : null,
+      }));
 
       console.log('✅ ZeVault payment modal opened');
     } catch (err: any) {
@@ -222,13 +315,30 @@ const ZeVaultCheckout: React.FC = () => {
                 <span className="text-white font-semibold">₹{paymentBreakdown?.gstAmount % 1 === 0 ? Math.floor(paymentBreakdown.gstAmount).toLocaleString('en-IN') : paymentBreakdown?.gstAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
 
-              <div className="border-t border-slate-700 pt-3 flex items-center justify-between">
-                <span className="font-semibold text-slate-100">Total Amount</span>
-                <span className="text-2xl font-bold text-yellow-300">
-                  ₹{paymentBreakdown?.totalAmount % 1 === 0 ? Math.floor(paymentBreakdown.totalAmount).toLocaleString('en-IN') : paymentBreakdown?.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {couponApplied && (
+                <div className="flex items-center justify-between text-sm border-t border-slate-700 pt-3">
+                  <span className="text-green-400 text-xs">Coupon Applied</span>
+                  <span className="text-green-400 font-semibold">-₹{couponApplied.discountAmount.toLocaleString('en-IN')}</span>
+                </div>
+              )}
+
+              <div className={`border-t border-slate-700 pt-3 flex items-center justify-between ${couponApplied ? '' : ''}`}>
+                <span className="font-semibold text-slate-100">{couponApplied ? 'Final Amount' : 'Total Amount'}</span>
+                <span className={`text-2xl font-bold ${couponApplied ? 'text-green-400' : 'text-yellow-300'}`}>
+                  ₹{(couponApplied ? couponApplied.finalPrice : paymentBreakdown?.totalAmount) % 1 === 0 ? Math.floor(couponApplied ? couponApplied.finalPrice : paymentBreakdown?.totalAmount).toLocaleString('en-IN') : (couponApplied ? couponApplied.finalPrice : paymentBreakdown?.totalAmount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
             </div>
+
+            {/* Coupon Code Display */}
+            {couponApplied && (
+              <div className="mt-2 flex items-center gap-2">
+                <p className="text-xs text-green-400 font-semibold">Code:</p>
+                <p className="text-xs text-green-300 bg-green-500/20 px-2 py-1 rounded">
+                  {couponApplied.coupon?.code}
+                </p>
+              </div>
+            )}
 
             {/* Benefits */}
             <div className="mt-6 rounded-xl border border-slate-700 bg-slate-900/30 p-4">
@@ -310,6 +420,40 @@ const ZeVaultCheckout: React.FC = () => {
               </div>
             )}
 
+            {/* Auto-Applied Welcome Discount */}
+            {couponApplied && couponEligible && (
+              <div className="mb-6 rounded-lg border border-green-500/30 bg-green-500/10 p-4 animate-pulse">
+                <div className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-green-300">Welcome Bonus Applied!</p>
+                    <p className="text-xs text-green-200 mt-1">You're getting 20% off your first purchase</p>
+                    <p className="text-xs text-green-100 mt-2">You save <span className="font-bold">₹{couponApplied.discountAmount.toLocaleString('en-IN')}</span> on this order</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!couponApplied && !checkingCoupon && !couponEligible && (
+              <div className="mb-6 rounded-lg border border-slate-700 bg-slate-900/50 p-4">
+                <p className="text-xs text-slate-400">
+                  <svg className="w-4 h-4 inline mr-2 text-slate-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2z" clipRule="evenodd" />
+                  </svg>
+                  Welcome discount already used for this plan. You can use it for other plans!
+                </p>
+              </div>
+            )}
+
+            {/* Error Message */}
+            {error && (
+              <div className="rounded-xl border border-red-500/30 bg-red-950/20 p-3 mb-6">
+                <p className="text-sm text-red-300">{error}</p>
+              </div>
+            )}
+
             {/* Terms & Conditions */}
             <div className="rounded-xl border border-slate-700 bg-slate-900/30 p-3 mb-6">
               <p className="text-xs text-slate-400 leading-relaxed">
@@ -332,52 +476,33 @@ const ZeVaultCheckout: React.FC = () => {
               className={`w-full py-3 px-4 rounded-lg font-semibold text-white flex items-center justify-center gap-2 transition-all ${
                 loading
                   ? 'bg-slate-700 cursor-not-allowed opacity-50'
-                  : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 shadow-lg shadow-cyan-500/40'
+                  : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700'
               }`}
             >
-              {loading && (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-spin">
-                  <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                </svg>
+              {loading ? (
+                <>
+                  <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Processing Payment...
+                </>
+              ) : (
+                <>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 1v22m11-9H1" />
+                  </svg>
+                  Proceed to Payment
+                </>
               )}
-              <span>{loading ? 'Processing...' : `Pay ₹${paymentBreakdown?.totalAmount % 1 === 0 ? Math.floor(paymentBreakdown.totalAmount).toLocaleString('en-IN') : paymentBreakdown?.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}</span>
             </button>
 
-            {/* Help Text */}
-            <p className="text-xs text-slate-400 text-center mt-4">
-              🔒 Your payment is 100% secure. Powered by Razorpay
-            </p>
-          </div>
-        </div>
-
-        {/* FAQ Section */}
-        <div className="mt-12 rounded-2xl border border-slate-800 bg-slate-950/70 p-6">
-          <h3 className="text-lg font-semibold text-white mb-6">Frequently Asked Questions</h3>
-          <div className="space-y-4">
-            <div>
-              <h4 className="text-sm font-semibold text-white mb-2">How long is my plan valid?</h4>
-              <p className="text-sm text-slate-300">
-                {planDetails.months > 0
-                  ? `Your plan is valid for ${planDetails.months} months from the date of purchase.`
-                  : 'Your one-time trial is valid for immediate use.'}
-              </p>
-            </div>
-            <div>
-              <h4 className="text-sm font-semibold text-white mb-2">Can I upgrade or downgrade?</h4>
-              <p className="text-sm text-slate-300">
-                Yes! You can upgrade to a higher plan anytime. Contact our support team for downgrade options.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-sm font-semibold text-white mb-2">Is there a refund policy?</h4>
-              <p className="text-sm text-slate-300">
-                Yes, we offer a 7-day money-back guarantee if you're not satisfied. Check our{' '}
-                <a href="/refund" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300">
-                  refund policy
-                </a>{' '}
-                for details.
-              </p>
-            </div>
+            {/* Error Message */}
+            {error && (
+              <div className="mt-4 p-3 rounded-lg border border-red-500/30 bg-red-950/20 text-red-200 text-sm">
+                {error}
+              </div>
+            )}
           </div>
         </div>
       </main>

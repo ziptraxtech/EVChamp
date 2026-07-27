@@ -15,7 +15,7 @@ import SmartSignIn from './components/SmartSignIn';
 import Franchise from './components/Franchise';
 import BuyUsedEV from './components/BuyUsedEV';
 import ServiceCentres from './components/ServiceCentres';
-import ZipBattery from './components/ZipBattery';
+import EVTruLife from './components/EVTruLife';
 import AdvanceAnalysis from './components/AdvanceAnalysis';
 import DeleteAccount from './components/DeleteAccount';
 import RSAPlans from './components/RSAPlans';
@@ -401,7 +401,7 @@ function App() {
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/zeflash-plans" element={<ZeflashPlans />} />
           <Route path="/ev-assistance" element={<SmarterEVAssistance />} />
-          <Route path="/zipbattery" element={<ZipBattery />} />
+          <Route path="/evtrulife" element={<EVTruLife />} />
           <Route path="/advance-analysis" element={
             <ProtectedRoute>
               <AdvanceAnalysis />

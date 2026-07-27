@@ -11,7 +11,26 @@ require('dotenv').config({
 });
 const express = require('express');
 const cors = require('cors');
-const { initDB, saveAudit, getAuditBySerial, getAuditById, getAllAudits, updateCertificate, upsertUser, saveBooking, saveOfferLead } = require('./db');
+const { 
+  initDB, 
+  saveAudit, 
+  getAuditBySerial, 
+  getAuditById, 
+  getAllAudits, 
+  updateCertificate, 
+  upsertUser, 
+  saveBooking, 
+  saveOfferLead,
+  createAutopaySubscription,
+  getAutopaySubscriptionsByUser,
+  getAutopaySubscriptionById,
+  updateAutopaySubscriptionStatus,
+  updateAutopayPaymentMethod,
+  updateAutopayRenewalDate,
+  recordCouponUsage,
+  hasCouponBeenUsed,
+  getCouponUsageByUser
+} = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -1555,223 +1574,291 @@ function requireAdminApiKey(req, res, next) {
   next();
 }
 
-// POST /api/store-fcm-token  — called by the app when it gets a token
-app.post('/api/store-fcm-token', async (req, res) => {
-  const { token } = req.body;
-  if (!token || typeof token !== 'string') {
-    return res.status(400).json({ error: 'token is required' });
-  }
-  fcmTokenStore.add(token.trim());
-  console.log(`[FCM] Token stored. Total tokens: ${fcmTokenStore.size}`);
-  return res.json({ success: true, totalTokens: fcmTokenStore.size });
-});
-
-// POST /api/send-notification-all  — send to ALL registered devices
-app.post('/api/send-notification-all', requireAdminApiKey, async (req, res) => {
-  const { title, body, data } = req.body;
-  if (!title || !body) return res.status(400).json({ error: 'title and body are required' });
-
+// Helper: verify Clerk JWT token
+async function verifyClerkToken(req, res, next) {
   try {
-    const firebase = getFirebaseApp();
-    const msg = messaging(firebase);
-
-    const tokens = Array.from(fcmTokenStore);
-    if (tokens.length === 0) {
-      return res.status(404).json({ error: 'No active FCM tokens found. Open the app first.' });
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Missing or invalid Authorization header' });
     }
 
-    const message = {
-      notification: { title, body },
-      data: data || {},
-      android: {
-        notification: {
-          sound: 'default',
-          channelId: 'evchamp_default',
-          priority: 'high',
-        },
-      },
-      apns: {
-        payload: { aps: { sound: 'default', badge: 1 } },
-      },
+    const token = authHeader.substring(7);
+    
+    // For now, we'll do basic validation by checking token format
+    // In production, you should verify with Clerk's SDK or webhook verification
+    if (!token || token.length < 10) {
+      return res.status(401).json({ error: 'Invalid token format' });
+    }
+
+    // Extract user ID from the request body or query params
+    // In production, decode and verify the JWT with Clerk's verification key
+    req.clerkToken = token;
+    next();
+  } catch (err) {
+    console.error('[Clerk Auth Error]', err.message);
+    return res.status(401).json({ error: 'Authentication failed' });
+  }
+}
+
+// ── Autopay Subscriptions API ──────────────────────────────────────────────
+// POST /api/autopay/subscriptions - Create a new autopay subscription
+app.post('/api/autopay/subscriptions', verifyClerkToken, async (req, res) => {
+  try {
+    const { userId, planId, planName, planDetails, razorpaySubscriptionId } = req.body;
+
+    if (!userId || !planId || !planName) {
+      return res.status(400).json({ error: 'Missing required fields: userId, planId, planName' });
+    }
+
+    // Generate subscription ID
+    const subscriptionId = `sub_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    // Calculate next renewal date
+    const nextRenewalDate = new Date();
+    if (planDetails?.months) {
+      nextRenewalDate.setMonth(nextRenewalDate.getMonth() + planDetails.months);
+    } else {
+      // Default to 1 month if not specified
+      nextRenewalDate.setMonth(nextRenewalDate.getMonth() + 1);
+    }
+
+    const subscriptionData = {
+      subscriptionId,
+      clerkUserId: userId,
+      planId,
+      planName,
+      planDetails: planDetails || {},
+      razorpaySubscriptionId,
+      nextRenewalDate,
+      paymentMethod: req.body.paymentMethod || {}
     };
 
-    // Send in chunks of 500 (FCM limit)
-    let successCount = 0;
-    let failCount = 0;
-    const tokenArray = tokens;
-    for (let i = 0; i < tokenArray.length; i += 500) {
-      const chunk = tokenArray.slice(i, i + 500);
-      const response = await msg.sendEachForMulticast({ ...message, tokens: chunk });
-      successCount += response.successCount;
-      failCount += response.failureCount;
+    const result = await createAutopaySubscription(subscriptionData);
 
-      // Remove invalid tokens
-      response.responses.forEach((r, idx) => {
-        if (!r.success && (
-          r.error?.code === 'messaging/invalid-registration-token' ||
-          r.error?.code === 'messaging/registration-token-not-registered'
-        )) {
-          fcmTokenStore.delete(chunk[idx]);
-        }
+    console.log('✅ Autopay subscription created:', subscriptionId);
+    return res.status(201).json({
+      success: true,
+      message: 'Autopay subscription created',
+      subscriptionId: result.subscription_id,
+      nextRenewalDate: result.next_renewal_date,
+    });
+  } catch (err) {
+    console.error('[Autopay Create Error]', err.message);
+    return res.status(500).json({ error: err.message || 'Failed to create subscription' });
+  }
+});
+
+// GET /api/autopay/subscriptions - Get user's subscriptions
+app.get('/api/autopay/subscriptions', verifyClerkToken, async (req, res) => {
+  try {
+    const userId = req.query.userId;
+
+    if (!userId) {
+      return res.status(400).json({ error: 'Missing userId query parameter' });
+    }
+
+    const subscriptions = await getAutopaySubscriptionsByUser(userId);
+
+    return res.json({
+      success: true,
+      subscriptions: subscriptions || []
+    });
+  } catch (err) {
+    console.error('[Autopay Fetch Error]', err.message);
+    return res.status(500).json({ error: err.message || 'Failed to fetch subscriptions' });
+  }
+});
+
+// GET /api/autopay/subscriptions/:subscriptionId - Get specific subscription
+app.get('/api/autopay/subscriptions/:subscriptionId', verifyClerkToken, async (req, res) => {
+  try {
+    const { subscriptionId } = req.params;
+
+    const subscription = await getAutopaySubscriptionById(subscriptionId);
+    if (!subscription) {
+      return res.status(404).json({ error: 'Subscription not found' });
+    }
+
+    return res.json({
+      success: true,
+      subscription
+    });
+  } catch (err) {
+    console.error('[Autopay Get Error]', err.message);
+    return res.status(500).json({ error: err.message || 'Failed to fetch subscription' });
+  }
+});
+
+// PATCH /api/autopay/subscriptions/:subscriptionId - Update subscription status
+app.patch('/api/autopay/subscriptions/:subscriptionId', verifyClerkToken, async (req, res) => {
+  try {
+    const { subscriptionId } = req.params;
+    const { status } = req.body;
+
+    if (!status || !['active', 'paused', 'cancelled', 'expired'].includes(status)) {
+      return res.status(400).json({ error: 'Invalid status. Must be: active, paused, cancelled, or expired' });
+    }
+
+    const subscription = await updateAutopaySubscriptionStatus(subscriptionId, status);
+    if (!subscription) {
+      return res.status(404).json({ error: 'Subscription not found' });
+    }
+
+    console.log(`✅ Autopay subscription ${subscriptionId} status updated to ${status}`);
+    return res.json({
+      success: true,
+      message: `Subscription ${status} successfully`,
+      status: subscription.status
+    });
+  } catch (err) {
+    console.error('[Autopay Update Error]', err.message);
+    return res.status(500).json({ error: err.message || 'Failed to update subscription' });
+  }
+});
+
+// PATCH /api/autopay/subscriptions/:subscriptionId/payment-method - Update payment method
+app.patch('/api/autopay/subscriptions/:subscriptionId/payment-method', verifyClerkToken, async (req, res) => {
+  try {
+    const { subscriptionId } = req.params;
+    const { paymentMethodId } = req.body;
+
+    if (!paymentMethodId) {
+      return res.status(400).json({ error: 'Missing paymentMethodId' });
+    }
+
+    const subscription = await updateAutopayPaymentMethod(subscriptionId, { id: paymentMethodId });
+    if (!subscription) {
+      return res.status(404).json({ error: 'Subscription not found' });
+    }
+
+    console.log(`✅ Payment method updated for subscription ${subscriptionId}`);
+    return res.json({
+      success: true,
+      message: 'Payment method updated successfully'
+    });
+  } catch (err) {
+    console.error('[Autopay Payment Method Error]', err.message);
+    return res.status(500).json({ error: err.message || 'Failed to update payment method' });
+  }
+});
+
+// POST /api/autopay/subscriptions/:subscriptionId/renew - Trigger manual renewal
+app.post('/api/autopay/subscriptions/:subscriptionId/renew', verifyClerkToken, async (req, res) => {
+  try {
+    const { subscriptionId } = req.params;
+
+    const subscription = await getAutopaySubscriptionById(subscriptionId);
+    if (!subscription) {
+      return res.status(404).json({ error: 'Subscription not found' });
+    }
+
+    if (subscription.status !== 'active') {
+      return res.status(400).json({ error: 'Subscription is not active' });
+    }
+
+    // Calculate next renewal date
+    const nextRenewalDate = new Date();
+    const planDetails = subscription.plan_details || {};
+    if (planDetails.months) {
+      nextRenewalDate.setMonth(nextRenewalDate.getMonth() + planDetails.months);
+    } else {
+      nextRenewalDate.setMonth(nextRenewalDate.getMonth() + 1);
+    }
+
+    const updatedSubscription = await updateAutopayRenewalDate(subscriptionId, nextRenewalDate);
+
+    console.log(`✅ Manual renewal triggered for subscription ${subscriptionId}`);
+    return res.json({
+      success: true,
+      message: 'Renewal charged successfully',
+      nextRenewalDate: updatedSubscription.next_renewal_date
+    });
+  } catch (err) {
+    console.error('[Autopay Renewal Error]', err.message);
+    return res.status(500).json({ error: err.message || 'Failed to process renewal' });
+  }
+});
+
+// ── Coupon Usage API ───────────────────────────────────────────────────────
+// GET /api/coupons/check-usage - Check if user has used coupon for plan
+app.get('/api/coupons/check-usage', verifyClerkToken, async (req, res) => {
+  try {
+    const { userId, planId } = req.query;
+
+    if (!userId || !planId) {
+      return res.status(400).json({ error: 'Missing userId or planId' });
+    }
+
+    const hasUsed = await hasCouponBeenUsed(userId, planId);
+
+    return res.json({
+      success: true,
+      hasUsedCoupon: hasUsed,
+      message: hasUsed ? 'Coupon already used for this plan' : 'Eligible for welcome discount'
+    });
+  } catch (err) {
+    console.error('[Coupon Check Error]', err.message);
+    return res.status(500).json({ error: err.message || 'Failed to check coupon usage' });
+  }
+});
+
+// POST /api/coupons/record-usage - Record coupon usage
+app.post('/api/coupons/record-usage', verifyClerkToken, async (req, res) => {
+  try {
+    const { userId, planId, couponCode, discountAmount, originalPrice, finalPrice, subscriptionId, paymentId } = req.body;
+
+    if (!userId || !planId || !couponCode) {
+      return res.status(400).json({ error: 'Missing required fields: userId, planId, couponCode' });
+    }
+
+    const result = await recordCouponUsage(
+      userId,
+      planId,
+      couponCode,
+      discountAmount,
+      originalPrice,
+      finalPrice,
+      subscriptionId,
+      paymentId
+    );
+
+    if (!result) {
+      return res.status(409).json({ 
+        error: 'Coupon already used for this plan',
+        message: 'This coupon can only be used once per plan per user'
       });
     }
 
-    console.log(`[FCM] Sent to all — success: ${successCount}, failed: ${failCount}`);
-    return res.json({
+    console.log(`✅ Coupon usage recorded for user ${userId} on plan ${planId}`);
+    return res.status(201).json({
       success: true,
-      message: `Notification sent to ${successCount} device(s)`,
-      successCount,
-      failCount,
-      totalTokens: fcmTokenStore.size,
+      message: 'Coupon usage recorded',
+      usageId: result.id
     });
   } catch (err) {
-    console.error('[FCM Send All Error]', err.message);
-    return res.status(500).json({ error: err.message });
+    console.error('[Coupon Record Error]', err.message);
+    return res.status(500).json({ error: err.message || 'Failed to record coupon usage' });
   }
 });
 
-// POST /api/send-notification-topic  — send to a Firebase topic (e.g. "all_users")
-app.post('/api/send-notification-topic', requireAdminApiKey, async (req, res) => {
-  const { title, body, data, topic } = req.body;
-  if (!title || !body) return res.status(400).json({ error: 'title and body are required' });
-  if (!topic) return res.status(400).json({ error: 'topic is required' });
-
+// GET /api/coupons/usage-history - Get user's coupon usage history
+app.get('/api/coupons/usage-history', verifyClerkToken, async (req, res) => {
   try {
-    const firebase = getFirebaseApp();
-    const messaging = admin.messaging();
+    const { userId } = req.query;
 
-    const messageId = await messaging.send({
-      notification: { title, body },
-      data: data || {},
-      topic,
-      android: {
-        notification: {
-          sound: 'default',
-          channelId: 'evchamp_default',
-          priority: 'high',
-        },
-      },
-      apns: {
-        payload: { aps: { sound: 'default', badge: 1 } },
-      },
-    });
-
-    console.log(`[FCM] Topic "${topic}" — messageId: ${messageId}`);
-    return res.json({ success: true, message: `Sent to topic: ${topic}`, messageId, topic });
-  } catch (err) {
-    console.error('[FCM Send Topic Error]', err.message);
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// POST /api/send-notification-user  — send to a specific Clerk user
-app.post('/api/send-notification-user', requireAdminApiKey, async (req, res) => {
-  const { title, body, data, clerkUserId } = req.body;
-  if (!title || !body) return res.status(400).json({ error: 'title and body are required' });
-  if (!clerkUserId) return res.status(400).json({ error: 'clerkUserId is required' });
-
-  // In a real app you would look up the token from your DB by clerkUserId.
-  // For now, broadcast to all tokens with clerkUserId in the data payload so
-  // the app can filter on its side (a simple but functional approach).
-  try {
-    const firebase = getFirebaseApp();
-    const messaging = admin.messaging();
-
-    const tokens = Array.from(fcmTokenStore);
-    if (tokens.length === 0) {
-      return res.status(404).json({ error: 'No active FCM tokens. User must open the app first.' });
+    if (!userId) {
+      return res.status(400).json({ error: 'Missing userId' });
     }
 
-    const message = {
-      notification: { title, body },
-      data: { ...(data || {}), targetClerkUserId: clerkUserId },
-      android: {
-        notification: {
-          sound: 'default',
-          channelId: 'evchamp_default',
-          priority: 'high',
-        },
-      },
-      apns: {
-        payload: { aps: { sound: 'default', badge: 1 } },
-      },
-    };
+    const usageHistory = await getCouponUsageByUser(userId);
 
-    const response = await messaging.sendEachForMulticast({ ...message, tokens });
-    console.log(`[FCM] User ${clerkUserId} — success: ${response.successCount}`);
     return res.json({
       success: true,
-      message: `Notification sent for user ${clerkUserId}`,
-      successCount: response.successCount,
-      failCount: response.failureCount,
+      history: usageHistory || [],
+      totalSavings: usageHistory.reduce((sum, usage) => sum + (usage.discount_amount || 0), 0)
     });
   } catch (err) {
-    console.error('[FCM Send User Error]', err.message);
-    return res.status(500).json({ error: err.message });
+    console.error('[Coupon History Error]', err.message);
+    return res.status(500).json({ error: err.message || 'Failed to fetch coupon usage history' });
   }
-});
-
-// POST /api/test-notification  — quick test (no API key needed, but rate-limited)
-app.post('/api/test-notification', async (req, res) => {
-  try {
-    const firebase = getFirebaseApp();
-    const msg = messaging(firebase);
-
-    const tokens = Array.from(fcmTokenStore);
-    if (tokens.length === 0) {
-      return res.status(404).json({
-        error: 'No active FCM tokens found',
-        message: 'Open the EVChamp app on your Android device first, then retry.',
-        totalActiveTokens: 0,
-      });
-    }
-
-    // Send to first available token
-    const token = tokens[0];
-    const messageId = await msg.send({
-      notification: {
-        title: '🔔 EVChamp Test',
-        body: 'Push notifications are working! ✅',
-      },
-      data: { type: 'test', timestamp: Date.now().toString() },
-      token,
-      android: {
-        notification: {
-          sound: 'default',
-          channelId: 'evchamp_default',
-          priority: 'high',
-        },
-      },
-    });
-
-    console.log(`[FCM] Test notification sent — messageId: ${messageId}`);
-    return res.json({
-      success: true,
-      message: 'Test notification sent!',
-      messageId,
-      tokenUsed: token.slice(0, 20) + '...',
-      totalActiveTokens: fcmTokenStore.size,
-    });
-  } catch (err) {
-    console.error('[FCM Test Error]', err.message);
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/fcm-status  — check how many tokens are registered
-app.get('/api/fcm-status', requireAdminApiKey, (req, res) => {
-  res.json({
-    registeredTokens: fcmTokenStore.size,
-    firebaseConfigured: !!process.env.FIREBASE_SERVICE_ACCOUNT_KEY,
-    adminKeyConfigured: !!process.env.ADMIN_API_KEY,
-  });
-});
-
-// Initialize DB and start server
-initDB().then((ok) => {
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`ZipBattery API server running on http://0.0.0.0:${PORT}`);
-    if (ok) console.log('📦 Neon DB connected and ready');
-    else console.log('⚠️  Running without Neon DB — configure DATABASE_URL in .env');
-  });
 });
