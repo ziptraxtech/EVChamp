@@ -203,7 +203,7 @@ const ZeVaultPage: React.FC = () => {
                 <button
                   onClick={() => {
                     console.log('📋 Trial Plan Selected:', { plan: 'trial', tests: 1, months: 0, price: 300, amountInPaise: 30000, autoPay: true });
-                    navigate('/zeflash', { state: { plan: 'trial', tests: 1, months: 0, price: 300, openCheckout: true, autoPay: true } });
+                    navigate('/checkout?plan=trial&tests=1&months=0&price=300');
                     window.scrollTo({ top: 0, behavior: 'auto' });
                   }}
                   className="block w-full text-center rounded-lg text-white font-semibold px-4 py-2.5 shadow-md transition-all"
