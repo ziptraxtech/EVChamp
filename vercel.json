@@ -117,7 +117,7 @@
   "crons": [
     {
       "path": "/api/process-credit-outbox",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 3 * * *"
     }
   ],
   "headers": [
