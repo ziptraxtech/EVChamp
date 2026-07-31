@@ -315,7 +315,7 @@ const ServicesShowcase: React.FC = () => {
                 <div className="mb-6">
                   <div className="flex items-center gap-2">
                     <span className="text-4xl font-extrabold text-emerald-700">₹300</span>
-                    <p className="text-xs text-gray-600"> -Valid for one time use only</p>
+                    <p className="text-xs text-gray-600"> — Test price, 1 Zeflash AI diagnostic</p>
                   </div>
                 </div>
                 <ul className="space-y-3 mb-6 flex-grow">
@@ -337,12 +337,12 @@ const ServicesShowcase: React.FC = () => {
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-emerald-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>No credit card required</span>
+                    <span>Coupon emailed if you&apos;re new to Zeflash</span>
                   </li>
                 </ul>
                 <button
                   onClick={() => {
-                    console.log('📋 Trial Plan Selected:', { plan: 'trial', tests: 1, months: 0, price: 300, amountInPaise: 30000, autoPay: true });
+                    console.log('📋 Trial Plan Selected:', { plan: 'trial', tests: 1, months: 0, price: 300, amountInPaise: 30000 });
                     navigate('/checkout?plan=trial&tests=1&months=0&price=300');
                     window.scrollTo({ top: 0, behavior: 'auto' });
                   }}

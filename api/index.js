@@ -7,6 +7,7 @@ const nodemailer = require('nodemailer');
 const { verifyToken, createClerkClient } = require('@clerk/backend');
 const crypto = require('crypto');
 const admin = require('firebase-admin');
+const Razorpay = require('razorpay');
 
 const app = express();
 
@@ -45,7 +46,10 @@ try { ensureFirebase(); } catch (_) { /* will surface per-request */ }
 
 
 app.use(cors());
-app.use(express.json());
+// Capture the raw body alongside the parsed one — Razorpay webhook signature
+// verification (see /api/razorpay-webhook) must hash the exact raw bytes,
+// not a re-serialized copy of the parsed JSON.
+app.use(express.json({ verify: (req, _res, buf) => { req.rawBody = buf; } }));
 
 // Initialize DB on first request (serverless cold start)
 let initPromise = null;
@@ -144,6 +148,32 @@ async function initDB() {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       )
     `;
+
+    // Outbox for fanning a single purchase out to partner services (Zeflash,
+    // ZipsureAI, ...). One row per non-EVChamp line item in the purchased
+    // plan's bundle. A (razorpay_order_id, service, unit_type) row is unique
+    // so re-processing the same webhook delivery never double-grants.
+    await getSQL()`
+      CREATE TABLE IF NOT EXISTS credit_grant_outbox (
+        id SERIAL PRIMARY KEY,
+        razorpay_order_id TEXT NOT NULL,
+        razorpay_payment_id TEXT,
+        clerk_user_id TEXT NOT NULL,
+        plan_id TEXT NOT NULL,
+        service TEXT NOT NULL,
+        unit_type TEXT NOT NULL,
+        quantity INTEGER NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending', -- pending | processing | success | failed
+        attempts INTEGER NOT NULL DEFAULT 0,
+        last_error TEXT,
+        next_attempt_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        UNIQUE (razorpay_order_id, service, unit_type)
+      )
+    `;
+    await getSQL()`CREATE INDEX IF NOT EXISTS idx_outbox_due ON credit_grant_outbox(status, next_attempt_at)`;
+    await getSQL()`ALTER TABLE credit_grant_outbox ADD COLUMN IF NOT EXISTS coupon_code TEXT`;
 
     await getSQL()`
       CREATE TABLE IF NOT EXISTS fcm_tokens (
@@ -1516,6 +1546,426 @@ app.post('/api/wallet-deduct', async (req, res) => {
   } catch (err) {
     console.error('[ZeVault Deduct Error]', err.message);
     return res.status(500).json({ error: 'Could not process deduction', detail: err.message });
+  }
+});
+
+// ============ Credit Grant Outbox (bundle purchase → fan out to partners) ============
+// Mirrors src/config/creditPlans.ts — kept in sync manually (separate
+// CommonJS backend file, no shared module with the frontend). Every line
+// item in a plan goes through the same outbox table, so the one idempotency
+// mechanism (the UNIQUE constraint on credit_grant_outbox) covers all of
+// them, not just external partners.
+//
+// The live catalog is EVChamp-only. Add Zeflash/ZipsureAI line items only
+// after their authenticated, idempotent partner endpoints are deployed.
+const CREDIT_PLANS = {
+  'zeflash-trial':   { priceInr: 300,  lineItems: [{ service: 'zeflash', unitType: 'diagnostic_test', quantity: 1 }] },
+  'zeflash-starter': { priceInr: 1500, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 1500 }] },
+  'zeflash-value':   { priceInr: 3000, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 3000 }] },
+  'zeflash-smart':   { priceInr: 6000, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 6000 }] },
+};
+
+// Server-to-server "grant credit" call to a partner service. STUBBED —
+// Zeflash and ZipsureAI don't expose this API yet; this is the shape
+// EVChamp's side is ready to call once they do. Each partner needs its own
+// API key configured via the env vars below.
+// Zeflash's backend is a separately-deployed Express app (see
+// ZIpsure/Zeflash/Zeflash2/backend) reached at ZEFLASH_BACKEND_URL — the
+// same URL Zeflash's own Vercel frontend proxies to (its vercel.json). No
+// default here since a stale fallback could silently deliver credits to the
+// wrong place; ZEFLASH_BACKEND_URL must be explicitly configured.
+const PARTNER_GRANT_ENDPOINTS = {
+  zeflash: { url: `${process.env.ZEFLASH_BACKEND_URL || ''}/partner/credits/grant`, apiKeyEnv: 'ZEFLASH_PARTNER_API_KEY' },
+  zipsureai: { url: 'https://api.zipsureai.com/credits/grant', apiKeyEnv: 'ZIPSUREAI_PARTNER_API_KEY' },
+};
+
+// Delivers one outbox row. Throws on any failure — the caller records the
+// error and reschedules with backoff.
+async function deliverCreditGrant(row) {
+  if (row.service === 'evchamp') {
+    // EVChamp's own wallet — no network call, just credit it directly.
+    const amountPaise = Math.round(row.quantity * 100);
+    const sql = getSQL();
+    await sql`
+      INSERT INTO wallet_balance (clerk_user_id, balance_paise, updated_at)
+      VALUES (${row.clerk_user_id}, ${amountPaise}, NOW())
+      ON CONFLICT (clerk_user_id) DO UPDATE
+        SET balance_paise = wallet_balance.balance_paise + ${amountPaise}, updated_at = NOW()
+    `;
+    await sql`
+      INSERT INTO wallet_transactions (clerk_user_id, amount_paise, direction, description, razorpay_payment_id, razorpay_order_id)
+      VALUES (${row.clerk_user_id}, ${amountPaise}, 'credit', ${row.plan_id}, ${row.razorpay_payment_id}, ${row.razorpay_order_id})
+    `;
+    return { service: 'evchamp', credited: true };
+  }
+
+  const target = PARTNER_GRANT_ENDPOINTS[row.service];
+  if (!target || !target.url || target.url.startsWith('/')) {
+    throw new Error(`No grant endpoint configured for service "${row.service}" (check ZEFLASH_BACKEND_URL)`);
+  }
+  const apiKey = process.env[target.apiKeyEnv];
+  if (!apiKey) throw new Error(`${target.apiKeyEnv} is not configured`);
+
+  const res = await fetch(target.url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      orderId: row.razorpay_order_id,
+      userId: row.clerk_user_id,
+      unitType: row.unit_type,
+      quantity: row.quantity,
+      couponCode: row.coupon_code || undefined,
+    }),
+  });
+  if (!res.ok) throw new Error(`${row.service} grant responded ${res.status}`);
+
+  const result = await res.json().catch(() => ({}));
+  if (row.service === 'zeflash' && result.couponIssued && row.coupon_code) {
+    try {
+      await emailZeflashCoupon(row);
+    } catch (emailErr) {
+      // Coupon is already issued in Zeflash — still return the code so the
+      // success screen can show it even if SMTP fails.
+      console.error('[credit-outbox] Coupon email failed:', emailErr.message);
+    }
+    return { service: 'zeflash', couponIssued: true, couponCode: row.coupon_code };
+  }
+  // Wallet credit path: drop the pre-generated code so we never surface a
+  // coupon that was never created in PartnerCoupon.
+  if (row.service === 'zeflash' && row.coupon_code) {
+    const sql = getSQL();
+    await sql`UPDATE credit_grant_outbox SET coupon_code = NULL WHERE id = ${row.id}`;
+  }
+  return { service: row.service, credited: true, alreadyGranted: !!result.alreadyGranted };
+}
+
+async function queuePlanOutbox({ orderId, paymentId, planId, clerkUserId }) {
+  const plan = CREDIT_PLANS[planId];
+  if (!plan) throw new Error(`Unknown plan: ${planId}`);
+  const sql = getSQL();
+  for (const item of plan.lineItems) {
+    const couponCode = item.service === 'zeflash'
+      ? `EVZ-${crypto.randomBytes(5).toString('hex').toUpperCase()}`
+      : null;
+    await sql`
+      INSERT INTO credit_grant_outbox
+        (razorpay_order_id, razorpay_payment_id, clerk_user_id, plan_id, service, unit_type, quantity, coupon_code)
+      VALUES (${orderId}, ${paymentId}, ${clerkUserId}, ${planId}, ${item.service}, ${item.unitType}, ${item.quantity}, ${couponCode})
+      ON CONFLICT (razorpay_order_id, service, unit_type) DO NOTHING
+    `;
+  }
+  return plan.lineItems.length;
+}
+
+// Deliver pending/failed outbox rows for one order immediately (used by
+// confirm-credit-payment so the buyer gets their coupon/credits without
+// waiting for the 5-minute cron). Same claim semantics as the cron worker.
+async function processOutboxForOrder(orderId) {
+  const MAX_ATTEMPTS = 6;
+  const sql = getSQL();
+  const due = await sql`
+    SELECT * FROM credit_grant_outbox
+    WHERE razorpay_order_id = ${orderId}
+      AND status IN ('pending', 'failed')
+      AND attempts < ${MAX_ATTEMPTS}
+    ORDER BY created_at ASC
+  `;
+
+  const results = [];
+  for (const row of due) {
+    const claimed = await sql`
+      UPDATE credit_grant_outbox
+      SET status = 'processing', updated_at = NOW()
+      WHERE id = ${row.id}
+        AND status IN ('pending', 'failed')
+        AND attempts = ${row.attempts}
+      RETURNING *
+    `;
+    if (claimed.length === 0) continue;
+    const claimedRow = claimed[0];
+    try {
+      const delivery = await deliverCreditGrant(claimedRow);
+      await sql`UPDATE credit_grant_outbox SET status = 'success', updated_at = NOW() WHERE id = ${claimedRow.id}`;
+      results.push({ id: claimedRow.id, service: claimedRow.service, status: 'success', ...delivery });
+    } catch (err) {
+      const attempts = claimedRow.attempts + 1;
+      const backoffMinutes = Math.pow(2, attempts - 1);
+      await sql`
+        UPDATE credit_grant_outbox
+        SET status = 'failed', attempts = ${attempts}, last_error = ${err.message},
+            next_attempt_at = NOW() + (${backoffMinutes} || ' minutes')::interval, updated_at = NOW()
+        WHERE id = ${claimedRow.id}
+      `;
+      console.error(`[credit-outbox] Grant failed for row ${claimedRow.id} (${claimedRow.service}):`, err.message);
+      results.push({ id: claimedRow.id, service: claimedRow.service, status: 'failed', error: err.message });
+    }
+  }
+  return results;
+}
+
+async function emailZeflashCoupon(row) {
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+    throw new Error('Coupon issued but email is not configured');
+  }
+  const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+  if (!clerkSecretKey) throw new Error('Coupon issued but Clerk is not configured');
+  const clerkClient = createClerkClient({ secretKey: clerkSecretKey });
+  const clerkUser = await clerkClient.users.getUser(row.clerk_user_id);
+  const email = clerkUser.primaryEmailAddress?.emailAddress || clerkUser.emailAddresses?.[0]?.emailAddress;
+  if (!email) throw new Error('Coupon issued but the Clerk user has no email address');
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
+  });
+  await transporter.sendMail({
+    from: `"EVChamp" <${process.env.GMAIL_USER}>`,
+    to: email,
+    subject: 'Your free Zeflash AI diagnostic coupon',
+    html: `<p>Thank you for your EVChamp purchase.</p><p>Your one-time Zeflash AI diagnostic coupon is:</p><p style="font-size:24px;font-weight:700;letter-spacing:2px">${row.coupon_code}</p><p>Enter it in Zeflash to generate one free AI diagnostic. Keep this code private; it can be used once.</p>`,
+  });
+}
+
+// POST /api/create-credit-order — creates a Razorpay order for a catalog
+// plan (see CREDIT_PLANS above), with notes: { planId, clerkUserId }
+// attached so the webhook below knows what to credit once payment is
+// captured. Amount is computed here from the catalog, GST-inclusive — the
+// client only ever supplies which plan it wants, never the price.
+app.post('/api/create-credit-order', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Missing Authorization header' });
+    }
+    const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+    if (!clerkSecretKey) return res.status(500).json({ error: 'Server auth not configured' });
+    const token = authHeader.split(' ')[1];
+    const tokenPayload = await verifyToken(token, { secretKey: clerkSecretKey });
+    const clerkUserId = tokenPayload.sub;
+    if (!clerkUserId) return res.status(401).json({ error: 'Invalid token' });
+
+    const { planId } = req.body;
+    const plan = CREDIT_PLANS[planId];
+    if (!plan) return res.status(400).json({ error: 'Unknown plan' });
+
+    const keyId = process.env.RAZORPAY_KEY_ID;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    if (!keyId || !keySecret) return res.status(500).json({ error: 'Payments not configured' });
+
+    // GST is charged to the customer but isn't part of the credited value —
+    // the webhook credits plan.priceInr regardless of what's actually
+    // charged here, so tax and wallet balance stay independent.
+    const totalInr = Math.round(plan.priceInr * 1.18 * 100) / 100;
+    const amountPaise = Math.round(totalInr * 100);
+
+    const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret });
+    const order = await razorpay.orders.create({
+      amount: amountPaise,
+      currency: 'INR',
+      receipt: `credit_${planId}_${Date.now()}`,
+      notes: { planId, clerkUserId },
+    });
+
+    return res.json({
+      orderId: order.id,
+      amount: order.amount,
+      currency: order.currency,
+      keyId,
+      baseAmount: plan.priceInr,
+      totalAmount: totalInr,
+    });
+  } catch (err) {
+    console.error('[create-credit-order] Error:', err.message);
+    return res.status(500).json({ error: 'Could not create order' });
+  }
+});
+
+// POST /api/confirm-credit-payment — authenticated backup to the Razorpay
+// webhook. Verifies the checkout signature, queues the same outbox rows, and
+// delivers them immediately so the buyer gets a coupon email / Zeflash
+// credits without waiting for cron (critical for local dev where webhooks
+// cannot reach localhost). Idempotent with the webhook via the outbox UNIQUE.
+app.post('/api/confirm-credit-payment', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Missing Authorization header' });
+    }
+    const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+    if (!clerkSecretKey) return res.status(500).json({ error: 'Server auth not configured' });
+    const token = authHeader.split(' ')[1];
+    const tokenPayload = await verifyToken(token, { secretKey: clerkSecretKey });
+    const clerkUserId = tokenPayload.sub;
+    if (!clerkUserId) return res.status(401).json({ error: 'Invalid token' });
+
+    const { razorpay_order_id: orderId, razorpay_payment_id: paymentId, razorpay_signature: signature } = req.body || {};
+    if (!orderId || !paymentId || !signature) {
+      return res.status(400).json({ error: 'Missing Razorpay payment fields' });
+    }
+
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    const keyId = process.env.RAZORPAY_KEY_ID;
+    if (!keySecret || !keyId) return res.status(500).json({ error: 'Payments not configured' });
+
+    const expected = crypto.createHmac('sha256', keySecret).update(`${orderId}|${paymentId}`).digest('hex');
+    if (expected !== signature) return res.status(400).json({ error: 'Invalid payment signature' });
+
+    const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret });
+    const order = await razorpay.orders.fetch(orderId);
+    const planId = order?.notes?.planId;
+    const notesUserId = order?.notes?.clerkUserId;
+    if (!planId || !notesUserId) {
+      return res.status(400).json({ error: 'Order is missing plan/user notes' });
+    }
+    if (notesUserId !== clerkUserId) {
+      return res.status(403).json({ error: 'Order does not belong to this user' });
+    }
+
+    const queued = await queuePlanOutbox({ orderId, paymentId, planId, clerkUserId });
+    const deliveries = await processOutboxForOrder(orderId);
+
+    const zeflashRow = deliveries.find((d) => d.service === 'zeflash');
+    let zeflash = 'pending';
+    if (zeflashRow?.status === 'success' && zeflashRow.couponIssued) zeflash = 'coupon_emailed';
+    else if (zeflashRow?.status === 'success') zeflash = 'credited';
+    else if (zeflashRow?.status === 'failed') zeflash = 'failed';
+    else if (!CREDIT_PLANS[planId]?.lineItems?.some((i) => i.service === 'zeflash')) zeflash = 'n/a';
+
+    // Prefer delivery result; fall back to outbox (e.g. already delivered).
+    let couponCode = zeflashRow?.couponCode || null;
+    if (!couponCode) {
+      const sql = getSQL();
+      const existing = await sql`
+        SELECT coupon_code, status FROM credit_grant_outbox
+        WHERE razorpay_order_id = ${orderId} AND service = 'zeflash'
+        LIMIT 1
+      `;
+      if (existing[0]?.status === 'success' && existing[0].coupon_code) {
+        couponCode = existing[0].coupon_code;
+        if (zeflash === 'pending') zeflash = 'coupon_emailed';
+      } else if (existing[0]?.status === 'success' && zeflash === 'pending') {
+        zeflash = 'credited';
+      }
+    }
+
+    return res.json({ ok: true, queued, deliveries, zeflash, couponCode: couponCode || undefined });
+  } catch (err) {
+    console.error('[confirm-credit-payment] Error:', err.message);
+    return res.status(500).json({ error: 'Could not confirm payment', detail: err.message });
+  }
+});
+
+// Razorpay webhook — server-to-server, fires on payment.captured regardless
+// of whether the buyer's browser tab stays open. Primary durable trigger for
+// granting credit; /api/confirm-credit-payment is an idempotent fast-path.
+//
+// The order/payment must carry `notes: { planId, clerkUserId }` — set these
+// when creating the Razorpay order, so the webhook knows what was bought
+// and for whom without trusting anything from the browser.
+app.post('/api/razorpay-webhook', async (req, res) => {
+  try {
+    const signature = req.headers['x-razorpay-signature'];
+    const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+    if (!secret) {
+      console.error('[razorpay-webhook] RAZORPAY_WEBHOOK_SECRET not configured');
+      return res.status(500).json({ error: 'Webhook not configured' });
+    }
+    const expected = crypto.createHmac('sha256', secret).update(req.rawBody).digest('hex');
+    if (!signature || expected !== signature) {
+      return res.status(400).json({ error: 'Invalid signature' });
+    }
+
+    const event = req.body;
+    if (event.event !== 'payment.captured') {
+      return res.json({ ok: true, ignored: event.event });
+    }
+
+    const payment = event.payload?.payment?.entity;
+    const orderId = payment?.order_id;
+    const paymentId = payment?.id;
+    const notes = payment?.notes || {};
+    const planId = notes.planId;
+    const clerkUserId = notes.clerkUserId;
+
+    const plan = CREDIT_PLANS[planId];
+    if (!plan || !clerkUserId || !orderId) {
+      console.error('[razorpay-webhook] Missing plan/user/order on payment notes', { planId, clerkUserId, orderId });
+      return res.status(400).json({ error: 'Missing plan or user reference in payment notes' });
+    }
+
+    const queued = await queuePlanOutbox({
+      orderId,
+      paymentId,
+      planId,
+      clerkUserId,
+    });
+
+    return res.json({ ok: true, queued });
+  } catch (err) {
+    console.error('[razorpay-webhook] Error:', err.message);
+    return res.status(500).json({ error: 'Webhook processing failed' });
+  }
+});
+
+// GET /api/process-credit-outbox — invoked on a schedule (see vercel.json
+// crons) to deliver queued credit grants with retry + exponential backoff.
+// Protected by CRON_SECRET, same pattern as /api/cron-notify.
+app.get('/api/process-credit-outbox', async (req, res) => {
+  const cronSecret = process.env.CRON_SECRET;
+  if (cronSecret) {
+    const authHeader = req.headers.authorization || '';
+    if (authHeader !== `Bearer ${cronSecret}`) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+  }
+
+  try {
+    const MAX_ATTEMPTS = 6;
+    const sql = getSQL();
+    const due = await sql`
+      SELECT * FROM credit_grant_outbox
+      WHERE status IN ('pending', 'failed') AND attempts < ${MAX_ATTEMPTS} AND next_attempt_at <= NOW()
+      ORDER BY created_at ASC
+      LIMIT 50
+    `;
+
+    let succeeded = 0, failed = 0;
+    for (const row of due) {
+      // Claim the row atomically. Two overlapping cron invocations must not
+      // both deliver an EVChamp-native grant, because that path has no
+      // external idempotency endpoint to absorb a duplicate delivery.
+      const claimed = await sql`
+        UPDATE credit_grant_outbox
+        SET status = 'processing', updated_at = NOW()
+        WHERE id = ${row.id}
+          AND status IN ('pending', 'failed')
+          AND attempts = ${row.attempts}
+        RETURNING *
+      `;
+      if (claimed.length === 0) continue;
+      const claimedRow = claimed[0];
+      try {
+        await deliverCreditGrant(claimedRow);
+        await sql`UPDATE credit_grant_outbox SET status = 'success', updated_at = NOW() WHERE id = ${claimedRow.id}`;
+        succeeded++;
+      } catch (err) {
+        const attempts = claimedRow.attempts + 1;
+        const backoffMinutes = Math.pow(2, attempts - 1); // 1, 2, 4, 8, 16, 32
+        await sql`
+          UPDATE credit_grant_outbox
+          SET status = 'failed', attempts = ${attempts}, last_error = ${err.message},
+              next_attempt_at = NOW() + (${backoffMinutes} || ' minutes')::interval, updated_at = NOW()
+          WHERE id = ${claimedRow.id}
+        `;
+        failed++;
+        console.error(`[credit-outbox] Grant failed for row ${claimedRow.id} (${claimedRow.service}):`, err.message);
+      }
+    }
+
+    return res.json({ processed: due.length, succeeded, failed });
+  } catch (err) {
+    console.error('[credit-outbox] Processing run failed:', err.message);
+    return res.status(500).json({ error: 'Outbox processing failed' });
   }
 });
 

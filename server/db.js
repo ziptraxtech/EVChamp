@@ -183,6 +183,53 @@ async function initDB() {
     `;
     console.log('✅ Neon DB: coupon_usage table ready');
 
+    // ZeVault wallet (mirrors api/index.js bootstrap)
+    await sql`
+      CREATE TABLE IF NOT EXISTS wallet_balance (
+        id SERIAL PRIMARY KEY,
+        clerk_user_id TEXT UNIQUE NOT NULL,
+        balance_paise BIGINT NOT NULL DEFAULT 0,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_wallet_clerk_id ON wallet_balance(clerk_user_id)`;
+
+    await sql`
+      CREATE TABLE IF NOT EXISTS wallet_transactions (
+        id SERIAL PRIMARY KEY,
+        clerk_user_id TEXT NOT NULL,
+        amount_paise BIGINT NOT NULL,
+        direction TEXT NOT NULL,
+        description TEXT,
+        razorpay_payment_id TEXT,
+        razorpay_order_id TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `;
+
+    await sql`
+      CREATE TABLE IF NOT EXISTS credit_grant_outbox (
+        id SERIAL PRIMARY KEY,
+        razorpay_order_id TEXT NOT NULL,
+        razorpay_payment_id TEXT,
+        clerk_user_id TEXT NOT NULL,
+        plan_id TEXT NOT NULL,
+        service TEXT NOT NULL,
+        unit_type TEXT NOT NULL,
+        quantity INTEGER NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        attempts INTEGER NOT NULL DEFAULT 0,
+        last_error TEXT,
+        next_attempt_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        UNIQUE (razorpay_order_id, service, unit_type)
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_outbox_due ON credit_grant_outbox(status, next_attempt_at)`;
+    await sql`ALTER TABLE credit_grant_outbox ADD COLUMN IF NOT EXISTS coupon_code TEXT`;
+    console.log('✅ Neon DB: wallet_balance / credit_grant_outbox ready');
+
     return true;
   } catch (err) {
     console.error('❌ Neon DB init failed:', err.message);

@@ -1,10 +1,4 @@
-/* ──────────────────────────────────────────────────────────────────────────
-   EV Marketplace (Decision Toolkit) — scoped styles.
-   EVERYTHING here is namespaced under `.ev-marketplace` (and keyframes are
-   prefixed `mk*`) so it can never affect the rest of the EVChamp site.
-   Ported from the EV-Buyer Next.js app's globals.css (Tailwind v4 @theme),
-   re-expressed as plain CSS for EVChamp's Tailwind v3 / CRA setup.
-   ────────────────────────────────────────────────────────────────────────── */
+
 
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap');
 

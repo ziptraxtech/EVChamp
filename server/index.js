@@ -11,32 +11,16 @@ require('dotenv').config({
 });
 const express = require('express');
 const cors = require('cors');
-const { 
-  initDB, 
-  saveAudit, 
-  getAuditBySerial, 
-  getAuditById, 
-  getAllAudits, 
-  updateCertificate, 
-  upsertUser, 
-  saveBooking, 
-  saveOfferLead,
-  createAutopaySubscription,
-  getAutopaySubscriptionsByUser,
-  getAutopaySubscriptionById,
-  updateAutopaySubscriptionStatus,
-  updateAutopayPaymentMethod,
-  updateAutopayRenewalDate,
-  recordCouponUsage,
-  hasCouponBeenUsed,
-  getCouponUsageByUser
-} = require('./db');
+const { initDB, saveAudit, getAuditBySerial, getAuditById, getAllAudits, updateCertificate, upsertUser, saveBooking, saveOfferLead } = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
 
 app.use(cors());
-app.use(express.json());
+// Capture the raw body alongside the parsed one — Razorpay webhook signature
+// verification (see /api/razorpay-webhook) must hash the exact raw bytes,
+// not a re-serialized copy of the parsed JSON.
+app.use(express.json({ verify: (req, _res, buf) => { req.rawBody = buf; } }));
 
 // ============================================
 // 🔒 SECURITY VALIDATION
@@ -1361,6 +1345,17 @@ function generateZeflashId() {
   return 'c' + Date.now().toString(36) + Math.random().toString(36).substr(2, 10);
 }
 
+// Matches api/index.js's getSQL() — the credit_grant_outbox/wallet_balance
+// tables live in DATABASE_URL (bootstrapped by api/index.js), not the
+// ZEFLASH_DATABASE_URL that getZeflashSQL() below points at.
+let mainSql = null;
+function getSQL() {
+  if (!mainSql) {
+    mainSql = neonExtra(process.env.DATABASE_URL);
+  }
+  return mainSql;
+}
+
 let zeflashSql = null;
 function getZeflashSQL() {
   if (!zeflashSql) {
@@ -1386,31 +1381,19 @@ app.get('/api/zevault-credits', async (req, res) => {
 
     const payload = await verifyToken(token, { secretKey: clerkSecretKey });
     const clerkUserId = payload.sub;
+    if (!clerkUserId) return res.status(401).json({ error: 'Invalid token' });
 
-    // ZeFlash stores users with a placeholder email derived from the Clerk user ID
-    const placeholderEmail = `${clerkUserId}@placeholder.zeflash.app`;
-
-    const zsql = getZeflashSQL();
-    const rows = await zsql`
-      SELECT c.remaining, c.total, c.used
-      FROM "Credit" c
-      JOIN "User" u ON u.id = c."userId"
-      WHERE u."clerkUserId" = ${clerkUserId}
-      LIMIT 1
+    // Matches api/index.js — ZeVault balance lives in wallet_balance on DATABASE_URL.
+    const sql = getSQL();
+    const rows = await sql`
+      SELECT balance_paise FROM wallet_balance WHERE clerk_user_id = ${clerkUserId} LIMIT 1
     `;
 
-    if (rows.length === 0) {
-      return res.json({ remaining: 0, total: 0, used: 0 });
-    }
-
-    return res.json({
-      remaining: rows[0].remaining,
-      total: rows[0].total,
-      used: rows[0].used,
-    });
+    const balancePaise = rows.length > 0 ? Number(rows[0].balance_paise) : 0;
+    return res.json({ balance_paise: balancePaise, balance_inr: balancePaise / 100 });
   } catch (err) {
-    console.error('[ZeVault Credits Error]', err.message);
-    return res.status(500).json({ error: 'Unable to load your credits right now.' });
+    console.error('[ZeVault Balance Error]', err.message);
+    return res.status(500).json({ error: 'Unable to load your wallet balance right now.', detail: err.message });
   }
 });
 
@@ -1527,6 +1510,382 @@ app.post('/api/zeflash-add-credits', async (req, res) => {
   }
 });
 
+// ============ Credit Grant Outbox (bundle purchase → fan out to partners) ============
+// Mirrors api/index.js (the deployed source of truth) and
+// src/config/creditPlans.ts — kept in sync manually. Requires the
+// credit_grant_outbox table, which is bootstrapped by api/index.js against
+// the shared DATABASE_URL; run that at least once before using this locally.
+// Scoped to EVChamp-only for now — see api/index.js for the full rationale.
+const CREDIT_PLANS = {
+  'zeflash-trial':   { priceInr: 300,  lineItems: [{ service: 'zeflash', unitType: 'diagnostic_test', quantity: 1 }] },
+  'zeflash-starter': { priceInr: 1500, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 1500 }] },
+  'zeflash-value':   { priceInr: 3000, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 3000 }] },
+  'zeflash-smart':   { priceInr: 6000, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 6000 }] },
+};
+
+// See api/index.js for the full rationale.
+const PARTNER_GRANT_ENDPOINTS = {
+  zeflash: { url: `${process.env.ZEFLASH_BACKEND_URL || ''}/partner/credits/grant`, apiKeyEnv: 'ZEFLASH_PARTNER_API_KEY' },
+  zipsureai: { url: 'https://api.zipsureai.com/credits/grant', apiKeyEnv: 'ZIPSUREAI_PARTNER_API_KEY' },
+};
+
+async function deliverCreditGrant(row) {
+  if (row.service === 'evchamp') {
+    const amountPaise = Math.round(row.quantity * 100);
+    const sql = getSQL();
+    await sql`
+      INSERT INTO wallet_balance (clerk_user_id, balance_paise, updated_at)
+      VALUES (${row.clerk_user_id}, ${amountPaise}, NOW())
+      ON CONFLICT (clerk_user_id) DO UPDATE
+        SET balance_paise = wallet_balance.balance_paise + ${amountPaise}, updated_at = NOW()
+    `;
+    await sql`
+      INSERT INTO wallet_transactions (clerk_user_id, amount_paise, direction, description, razorpay_payment_id, razorpay_order_id)
+      VALUES (${row.clerk_user_id}, ${amountPaise}, 'credit', ${row.plan_id}, ${row.razorpay_payment_id}, ${row.razorpay_order_id})
+    `;
+    return { service: 'evchamp', credited: true };
+  }
+
+  const target = PARTNER_GRANT_ENDPOINTS[row.service];
+  if (!target || !target.url || target.url.startsWith('/')) {
+    throw new Error(`No grant endpoint configured for service "${row.service}" (check ZEFLASH_BACKEND_URL)`);
+  }
+  const apiKey = process.env[target.apiKeyEnv];
+  if (!apiKey) throw new Error(`${target.apiKeyEnv} is not configured`);
+
+  const res = await fetch(target.url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      orderId: row.razorpay_order_id,
+      userId: row.clerk_user_id,
+      unitType: row.unit_type,
+      quantity: row.quantity,
+      couponCode: row.coupon_code || undefined,
+    }),
+  });
+  if (!res.ok) throw new Error(`${row.service} grant responded ${res.status}`);
+
+  const result = await res.json().catch(() => ({}));
+  if (row.service === 'zeflash' && result.couponIssued && row.coupon_code) {
+    try {
+      await emailZeflashCoupon(row);
+    } catch (emailErr) {
+      // Coupon is already issued in Zeflash — still return the code so the
+      // success screen can show it even if SMTP fails.
+      console.error('[credit-outbox] Coupon email failed:', emailErr.message);
+    }
+    return { service: 'zeflash', couponIssued: true, couponCode: row.coupon_code };
+  }
+  // Wallet credit path: drop the pre-generated code so we never surface a
+  // coupon that was never created in PartnerCoupon.
+  if (row.service === 'zeflash' && row.coupon_code) {
+    const sql = getSQL();
+    await sql`UPDATE credit_grant_outbox SET coupon_code = NULL WHERE id = ${row.id}`;
+  }
+  return { service: row.service, credited: true, alreadyGranted: !!result.alreadyGranted };
+}
+
+async function queuePlanOutbox({ orderId, paymentId, planId, clerkUserId }) {
+  const plan = CREDIT_PLANS[planId];
+  if (!plan) throw new Error(`Unknown plan: ${planId}`);
+  const sql = getSQL();
+  for (const item of plan.lineItems) {
+    const couponCode = item.service === 'zeflash'
+      ? `EVZ-${crypto.randomBytes(5).toString('hex').toUpperCase()}`
+      : null;
+    await sql`
+      INSERT INTO credit_grant_outbox
+        (razorpay_order_id, razorpay_payment_id, clerk_user_id, plan_id, service, unit_type, quantity, coupon_code)
+      VALUES (${orderId}, ${paymentId}, ${clerkUserId}, ${planId}, ${item.service}, ${item.unitType}, ${item.quantity}, ${couponCode})
+      ON CONFLICT (razorpay_order_id, service, unit_type) DO NOTHING
+    `;
+  }
+  return plan.lineItems.length;
+}
+
+async function processOutboxForOrder(orderId) {
+  const MAX_ATTEMPTS = 6;
+  const sql = getSQL();
+  const due = await sql`
+    SELECT * FROM credit_grant_outbox
+    WHERE razorpay_order_id = ${orderId}
+      AND status IN ('pending', 'failed')
+      AND attempts < ${MAX_ATTEMPTS}
+    ORDER BY created_at ASC
+  `;
+
+  const results = [];
+  for (const row of due) {
+    const claimed = await sql`
+      UPDATE credit_grant_outbox
+      SET status = 'processing', updated_at = NOW()
+      WHERE id = ${row.id}
+        AND status IN ('pending', 'failed')
+        AND attempts = ${row.attempts}
+      RETURNING *
+    `;
+    if (claimed.length === 0) continue;
+    const claimedRow = claimed[0];
+    try {
+      const delivery = await deliverCreditGrant(claimedRow);
+      await sql`UPDATE credit_grant_outbox SET status = 'success', updated_at = NOW() WHERE id = ${claimedRow.id}`;
+      results.push({ id: claimedRow.id, service: claimedRow.service, status: 'success', ...delivery });
+    } catch (err) {
+      const attempts = claimedRow.attempts + 1;
+      const backoffMinutes = Math.pow(2, attempts - 1);
+      await sql`
+        UPDATE credit_grant_outbox
+        SET status = 'failed', attempts = ${attempts}, last_error = ${err.message},
+            next_attempt_at = NOW() + (${backoffMinutes} || ' minutes')::interval, updated_at = NOW()
+        WHERE id = ${claimedRow.id}
+      `;
+      console.error(`[credit-outbox] Grant failed for row ${claimedRow.id} (${claimedRow.service}):`, err.message);
+      results.push({ id: claimedRow.id, service: claimedRow.service, status: 'failed', error: err.message });
+    }
+  }
+  return results;
+}
+
+async function emailZeflashCoupon(row) {
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+    throw new Error('Coupon issued but email is not configured');
+  }
+  const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+  if (!clerkSecretKey) throw new Error('Coupon issued but Clerk is not configured');
+  const clerkClient = createClerkClient({ secretKey: clerkSecretKey });
+  const clerkUser = await clerkClient.users.getUser(row.clerk_user_id);
+  const email = clerkUser.primaryEmailAddress?.emailAddress || clerkUser.emailAddresses?.[0]?.emailAddress;
+  if (!email) throw new Error('Coupon issued but the Clerk user has no email address');
+
+  const nodemailer = require('nodemailer');
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
+  });
+  await transporter.sendMail({
+    from: `"EVChamp" <${process.env.GMAIL_USER}>`,
+    to: email,
+    subject: 'Your free Zeflash AI diagnostic coupon',
+    html: `<p>Thank you for your EVChamp purchase.</p><p>Your one-time Zeflash AI diagnostic coupon is:</p><p style="font-size:24px;font-weight:700;letter-spacing:2px">${row.coupon_code}</p><p>Enter it in Zeflash to generate one free AI diagnostic. Keep this code private; it can be used once.</p>`,
+  });
+}
+
+// See api/index.js for the full rationale — mirrored here for local dev.
+app.post('/api/create-credit-order', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Missing Authorization header' });
+    }
+    const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+    if (!clerkSecretKey) return res.status(500).json({ error: 'Server auth not configured' });
+    const token = authHeader.split(' ')[1];
+    const tokenPayload = await verifyToken(token, { secretKey: clerkSecretKey });
+    const clerkUserId = tokenPayload.sub;
+    if (!clerkUserId) return res.status(401).json({ error: 'Invalid token' });
+
+    const { planId } = req.body;
+    const plan = CREDIT_PLANS[planId];
+    if (!plan) return res.status(400).json({ error: 'Unknown plan' });
+
+    const totalInr = Math.round(plan.priceInr * 1.18 * 100) / 100;
+    const amountPaise = Math.round(totalInr * 100);
+
+    const razorpay = getRazorpay();
+    const order = await razorpay.orders.create({
+      amount: amountPaise,
+      currency: 'INR',
+      receipt: `credit_${planId}_${Date.now()}`,
+      notes: { planId, clerkUserId },
+    });
+
+    return res.json({
+      orderId: order.id,
+      amount: order.amount,
+      currency: order.currency,
+      keyId: process.env.RAZORPAY_KEY_ID,
+      baseAmount: plan.priceInr,
+      totalAmount: totalInr,
+    });
+  } catch (err) {
+    console.error('[create-credit-order] Error:', err.message);
+    return res.status(500).json({ error: 'Could not create order' });
+  }
+});
+
+app.post('/api/confirm-credit-payment', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Missing Authorization header' });
+    }
+    const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+    if (!clerkSecretKey) return res.status(500).json({ error: 'Server auth not configured' });
+    const token = authHeader.split(' ')[1];
+    const tokenPayload = await verifyToken(token, { secretKey: clerkSecretKey });
+    const clerkUserId = tokenPayload.sub;
+    if (!clerkUserId) return res.status(401).json({ error: 'Invalid token' });
+
+    const { razorpay_order_id: orderId, razorpay_payment_id: paymentId, razorpay_signature: signature } = req.body || {};
+    if (!orderId || !paymentId || !signature) {
+      return res.status(400).json({ error: 'Missing Razorpay payment fields' });
+    }
+
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    if (!keySecret) return res.status(500).json({ error: 'Payments not configured' });
+
+    const expected = crypto.createHmac('sha256', keySecret).update(`${orderId}|${paymentId}`).digest('hex');
+    if (expected !== signature) return res.status(400).json({ error: 'Invalid payment signature' });
+
+    const razorpay = getRazorpay();
+    const order = await razorpay.orders.fetch(orderId);
+    const planId = order?.notes?.planId;
+    const notesUserId = order?.notes?.clerkUserId;
+    if (!planId || !notesUserId) {
+      return res.status(400).json({ error: 'Order is missing plan/user notes' });
+    }
+    if (notesUserId !== clerkUserId) {
+      return res.status(403).json({ error: 'Order does not belong to this user' });
+    }
+
+    const queued = await queuePlanOutbox({ orderId, paymentId, planId, clerkUserId });
+    const deliveries = await processOutboxForOrder(orderId);
+
+    const zeflashRow = deliveries.find((d) => d.service === 'zeflash');
+    let zeflash = 'pending';
+    if (zeflashRow?.status === 'success' && zeflashRow.couponIssued) zeflash = 'coupon_emailed';
+    else if (zeflashRow?.status === 'success') zeflash = 'credited';
+    else if (zeflashRow?.status === 'failed') zeflash = 'failed';
+    else if (!CREDIT_PLANS[planId]?.lineItems?.some((i) => i.service === 'zeflash')) zeflash = 'n/a';
+
+    // Prefer delivery result; fall back to outbox (e.g. already delivered).
+    let couponCode = zeflashRow?.couponCode || null;
+    if (!couponCode) {
+      const sql = getSQL();
+      const existing = await sql`
+        SELECT coupon_code, status FROM credit_grant_outbox
+        WHERE razorpay_order_id = ${orderId} AND service = 'zeflash'
+        LIMIT 1
+      `;
+      if (existing[0]?.status === 'success' && existing[0].coupon_code) {
+        couponCode = existing[0].coupon_code;
+        if (zeflash === 'pending') zeflash = 'coupon_emailed';
+      } else if (existing[0]?.status === 'success' && zeflash === 'pending') {
+        zeflash = 'credited';
+      }
+    }
+
+    return res.json({ ok: true, queued, deliveries, zeflash, couponCode: couponCode || undefined });
+  } catch (err) {
+    console.error('[confirm-credit-payment] Error:', err.message);
+    return res.status(500).json({ error: 'Could not confirm payment', detail: err.message });
+  }
+});
+
+app.post('/api/razorpay-webhook', async (req, res) => {
+  try {
+    const signature = req.headers['x-razorpay-signature'];
+    const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+    if (!secret) {
+      console.error('[razorpay-webhook] RAZORPAY_WEBHOOK_SECRET not configured');
+      return res.status(500).json({ error: 'Webhook not configured' });
+    }
+    const expected = crypto.createHmac('sha256', secret).update(req.rawBody).digest('hex');
+    if (!signature || expected !== signature) {
+      return res.status(400).json({ error: 'Invalid signature' });
+    }
+
+    const event = req.body;
+    if (event.event !== 'payment.captured') {
+      return res.json({ ok: true, ignored: event.event });
+    }
+
+    const payment = event.payload?.payment?.entity;
+    const orderId = payment?.order_id;
+    const paymentId = payment?.id;
+    const notes = payment?.notes || {};
+    const planId = notes.planId;
+    const clerkUserId = notes.clerkUserId;
+
+    const plan = CREDIT_PLANS[planId];
+    if (!plan || !clerkUserId || !orderId) {
+      console.error('[razorpay-webhook] Missing plan/user/order on payment notes', { planId, clerkUserId, orderId });
+      return res.status(400).json({ error: 'Missing plan or user reference in payment notes' });
+    }
+
+    const queued = await queuePlanOutbox({
+      orderId,
+      paymentId,
+      planId,
+      clerkUserId,
+    });
+
+    return res.json({ ok: true, queued });
+  } catch (err) {
+    console.error('[razorpay-webhook] Error:', err.message);
+    return res.status(500).json({ error: 'Webhook processing failed' });
+  }
+});
+
+app.get('/api/process-credit-outbox', async (req, res) => {
+  const cronSecret = process.env.CRON_SECRET;
+  if (cronSecret) {
+    const authHeader = req.headers.authorization || '';
+    if (authHeader !== `Bearer ${cronSecret}`) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+  }
+
+  try {
+    const MAX_ATTEMPTS = 6;
+    const sql = getSQL();
+    const due = await sql`
+      SELECT * FROM credit_grant_outbox
+      WHERE status IN ('pending', 'failed') AND attempts < ${MAX_ATTEMPTS} AND next_attempt_at <= NOW()
+      ORDER BY created_at ASC
+      LIMIT 50
+    `;
+
+    let succeeded = 0, failed = 0;
+    for (const row of due) {
+      // Claim each row atomically so overlapping local cron invocations
+      // cannot deliver the same EVChamp wallet credit twice.
+      const claimed = await sql`
+        UPDATE credit_grant_outbox
+        SET status = 'processing', updated_at = NOW()
+        WHERE id = ${row.id}
+          AND status IN ('pending', 'failed')
+          AND attempts = ${row.attempts}
+        RETURNING *
+      `;
+      if (claimed.length === 0) continue;
+      const claimedRow = claimed[0];
+      try {
+        await deliverCreditGrant(claimedRow);
+        await sql`UPDATE credit_grant_outbox SET status = 'success', updated_at = NOW() WHERE id = ${claimedRow.id}`;
+        succeeded++;
+      } catch (err) {
+        const attempts = claimedRow.attempts + 1;
+        const backoffMinutes = Math.pow(2, attempts - 1);
+        await sql`
+          UPDATE credit_grant_outbox
+          SET status = 'failed', attempts = ${attempts}, last_error = ${err.message},
+              next_attempt_at = NOW() + (${backoffMinutes} || ' minutes')::interval, updated_at = NOW()
+          WHERE id = ${claimedRow.id}
+        `;
+        failed++;
+        console.error(`[credit-outbox] Grant failed for row ${claimedRow.id} (${claimedRow.service}):`, err.message);
+      }
+    }
+
+    return res.json({ processed: due.length, succeeded, failed });
+  } catch (err) {
+    console.error('[credit-outbox] Processing run failed:', err.message);
+    return res.status(500).json({ error: 'Outbox processing failed' });
+  }
+});
+
 // ============================================================
 // 🔔 FIREBASE PUSH NOTIFICATIONS
 // ============================================================
@@ -1574,291 +1933,223 @@ function requireAdminApiKey(req, res, next) {
   next();
 }
 
-// Helper: verify Clerk JWT token
-async function verifyClerkToken(req, res, next) {
-  try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Missing or invalid Authorization header' });
-    }
-
-    const token = authHeader.substring(7);
-    
-    // For now, we'll do basic validation by checking token format
-    // In production, you should verify with Clerk's SDK or webhook verification
-    if (!token || token.length < 10) {
-      return res.status(401).json({ error: 'Invalid token format' });
-    }
-
-    // Extract user ID from the request body or query params
-    // In production, decode and verify the JWT with Clerk's verification key
-    req.clerkToken = token;
-    next();
-  } catch (err) {
-    console.error('[Clerk Auth Error]', err.message);
-    return res.status(401).json({ error: 'Authentication failed' });
+// POST /api/store-fcm-token  — called by the app when it gets a token
+app.post('/api/store-fcm-token', async (req, res) => {
+  const { token } = req.body;
+  if (!token || typeof token !== 'string') {
+    return res.status(400).json({ error: 'token is required' });
   }
-}
+  fcmTokenStore.add(token.trim());
+  console.log(`[FCM] Token stored. Total tokens: ${fcmTokenStore.size}`);
+  return res.json({ success: true, totalTokens: fcmTokenStore.size });
+});
 
-// ── Autopay Subscriptions API ──────────────────────────────────────────────
-// POST /api/autopay/subscriptions - Create a new autopay subscription
-app.post('/api/autopay/subscriptions', verifyClerkToken, async (req, res) => {
+// POST /api/send-notification-all  — send to ALL registered devices
+app.post('/api/send-notification-all', requireAdminApiKey, async (req, res) => {
+  const { title, body, data } = req.body;
+  if (!title || !body) return res.status(400).json({ error: 'title and body are required' });
+
   try {
-    const { userId, planId, planName, planDetails, razorpaySubscriptionId } = req.body;
+    const firebase = getFirebaseApp();
+    const msg = messaging(firebase);
 
-    if (!userId || !planId || !planName) {
-      return res.status(400).json({ error: 'Missing required fields: userId, planId, planName' });
+    const tokens = Array.from(fcmTokenStore);
+    if (tokens.length === 0) {
+      return res.status(404).json({ error: 'No active FCM tokens found. Open the app first.' });
     }
 
-    // Generate subscription ID
-    const subscriptionId = `sub_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-    // Calculate next renewal date
-    const nextRenewalDate = new Date();
-    if (planDetails?.months) {
-      nextRenewalDate.setMonth(nextRenewalDate.getMonth() + planDetails.months);
-    } else {
-      // Default to 1 month if not specified
-      nextRenewalDate.setMonth(nextRenewalDate.getMonth() + 1);
-    }
-
-    const subscriptionData = {
-      subscriptionId,
-      clerkUserId: userId,
-      planId,
-      planName,
-      planDetails: planDetails || {},
-      razorpaySubscriptionId,
-      nextRenewalDate,
-      paymentMethod: req.body.paymentMethod || {}
+    const message = {
+      notification: { title, body },
+      data: data || {},
+      android: {
+        notification: {
+          sound: 'default',
+          channelId: 'evchamp_default',
+          priority: 'high',
+        },
+      },
+      apns: {
+        payload: { aps: { sound: 'default', badge: 1 } },
+      },
     };
 
-    const result = await createAutopaySubscription(subscriptionData);
+    // Send in chunks of 500 (FCM limit)
+    let successCount = 0;
+    let failCount = 0;
+    const tokenArray = tokens;
+    for (let i = 0; i < tokenArray.length; i += 500) {
+      const chunk = tokenArray.slice(i, i + 500);
+      const response = await msg.sendEachForMulticast({ ...message, tokens: chunk });
+      successCount += response.successCount;
+      failCount += response.failureCount;
 
-    console.log('✅ Autopay subscription created:', subscriptionId);
-    return res.status(201).json({
-      success: true,
-      message: 'Autopay subscription created',
-      subscriptionId: result.subscription_id,
-      nextRenewalDate: result.next_renewal_date,
-    });
-  } catch (err) {
-    console.error('[Autopay Create Error]', err.message);
-    return res.status(500).json({ error: err.message || 'Failed to create subscription' });
-  }
-});
-
-// GET /api/autopay/subscriptions - Get user's subscriptions
-app.get('/api/autopay/subscriptions', verifyClerkToken, async (req, res) => {
-  try {
-    const userId = req.query.userId;
-
-    if (!userId) {
-      return res.status(400).json({ error: 'Missing userId query parameter' });
-    }
-
-    const subscriptions = await getAutopaySubscriptionsByUser(userId);
-
-    return res.json({
-      success: true,
-      subscriptions: subscriptions || []
-    });
-  } catch (err) {
-    console.error('[Autopay Fetch Error]', err.message);
-    return res.status(500).json({ error: err.message || 'Failed to fetch subscriptions' });
-  }
-});
-
-// GET /api/autopay/subscriptions/:subscriptionId - Get specific subscription
-app.get('/api/autopay/subscriptions/:subscriptionId', verifyClerkToken, async (req, res) => {
-  try {
-    const { subscriptionId } = req.params;
-
-    const subscription = await getAutopaySubscriptionById(subscriptionId);
-    if (!subscription) {
-      return res.status(404).json({ error: 'Subscription not found' });
-    }
-
-    return res.json({
-      success: true,
-      subscription
-    });
-  } catch (err) {
-    console.error('[Autopay Get Error]', err.message);
-    return res.status(500).json({ error: err.message || 'Failed to fetch subscription' });
-  }
-});
-
-// PATCH /api/autopay/subscriptions/:subscriptionId - Update subscription status
-app.patch('/api/autopay/subscriptions/:subscriptionId', verifyClerkToken, async (req, res) => {
-  try {
-    const { subscriptionId } = req.params;
-    const { status } = req.body;
-
-    if (!status || !['active', 'paused', 'cancelled', 'expired'].includes(status)) {
-      return res.status(400).json({ error: 'Invalid status. Must be: active, paused, cancelled, or expired' });
-    }
-
-    const subscription = await updateAutopaySubscriptionStatus(subscriptionId, status);
-    if (!subscription) {
-      return res.status(404).json({ error: 'Subscription not found' });
-    }
-
-    console.log(`✅ Autopay subscription ${subscriptionId} status updated to ${status}`);
-    return res.json({
-      success: true,
-      message: `Subscription ${status} successfully`,
-      status: subscription.status
-    });
-  } catch (err) {
-    console.error('[Autopay Update Error]', err.message);
-    return res.status(500).json({ error: err.message || 'Failed to update subscription' });
-  }
-});
-
-// PATCH /api/autopay/subscriptions/:subscriptionId/payment-method - Update payment method
-app.patch('/api/autopay/subscriptions/:subscriptionId/payment-method', verifyClerkToken, async (req, res) => {
-  try {
-    const { subscriptionId } = req.params;
-    const { paymentMethodId } = req.body;
-
-    if (!paymentMethodId) {
-      return res.status(400).json({ error: 'Missing paymentMethodId' });
-    }
-
-    const subscription = await updateAutopayPaymentMethod(subscriptionId, { id: paymentMethodId });
-    if (!subscription) {
-      return res.status(404).json({ error: 'Subscription not found' });
-    }
-
-    console.log(`✅ Payment method updated for subscription ${subscriptionId}`);
-    return res.json({
-      success: true,
-      message: 'Payment method updated successfully'
-    });
-  } catch (err) {
-    console.error('[Autopay Payment Method Error]', err.message);
-    return res.status(500).json({ error: err.message || 'Failed to update payment method' });
-  }
-});
-
-// POST /api/autopay/subscriptions/:subscriptionId/renew - Trigger manual renewal
-app.post('/api/autopay/subscriptions/:subscriptionId/renew', verifyClerkToken, async (req, res) => {
-  try {
-    const { subscriptionId } = req.params;
-
-    const subscription = await getAutopaySubscriptionById(subscriptionId);
-    if (!subscription) {
-      return res.status(404).json({ error: 'Subscription not found' });
-    }
-
-    if (subscription.status !== 'active') {
-      return res.status(400).json({ error: 'Subscription is not active' });
-    }
-
-    // Calculate next renewal date
-    const nextRenewalDate = new Date();
-    const planDetails = subscription.plan_details || {};
-    if (planDetails.months) {
-      nextRenewalDate.setMonth(nextRenewalDate.getMonth() + planDetails.months);
-    } else {
-      nextRenewalDate.setMonth(nextRenewalDate.getMonth() + 1);
-    }
-
-    const updatedSubscription = await updateAutopayRenewalDate(subscriptionId, nextRenewalDate);
-
-    console.log(`✅ Manual renewal triggered for subscription ${subscriptionId}`);
-    return res.json({
-      success: true,
-      message: 'Renewal charged successfully',
-      nextRenewalDate: updatedSubscription.next_renewal_date
-    });
-  } catch (err) {
-    console.error('[Autopay Renewal Error]', err.message);
-    return res.status(500).json({ error: err.message || 'Failed to process renewal' });
-  }
-});
-
-// ── Coupon Usage API ───────────────────────────────────────────────────────
-// GET /api/coupons/check-usage - Check if user has used coupon for plan
-app.get('/api/coupons/check-usage', verifyClerkToken, async (req, res) => {
-  try {
-    const { userId, planId } = req.query;
-
-    if (!userId || !planId) {
-      return res.status(400).json({ error: 'Missing userId or planId' });
-    }
-
-    const hasUsed = await hasCouponBeenUsed(userId, planId);
-
-    return res.json({
-      success: true,
-      hasUsedCoupon: hasUsed,
-      message: hasUsed ? 'Coupon already used for this plan' : 'Eligible for welcome discount'
-    });
-  } catch (err) {
-    console.error('[Coupon Check Error]', err.message);
-    return res.status(500).json({ error: err.message || 'Failed to check coupon usage' });
-  }
-});
-
-// POST /api/coupons/record-usage - Record coupon usage
-app.post('/api/coupons/record-usage', verifyClerkToken, async (req, res) => {
-  try {
-    const { userId, planId, couponCode, discountAmount, originalPrice, finalPrice, subscriptionId, paymentId } = req.body;
-
-    if (!userId || !planId || !couponCode) {
-      return res.status(400).json({ error: 'Missing required fields: userId, planId, couponCode' });
-    }
-
-    const result = await recordCouponUsage(
-      userId,
-      planId,
-      couponCode,
-      discountAmount,
-      originalPrice,
-      finalPrice,
-      subscriptionId,
-      paymentId
-    );
-
-    if (!result) {
-      return res.status(409).json({ 
-        error: 'Coupon already used for this plan',
-        message: 'This coupon can only be used once per plan per user'
+      // Remove invalid tokens
+      response.responses.forEach((r, idx) => {
+        if (!r.success && (
+          r.error?.code === 'messaging/invalid-registration-token' ||
+          r.error?.code === 'messaging/registration-token-not-registered'
+        )) {
+          fcmTokenStore.delete(chunk[idx]);
+        }
       });
     }
 
-    console.log(`✅ Coupon usage recorded for user ${userId} on plan ${planId}`);
-    return res.status(201).json({
+    console.log(`[FCM] Sent to all — success: ${successCount}, failed: ${failCount}`);
+    return res.json({
       success: true,
-      message: 'Coupon usage recorded',
-      usageId: result.id
+      message: `Notification sent to ${successCount} device(s)`,
+      successCount,
+      failCount,
+      totalTokens: fcmTokenStore.size,
     });
   } catch (err) {
-    console.error('[Coupon Record Error]', err.message);
-    return res.status(500).json({ error: err.message || 'Failed to record coupon usage' });
+    console.error('[FCM Send All Error]', err.message);
+    return res.status(500).json({ error: err.message });
   }
 });
 
-// GET /api/coupons/usage-history - Get user's coupon usage history
-app.get('/api/coupons/usage-history', verifyClerkToken, async (req, res) => {
-  try {
-    const { userId } = req.query;
+// POST /api/send-notification-topic  — send to a Firebase topic (e.g. "all_users")
+app.post('/api/send-notification-topic', requireAdminApiKey, async (req, res) => {
+  const { title, body, data, topic } = req.body;
+  if (!title || !body) return res.status(400).json({ error: 'title and body are required' });
+  if (!topic) return res.status(400).json({ error: 'topic is required' });
 
-    if (!userId) {
-      return res.status(400).json({ error: 'Missing userId' });
+  try {
+    const firebase = getFirebaseApp();
+    const messaging = admin.messaging();
+
+    const messageId = await messaging.send({
+      notification: { title, body },
+      data: data || {},
+      topic,
+      android: {
+        notification: {
+          sound: 'default',
+          channelId: 'evchamp_default',
+          priority: 'high',
+        },
+      },
+      apns: {
+        payload: { aps: { sound: 'default', badge: 1 } },
+      },
+    });
+
+    console.log(`[FCM] Topic "${topic}" — messageId: ${messageId}`);
+    return res.json({ success: true, message: `Sent to topic: ${topic}`, messageId, topic });
+  } catch (err) {
+    console.error('[FCM Send Topic Error]', err.message);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/send-notification-user  — send to a specific Clerk user
+app.post('/api/send-notification-user', requireAdminApiKey, async (req, res) => {
+  const { title, body, data, clerkUserId } = req.body;
+  if (!title || !body) return res.status(400).json({ error: 'title and body are required' });
+  if (!clerkUserId) return res.status(400).json({ error: 'clerkUserId is required' });
+
+  // In a real app you would look up the token from your DB by clerkUserId.
+  // For now, broadcast to all tokens with clerkUserId in the data payload so
+  // the app can filter on its side (a simple but functional approach).
+  try {
+    const firebase = getFirebaseApp();
+    const messaging = admin.messaging();
+
+    const tokens = Array.from(fcmTokenStore);
+    if (tokens.length === 0) {
+      return res.status(404).json({ error: 'No active FCM tokens. User must open the app first.' });
     }
 
-    const usageHistory = await getCouponUsageByUser(userId);
+    const message = {
+      notification: { title, body },
+      data: { ...(data || {}), targetClerkUserId: clerkUserId },
+      android: {
+        notification: {
+          sound: 'default',
+          channelId: 'evchamp_default',
+          priority: 'high',
+        },
+      },
+      apns: {
+        payload: { aps: { sound: 'default', badge: 1 } },
+      },
+    };
 
+    const response = await messaging.sendEachForMulticast({ ...message, tokens });
+    console.log(`[FCM] User ${clerkUserId} — success: ${response.successCount}`);
     return res.json({
       success: true,
-      history: usageHistory || [],
-      totalSavings: usageHistory.reduce((sum, usage) => sum + (usage.discount_amount || 0), 0)
+      message: `Notification sent for user ${clerkUserId}`,
+      successCount: response.successCount,
+      failCount: response.failureCount,
     });
   } catch (err) {
-    console.error('[Coupon History Error]', err.message);
-    return res.status(500).json({ error: err.message || 'Failed to fetch coupon usage history' });
+    console.error('[FCM Send User Error]', err.message);
+    return res.status(500).json({ error: err.message });
   }
+});
+
+// POST /api/test-notification  — quick test (no API key needed, but rate-limited)
+app.post('/api/test-notification', async (req, res) => {
+  try {
+    const firebase = getFirebaseApp();
+    const msg = messaging(firebase);
+
+    const tokens = Array.from(fcmTokenStore);
+    if (tokens.length === 0) {
+      return res.status(404).json({
+        error: 'No active FCM tokens found',
+        message: 'Open the EVChamp app on your Android device first, then retry.',
+        totalActiveTokens: 0,
+      });
+    }
+
+    // Send to first available token
+    const token = tokens[0];
+    const messageId = await msg.send({
+      notification: {
+        title: '🔔 EVChamp Test',
+        body: 'Push notifications are working! ✅',
+      },
+      data: { type: 'test', timestamp: Date.now().toString() },
+      token,
+      android: {
+        notification: {
+          sound: 'default',
+          channelId: 'evchamp_default',
+          priority: 'high',
+        },
+      },
+    });
+
+    console.log(`[FCM] Test notification sent — messageId: ${messageId}`);
+    return res.json({
+      success: true,
+      message: 'Test notification sent!',
+      messageId,
+      tokenUsed: token.slice(0, 20) + '...',
+      totalActiveTokens: fcmTokenStore.size,
+    });
+  } catch (err) {
+    console.error('[FCM Test Error]', err.message);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/fcm-status  — check how many tokens are registered
+app.get('/api/fcm-status', requireAdminApiKey, (req, res) => {
+  res.json({
+    registeredTokens: fcmTokenStore.size,
+    firebaseConfigured: !!process.env.FIREBASE_SERVICE_ACCOUNT_KEY,
+    adminKeyConfigured: !!process.env.ADMIN_API_KEY,
+  });
+});
+
+// Initialize DB and start server
+initDB().then((ok) => {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`ZipBattery API server running on http://0.0.0.0:${PORT}`);
+    if (ok) console.log('📦 Neon DB connected and ready');
+    else console.log('⚠️  Running without Neon DB — configure DATABASE_URL in .env');
+  });
 });

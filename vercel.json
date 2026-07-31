@@ -38,6 +38,22 @@
       "destination": "/api/index.js"
     },
     {
+      "source": "/api/create-credit-order",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/api/confirm-credit-payment",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/api/razorpay-webhook",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/api/process-credit-outbox",
+      "destination": "/api/index.js"
+    },
+    {
       "source": "/api/store-fcm-token",
       "destination": "/api/index.js"
     },
@@ -96,6 +112,12 @@
     {
       "source": "/(.*)",
       "destination": "/index.html"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/process-credit-outbox",
+      "schedule": "*/5 * * * *"
     }
   ],
   "headers": [
