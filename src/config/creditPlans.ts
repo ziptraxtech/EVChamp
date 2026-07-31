@@ -25,7 +25,7 @@ export const CREDIT_PLANS: CreditPlan[] = [
   {
     id: 'zeflash-trial',
     name: 'One Time',
-    priceInr: 1, // temporary live test price — restore to 300
+    priceInr: 300,
     // One Zeflash diagnostic. If the buyer already has a Zeflash account
     // (same Clerk user), credits land in their Zeflash wallet. Otherwise
     // EVChamp emails a one-time EVZ-… coupon they can redeem unsigned.

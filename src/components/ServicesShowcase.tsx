@@ -314,7 +314,7 @@ const ServicesShowcase: React.FC = () => {
                 </div>
                 <div className="mb-6">
                   <div className="flex items-center gap-2">
-                    <span className="text-4xl font-extrabold text-emerald-700">₹1</span>
+                    <span className="text-4xl font-extrabold text-emerald-700">₹300</span>
                     <p className="text-xs text-gray-600"> — Test price, 1 Zeflash AI diagnostic</p>
                   </div>
                 </div>
@@ -342,8 +342,8 @@ const ServicesShowcase: React.FC = () => {
                 </ul>
                 <button
                   onClick={() => {
-                    console.log('📋 Trial Plan Selected:', { plan: 'trial', tests: 1, months: 0, price: 1, amountInPaise: 100 });
-                    navigate('/checkout?plan=trial&tests=1&months=0&price=1');
+                    console.log('📋 Trial Plan Selected:', { plan: 'trial', tests: 1, months: 0, price: 300, amountInPaise: 30000 });
+                    navigate('/checkout?plan=trial&tests=1&months=0&price=300');
                     window.scrollTo({ top: 0, behavior: 'auto' });
                   }}
                   className="block w-full text-center rounded-lg text-white font-semibold px-4 py-2.5 shadow-sm"

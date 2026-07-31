@@ -1517,7 +1517,7 @@ app.post('/api/zeflash-add-credits', async (req, res) => {
 // the shared DATABASE_URL; run that at least once before using this locally.
 // Scoped to EVChamp-only for now — see api/index.js for the full rationale.
 const CREDIT_PLANS = {
-  'zeflash-trial':   { priceInr: 1,    lineItems: [{ service: 'zeflash', unitType: 'diagnostic_test', quantity: 1 }] }, // temp live test — restore 300
+  'zeflash-trial':   { priceInr: 300,  lineItems: [{ service: 'zeflash', unitType: 'diagnostic_test', quantity: 1 }] },
   'zeflash-starter': { priceInr: 1500, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 1500 }] },
   'zeflash-value':   { priceInr: 3000, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 3000 }] },
   'zeflash-smart':   { priceInr: 6000, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 6000 }] },
