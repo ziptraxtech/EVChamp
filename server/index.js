@@ -1517,7 +1517,7 @@ app.post('/api/zeflash-add-credits', async (req, res) => {
 // the shared DATABASE_URL; run that at least once before using this locally.
 // Scoped to EVChamp-only for now — see api/index.js for the full rationale.
 const CREDIT_PLANS = {
-  'zeflash-trial':   { priceInr: 300,  lineItems: [{ service: 'zeflash', unitType: 'diagnostic_test', quantity: 1 }] },
+  'zeflash-trial':   { priceInr: 1,    lineItems: [{ service: 'zeflash', unitType: 'diagnostic_test', quantity: 1 }] }, // temp live test — restore 300
   'zeflash-starter': { priceInr: 1500, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 1500 }] },
   'zeflash-value':   { priceInr: 3000, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 3000 }] },
   'zeflash-smart':   { priceInr: 6000, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 6000 }] },
@@ -1710,7 +1710,14 @@ app.post('/api/create-credit-order', async (req, res) => {
     });
   } catch (err) {
     console.error('[create-credit-order] Error:', err.message);
-    return res.status(500).json({ error: 'Could not create order' });
+    const msg = String(err.message || '');
+    if (/jwt|token|authenticated|clerk/i.test(msg)) {
+      return res.status(401).json({
+        error: 'Auth failed — Clerk publishable key must match CLERK_SECRET_KEY (both live or both test)',
+        detail: msg,
+      });
+    }
+    return res.status(500).json({ error: 'Could not create order', detail: msg });
   }
 });
 

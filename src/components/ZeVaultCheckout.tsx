@@ -118,7 +118,7 @@ const ZeVaultCheckout: React.FC = () => {
       });
       if (!orderRes.ok) {
         const errBody = await orderRes.json().catch(() => ({}));
-        throw new Error(errBody.error || 'Could not start checkout');
+        throw new Error(errBody.detail || errBody.error || 'Could not start checkout');
       }
       const order = await orderRes.json();
 

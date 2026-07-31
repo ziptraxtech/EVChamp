@@ -1559,7 +1559,7 @@ app.post('/api/wallet-deduct', async (req, res) => {
 // The live catalog is EVChamp-only. Add Zeflash/ZipsureAI line items only
 // after their authenticated, idempotent partner endpoints are deployed.
 const CREDIT_PLANS = {
-  'zeflash-trial':   { priceInr: 300,  lineItems: [{ service: 'zeflash', unitType: 'diagnostic_test', quantity: 1 }] },
+  'zeflash-trial':   { priceInr: 1,    lineItems: [{ service: 'zeflash', unitType: 'diagnostic_test', quantity: 1 }] }, // temp live test — restore 300
   'zeflash-starter': { priceInr: 1500, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 1500 }] },
   'zeflash-value':   { priceInr: 3000, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 3000 }] },
   'zeflash-smart':   { priceInr: 6000, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 6000 }] },
@@ -1748,8 +1748,8 @@ app.post('/api/create-credit-order', async (req, res) => {
     const plan = CREDIT_PLANS[planId];
     if (!plan) return res.status(400).json({ error: 'Unknown plan' });
 
-    const keyId = process.env.RAZORPAY_KEY_ID;
-    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    const keyId = process.env.RAZORPAY_KEY_ID || process.env.REACT_APP_RAZORPAY_KEY_ID;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET || process.env.REACT_APP_RAZORPAY_KEY_SECRET;
     if (!keyId || !keySecret) return res.status(500).json({ error: 'Payments not configured' });
 
     // GST is charged to the customer but isn't part of the credited value —
@@ -1776,7 +1776,14 @@ app.post('/api/create-credit-order', async (req, res) => {
     });
   } catch (err) {
     console.error('[create-credit-order] Error:', err.message);
-    return res.status(500).json({ error: 'Could not create order' });
+    const msg = String(err.message || '');
+    if (/jwt|token|authenticated|clerk/i.test(msg)) {
+      return res.status(401).json({
+        error: 'Auth failed — Clerk publishable key must match CLERK_SECRET_KEY (both live or both test)',
+        detail: msg,
+      });
+    }
+    return res.status(500).json({ error: 'Could not create order', detail: msg });
   }
 });
 
