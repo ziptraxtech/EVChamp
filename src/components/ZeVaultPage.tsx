@@ -31,6 +31,8 @@ const ZeVaultPage: React.FC = () => {
         if (!token) return;
         const response = await fetch('/api/zevault-credits', {
           headers: { Authorization: `Bearer ${token}` },
+          // Prevent caching to always get the latest balance
+          cache: 'no-store',
         });
         if (!response.ok) throw new Error('Unable to load your wallet balance right now.');
         const data = await response.json();
@@ -43,6 +45,13 @@ const ZeVaultPage: React.FC = () => {
     };
 
     void fetchBalance();
+    
+    // Refresh balance every 5 seconds to catch updates from recent payments
+    const balanceRefreshInterval = setInterval(() => {
+      void fetchBalance();
+    }, 5000);
+
+    return () => clearInterval(balanceRefreshInterval);
   }, [isSignedIn, getToken]);
 
   const balanceInr = balancePaise !== null ? balancePaise / 100 : null;
