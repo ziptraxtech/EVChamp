@@ -13,6 +13,20 @@ const CATALOG_PLAN_ID: { [key: string]: string } = {
   smart: 'zeflash-smart',
 };
 
+// Coupon codes configuration
+const AVAILABLE_COUPONS: { [key: string]: { type: 'flat' | 'percentage'; value: number; description: string } } = {
+  'EVCODERS': {
+    type: 'flat',
+    value: 999999,
+    description: 'Special offer - Pay only ₹1',
+  },
+  'OFFSEASON': {
+    type: 'percentage',
+    value: 20,
+    description: '20% discount on final amount',
+  },
+};
+
 function loadRazorpayScript(): Promise<void> {
   return new Promise((resolve, reject) => {
     if ((window as any).Razorpay) { resolve(); return; }
@@ -38,6 +52,11 @@ const ZeVaultCheckout: React.FC = () => {
   const [fulfillmentNote, setFulfillmentNote] = useState<string | null>(null);
   const [issuedCouponCode, setIssuedCouponCode] = useState<string | null>(null);
   const [couponCopied, setCouponCopied] = useState(false);
+  
+  // Coupon state
+  const [couponInput, setCouponInput] = useState('');
+  const [couponApplied, setCouponApplied] = useState<any>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
 
   // Extract params
   const plan = searchParams.get('plan');
@@ -93,6 +112,51 @@ const ZeVaultCheckout: React.FC = () => {
     return `${testCount} battery diagnostic tests`;
   };
 
+  const handleValidateCoupon = async () => {
+    if (!couponInput.trim()) {
+      setCouponError('Please enter a coupon code');
+      return;
+    }
+
+    const couponCode = couponInput.toUpperCase().trim();
+    const coupon = AVAILABLE_COUPONS[couponCode];
+
+    if (!coupon) {
+      setCouponError('Invalid coupon code. Available codes: EVCODERS, OFFSEASON');
+      return;
+    }
+
+    // Calculate discount
+    let discountAmount = 0;
+    let finalAmount = planDetails.price;
+
+    if (coupon.type === 'flat') {
+      discountAmount = Math.min(coupon.value, planDetails.price - 1);
+      finalAmount = Math.max(1, planDetails.price - discountAmount);
+    } else if (coupon.type === 'percentage') {
+      discountAmount = Math.round((planDetails.price * coupon.value) / 100);
+      finalAmount = Math.max(1, planDetails.price - discountAmount);
+    }
+
+    setCouponApplied({
+      couponCode: couponCode,
+      discountType: coupon.type,
+      discountValue: coupon.value,
+      discountAmount: discountAmount,
+      originalAmount: planDetails.price,
+      finalAmount: finalAmount,
+      description: coupon.description,
+    });
+    setCouponInput('');
+    setCouponError(null);
+  };
+
+  const handleRemoveCoupon = () => {
+    setCouponApplied(null);
+    setCouponInput('');
+    setCouponError(null);
+  };
+
   const handlePayment = async () => {
     if (!planDetails || !paymentBreakdown || !user?.primaryEmailAddress?.emailAddress) {
       setError('Unable to process payment. Missing required information.');
@@ -114,7 +178,10 @@ const ZeVaultCheckout: React.FC = () => {
       const orderRes = await fetch('/api/create-credit-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ planId: catalogPlanId }),
+        body: JSON.stringify({ 
+          planId: catalogPlanId,
+          couponCode: couponApplied?.couponCode || null,
+        }),
       });
       if (!orderRes.ok) {
         const errBody = await orderRes.json().catch(() => ({}));
@@ -354,17 +421,40 @@ const ZeVaultCheckout: React.FC = () => {
             <div className="rounded-xl border border-slate-700 bg-slate-900/50 p-4 space-y-3">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-slate-400">Subtotal</span>
-                <span className="text-white font-semibold">₹{planDetails.price.toLocaleString('en-IN')}</span>
+                <span className="text-white font-semibold">₹{(couponApplied?.originalAmount || planDetails.price).toLocaleString('en-IN')}</span>
               </div>
+
+              {/* Coupon Discount */}
+              {couponApplied && (
+                <div className="flex items-center justify-between text-sm bg-green-500/10 rounded-lg px-3 py-2 border border-green-500/30">
+                  <span className="text-green-400 font-semibold">
+                    {couponApplied.discountType === 'flat' 
+                      ? `Discount (${couponApplied.couponCode})`
+                      : `Discount ${couponApplied.discountValue}% (${couponApplied.couponCode})`
+                    }
+                  </span>
+                  <span className="text-green-300 font-bold">-₹{couponApplied.discountAmount.toLocaleString('en-IN')}</span>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-slate-400">
+                  {couponApplied ? 'Subtotal after discount' : 'Subtotal'}
+                </span>
+                <span className="text-white font-semibold">₹{(couponApplied?.finalAmount || planDetails.price).toLocaleString('en-IN')}</span>
+              </div>
+
               <div className="flex items-center justify-between text-sm">
                 <span className="text-slate-400">GST (18%)</span>
-                <span className="text-white font-semibold">₹{paymentBreakdown?.gstAmount % 1 === 0 ? Math.floor(paymentBreakdown.gstAmount).toLocaleString('en-IN') : paymentBreakdown?.gstAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="text-white font-semibold">₹{((couponApplied?.finalAmount || planDetails.price) * 0.18 % 1 === 0 
+                  ? Math.floor((couponApplied?.finalAmount || planDetails.price) * 0.18).toLocaleString('en-IN') 
+                  : ((couponApplied?.finalAmount || planDetails.price) * 0.18).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }))}</span>
               </div>
 
               <div className="border-t border-slate-700 pt-3 flex items-center justify-between">
                 <span className="font-semibold text-slate-100">Total Amount</span>
                 <span className="text-2xl font-bold text-yellow-300">
-                  ₹{paymentBreakdown?.totalAmount % 1 === 0 ? Math.floor(paymentBreakdown.totalAmount).toLocaleString('en-IN') : paymentBreakdown?.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  ₹{Math.round((couponApplied?.finalAmount || planDetails.price) * 1.18).toLocaleString('en-IN')}
                 </span>
               </div>
             </div>
@@ -403,6 +493,67 @@ const ZeVaultCheckout: React.FC = () => {
           {/* Payment Section */}
           <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-6 h-fit sticky top-24">
             <h2 className="text-lg font-semibold text-white mb-6">Payment Details</h2>
+
+            {/* Coupon Section */}
+            <div className="rounded-xl border border-cyan-500/30 bg-cyan-950/20 p-4 mb-6">
+              <p className="text-xs font-semibold text-cyan-300 uppercase tracking-wider mb-3">
+                Have a coupon code? Enter it below
+              </p>
+              
+              {couponApplied ? (
+                <div className="rounded-lg border border-green-500/40 bg-green-500/10 p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <p className="text-xs text-green-300/70 mb-1">Coupon Applied ✓</p>
+                      <p className="text-lg font-bold text-green-300">{couponApplied.couponCode}</p>
+                      <p className="text-xs text-green-300/60 mt-1">{couponApplied.description}</p>
+                    </div>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-400">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                      <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRemoveCoupon}
+                    className="text-xs text-green-300/60 hover:text-green-300 underline"
+                  >
+                    Remove coupon
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={couponInput}
+                      onChange={(e) => {
+                        setCouponInput(e.target.value.toUpperCase());
+                        setCouponError(null);
+                      }}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          handleValidateCoupon();
+                        }
+                      }}
+                      placeholder="Enter coupon code"
+                      className="flex-1 px-3 py-2 rounded-lg border border-slate-600 bg-slate-900/50 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50"
+                    />
+                    <button
+                      onClick={handleValidateCoupon}
+                      disabled={!couponInput.trim()}
+                      className="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white text-sm font-semibold transition-all"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                  {couponError && (
+                    <p className="text-xs text-red-400">{couponError}</p>
+                  )}
+                  <p className="text-xs text-slate-400">Try: OFFSEASON (20% off)</p>
+                </div>
+              )}
+            </div>
 
             {/* User Info */}
             <div className="rounded-xl border border-slate-700 bg-slate-900/50 p-4 mb-6">
@@ -479,7 +630,7 @@ const ZeVaultCheckout: React.FC = () => {
                   <path d="M21 12a9 9 0 1 1-6.219-8.56" />
                 </svg>
               )}
-              <span>{loading ? 'Processing...' : `Pay ₹${paymentBreakdown?.totalAmount % 1 === 0 ? Math.floor(paymentBreakdown.totalAmount).toLocaleString('en-IN') : paymentBreakdown?.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}</span>
+              <span>{loading ? 'Processing...' : `Pay ₹${Math.round((couponApplied?.finalAmount || planDetails.price) * 1.18).toLocaleString('en-IN')}`}</span>
             </button>
 
             {/* Help Text */}
