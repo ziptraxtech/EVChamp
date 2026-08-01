@@ -243,12 +243,17 @@ const ZeVaultCheckout: React.FC = () => {
           <p className="text-xs text-slate-400 mb-6">
             {fulfillmentNote || 'Your purchase is confirmed. Zeflash credits or a coupon email will arrive shortly.'}
           </p>
-          <button
-            onClick={() => navigate('/zevault')}
-            className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md hover:from-cyan-600 hover:to-blue-700"
-          >
-            Back to ZeVault
-          </button>
+          <div className="space-y-3">
+            <button
+              onClick={() => navigate('/zevault')}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md hover:from-cyan-600 hover:to-blue-700"
+            >
+              Back to ZeVault
+            </button>
+            <p className="text-xs text-slate-400 text-center">
+              Your wallet balance will be updated on the ZeVault page
+            </p>
+          </div>
         </div>
       </div>
     );
