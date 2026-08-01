@@ -419,10 +419,12 @@ const ZeVaultCheckout: React.FC = () => {
 
             {/* Price Breakdown */}
             <div className="rounded-xl border border-slate-700 bg-slate-900/50 p-4 space-y-3">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-400">Subtotal</span>
-                <span className="text-white font-semibold">₹{(couponApplied?.originalAmount || planDetails.price).toLocaleString('en-IN')}</span>
-              </div>
+              {couponApplied && (
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-slate-400">Subtotal</span>
+                  <span className="text-white font-semibold">₹{couponApplied.originalAmount.toLocaleString('en-IN')}</span>
+                </div>
+              )}
 
               {/* Coupon Discount */}
               {couponApplied && (
@@ -439,7 +441,7 @@ const ZeVaultCheckout: React.FC = () => {
 
               <div className="flex items-center justify-between text-sm">
                 <span className="text-slate-400">
-                  {couponApplied ? 'Subtotal after discount' : 'Subtotal'}
+                  {couponApplied ? 'Price after discount' : 'Subtotal'}
                 </span>
                 <span className="text-white font-semibold">₹{(couponApplied?.finalAmount || planDetails.price).toLocaleString('en-IN')}</span>
               </div>

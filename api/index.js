@@ -1726,11 +1726,26 @@ async function emailZeflashCoupon(row) {
   });
 }
 
+// Coupon codes configuration (matching frontend)
+const AVAILABLE_COUPONS = {
+  'EVCODERS': {
+    type: 'flat',
+    value: 999999,
+    description: 'Special offer - Pay only ₹1',
+  },
+  'OFFSEASON': {
+    type: 'percentage',
+    value: 20,
+    description: '20% discount on final amount',
+  },
+};
+
 // POST /api/create-credit-order — creates a Razorpay order for a catalog
-// plan (see CREDIT_PLANS above), with notes: { planId, clerkUserId }
+// plan (see CREDIT_PLANS above), with notes: { planId, clerkUserId, couponCode }
 // attached so the webhook below knows what to credit once payment is
 // captured. Amount is computed here from the catalog, GST-inclusive — the
-// client only ever supplies which plan it wants, never the price.
+// client only ever supplies which plan it wants, never the price. Coupon
+// discounts are applied here.
 app.post('/api/create-credit-order', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
@@ -1744,7 +1759,7 @@ app.post('/api/create-credit-order', async (req, res) => {
     const clerkUserId = tokenPayload.sub;
     if (!clerkUserId) return res.status(401).json({ error: 'Invalid token' });
 
-    const { planId } = req.body;
+    const { planId, couponCode } = req.body;
     const plan = CREDIT_PLANS[planId];
     if (!plan) return res.status(400).json({ error: 'Unknown plan' });
 
@@ -1752,10 +1767,32 @@ app.post('/api/create-credit-order', async (req, res) => {
     const keySecret = process.env.RAZORPAY_KEY_SECRET || process.env.REACT_APP_RAZORPAY_KEY_SECRET;
     if (!keyId || !keySecret) return res.status(500).json({ error: 'Payments not configured' });
 
+    // Apply coupon discount if provided
+    let basePriceInr = plan.priceInr;
+    let discountAmount = 0;
+    let appliedCouponCode = null;
+
+    if (couponCode) {
+      const couponCode_upper = String(couponCode).toUpperCase().trim();
+      const coupon = AVAILABLE_COUPONS[couponCode_upper];
+      
+      if (coupon) {
+        appliedCouponCode = couponCode_upper;
+        if (coupon.type === 'flat') {
+          discountAmount = Math.min(coupon.value, plan.priceInr - 1);
+        } else if (coupon.type === 'percentage') {
+          discountAmount = Math.round((plan.priceInr * coupon.value) / 100);
+        }
+      }
+    }
+
+    // Final price after discount but before GST
+    const priceAfterDiscount = Math.max(1, basePriceInr - discountAmount);
+
     // GST is charged to the customer but isn't part of the credited value —
     // the webhook credits plan.priceInr regardless of what's actually
     // charged here, so tax and wallet balance stay independent.
-    const totalInr = Math.round(plan.priceInr * 1.18 * 100) / 100;
+    const totalInr = Math.round(priceAfterDiscount * 1.18 * 100) / 100;
     const amountPaise = Math.round(totalInr * 100);
 
     const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret });
@@ -1763,7 +1800,14 @@ app.post('/api/create-credit-order', async (req, res) => {
       amount: amountPaise,
       currency: 'INR',
       receipt: `credit_${planId}_${Date.now()}`,
-      notes: { planId, clerkUserId },
+      notes: { 
+        planId, 
+        clerkUserId,
+        couponCode: appliedCouponCode || null,
+        discountAmount: discountAmount,
+        originalPrice: basePriceInr,
+        priceAfterDiscount: priceAfterDiscount,
+      },
     });
 
     return res.json({
@@ -1772,7 +1816,10 @@ app.post('/api/create-credit-order', async (req, res) => {
       currency: order.currency,
       keyId,
       baseAmount: plan.priceInr,
+      discountAmount: discountAmount,
+      priceAfterDiscount: priceAfterDiscount,
       totalAmount: totalInr,
+      couponApplied: appliedCouponCode,
     });
   } catch (err) {
     console.error('[create-credit-order] Error:', err.message);
