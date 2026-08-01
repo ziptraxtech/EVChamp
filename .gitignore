@@ -8,48 +8,24 @@ yarn-error.log*
 /build
 /dist
 
-# Environment variables
+# Environment variables - NEVER COMMIT THESE
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
+.env.*.backup
+.env.production
+.env.staging
+.env.development
 server/.env
-
-# ⚠️ CRITICAL: Never commit files containing secrets
-# These files should NEVER be committed - they contain sensitive credentials
-# Including: API keys, database passwords, Razorpay keys, Firebase keys, etc.
-# If accidentally committed, rotate all keys immediately!
-
-# Sensitive credential files
-.env*.local
-.env.secrets
 secrets/
-config/secrets
-**/.env.production
-**/.env.local.backup
-
-# SSH keys
+credentials.json
+*.key
 *.pem
-
-# IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Logs
-logs
-*.log
+*.p8
+*.p12
+*.pfx
+.aws
+.gcp
 
 # Runtime data
 pids

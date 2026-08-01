@@ -1,0 +1,86 @@
+#!/bin/bash
+# 🔐 Pre-commit hook to prevent accidental secret commits
+# Install: cp .githooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+
+set -e
+
+echo "🔍 Checking for secrets before commit..."
+
+# Files to check
+FILES_TO_CHECK=$(git diff --cached --name-only)
+
+# Patterns that should NEVER be committed
+FORBIDDEN_PATTERNS=(
+    "DATABASE_URL=postgres"
+    "RAZORPAY_KEY_ID=rzp"
+    "RAZORPAY_KEY_SECRET="
+    "CLERK_SECRET_KEY=sk_"
+    "FIREBASE_PRIVATE_KEY="
+    "GMAIL_APP_PASSWORD="
+    "sk_live_"
+    "sk_test_"
+    "AIzaSy"
+    "firebase_config"
+    ".env.local"
+    ".env.production"
+)
+
+HAS_SECRETS=0
+
+for file in $FILES_TO_CHECK; do
+    # Skip documentation, gitignore, and template files
+    if [[ "$file" == ".env.example" ]] || [[ "$file" == ".gitignore" ]] || [[ "$file" == *"SECURITY"* ]] || [[ "$file" == ".githooks/"* ]]; then
+        continue
+    fi
+    
+    # Skip deleted files
+    if git ls-files --error-unmatch "$file" 2>/dev/null; then
+        # Check staged changes for secrets
+        STAGED_CONTENT=$(git diff --cached "$file" 2>/dev/null || true)
+        
+        for pattern in "${FORBIDDEN_PATTERNS[@]}"; do
+            if echo "$STAGED_CONTENT" | grep -q "$pattern"; then
+                echo "❌ SECURITY ALERT: Found potential secret in $file"
+                echo "   Pattern: $pattern"
+                HAS_SECRETS=1
+            fi
+        done
+    fi
+done
+
+# Also check file names
+for file in $FILES_TO_CHECK; do
+    # Skip documentation, templates, and hooks
+    if [[ "$file" == ".env.example" ]] || [[ "$file" == *"SECURITY"* ]] || [[ "$file" == ".githooks/"* ]]; then
+        continue
+    fi
+    
+    if [[ "$file" == ".env"* ]] && [[ "$file" != ".env.example" ]]; then
+        echo "❌ SECURITY ALERT: Attempting to commit $file"
+        echo "   Add this file to .gitignore!"
+        HAS_SECRETS=1
+    fi
+    
+    if [[ "$file" == *"credentials"* ]] || [[ "$file" == *"secret"* ]] || [[ "$file" == *"key"* ]]; then
+        if [[ "$file" != *".example"* ]]; then
+            echo "⚠️  WARNING: File name suggests it contains secrets: $file"
+        fi
+    fi
+done
+
+if [ $HAS_SECRETS -eq 1 ]; then
+    echo ""
+    echo "🚫 COMMIT BLOCKED: Potential secrets detected!"
+    echo ""
+    echo "To fix:"
+    echo "1. Remove secrets from the file"
+    echo "2. Run: git reset HEAD <file>"
+    echo "3. Add secrets to .env.local (not committed)"
+    echo "4. Try commit again"
+    echo ""
+    echo "To bypass (NOT RECOMMENDED): git commit --no-verify"
+    exit 1
+fi
+
+echo "✅ No secrets detected - proceeding with commit"
+exit 0
