@@ -245,6 +245,10 @@ const ZeVaultCheckout: React.FC = () => {
           } finally {
             setLoading(false);
             setPaid(true);
+            // Reload the page after 3 seconds to ensure wallet balance is updated
+            setTimeout(() => {
+              window.location.href = '/zevault';
+            }, 3000);
           }
         },
         modal: { ondismiss: () => setLoading(false) },

@@ -20,29 +20,29 @@ const ZeVaultPage: React.FC = () => {
   const pricePerTest = pricePerTestMap[selectedMonths];
   const customTotalPrice = customTests * pricePerTest;
 
+  const fetchBalance = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = await getToken();
+      if (!token) return;
+      const response = await fetch('/api/zevault-credits', {
+        headers: { Authorization: `Bearer ${token}` },
+        // Prevent caching to always get the latest balance
+        cache: 'no-store',
+      });
+      if (!response.ok) throw new Error('Unable to load your wallet balance right now.');
+      const data = await response.json();
+      setBalancePaise(data.balance_paise ?? 0);
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!isSignedIn) { setBalancePaise(null); return; }
-
-    const fetchBalance = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const token = await getToken();
-        if (!token) return;
-        const response = await fetch('/api/zevault-credits', {
-          headers: { Authorization: `Bearer ${token}` },
-          // Prevent caching to always get the latest balance
-          cache: 'no-store',
-        });
-        if (!response.ok) throw new Error('Unable to load your wallet balance right now.');
-        const data = await response.json();
-        setBalancePaise(data.balance_paise ?? 0);
-      } catch (err: any) {
-        setError(err.message || 'Something went wrong.');
-      } finally {
-        setLoading(false);
-      }
-    };
 
     void fetchBalance();
     
@@ -55,7 +55,13 @@ const ZeVaultPage: React.FC = () => {
   }, [isSignedIn, getToken]);
 
   const balanceInr = balancePaise !== null ? balancePaise / 100 : null;
-  const formatInr = (n: number) => `₹${n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const formatInr = (n: number) => {
+    // Show as whole number if no paise, otherwise show with decimals
+    if (Number.isInteger(n)) {
+      return `₹${n.toLocaleString('en-IN')}`;
+    }
+    return `₹${n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
 
   if (!isSignedIn) {
     return (
@@ -95,7 +101,21 @@ const ZeVaultPage: React.FC = () => {
               </h1>
               <p className="text-xs sm:text-sm text-slate-400">Your unified wallet for all EVChamp services.</p>
             </div>
-          </div>          
+          </div>
+          <button 
+            onClick={() => fetchBalance()} 
+            disabled={loading}
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Refresh wallet balance"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={loading ? 'animate-spin' : ''}>
+              <path d="M21 2v6h-6" />
+              <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+              <path d="M3 22v-6h6" />
+              <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+            </svg>
+            Refresh
+          </button>
         </div>
       </header>
 
