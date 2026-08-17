@@ -28,6 +28,7 @@ import FindEVChargers from './components/FindEVChargers';
 import ContactUs from './components/ContactUs';
 import SmarterEVAssistance from './components/SmarterEVAssistance';
 import Zeflash from './components/Zeflash';
+import EVChampPay from './components/EVChampPay';
 import ZeVaultPage from './components/ZeVaultPage';
 import ZeVaultCheckout from './components/ZeVaultCheckout';
 import Blog from './components/Blog';
@@ -392,6 +393,7 @@ function App() {
             </ProtectedRoute>
           } />
           <Route path="/zeflash" element={<Zeflash />} />
+          <Route path="/evchamp-pay" element={<EVChampPay />} />
           <Route path="/zevault" element={<ZeVaultPage />} />
           <Route path="/ze-xperience" element={<ZeXperience />} />
           <Route path="/checkout" element={<ZeVaultCheckout />} />

@@ -70,3 +70,4 @@ jspm_packages/
 .local-jdk/
 VERCEL_SETUP.md
 QUICK_REFERENCE.md
+.DS_Store
