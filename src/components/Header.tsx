@@ -57,7 +57,7 @@ const Header: React.FC = () => {
     { label: 'EV Showcase & Test drive', route: '/ev-marketplace' },
     { label: 'Find EV Chargers', route: '/find-ev-chargers' },
     { label: 'Find EV Service Centres', route: '/service-centres' },
-    { label: 'ZipsureAI & IOT Plans', route: '/buy-plans' },
+    { label: 'IOT Plans', route: '/buy-plans' },
     { label: 'Sell Your EV', route: '/sell-ev' },
     { label: 'Roadside Assistance', route: '/rsa-plans' },
     { label: 'Ze.Xperience', route: '/ze-xperience' },
@@ -134,7 +134,7 @@ const Header: React.FC = () => {
             </button>
           )}
           <button
-            onClick={() => goTo('/buy-plans')}
+            onClick={() => goTo('/find-ev-chargers')}
             className="inline-flex items-center gap-1.5 font-semibold px-4 py-2 rounded-lg text-sm text-white shadow-md transition-all"
             style={{
               background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
@@ -231,7 +231,7 @@ const Header: React.FC = () => {
             {/* Primary CTAs */}
             <div className="flex gap-2 pb-3 border-b border-gray-100">
               <button 
-                onClick={() => goTo('/buy-plans')} 
+                onClick={() => goTo('/find-ev-chargers')} 
                 className="flex-1 text-center text-white font-medium px-3 py-2.5 rounded-lg text-sm shadow-md transition-all"
                 style={{
                   background: 'linear-gradient(120deg, #0a8a52, #1257c4)',

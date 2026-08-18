@@ -22,7 +22,7 @@ const AVAILABLE_COUPONS: { [key: string]: { type: 'flat' | 'percentage'; value: 
   },
   'OFFSEASON': {
     type: 'percentage',
-    value: 20,
+    value: 20, // Default 20%, will be overridden to 50% for trial plan
     description: '20% discount on final amount',
   },
 };
@@ -82,17 +82,23 @@ const ZeVaultCheckout: React.FC = () => {
       return;
     }
 
+    // Override trial plan price from 300 to 199
+    let adjustedPrice = price;
+    if (plan === 'trial' && price === 300) {
+      adjustedPrice = 199;
+    }
+
     const planData = {
       plan,
       tests,
       months,
-      price,
+      price: adjustedPrice,
       planName: getPlanName(plan),
       description: getPlanDescription(plan, tests, months),
     };
 
     setPlanDetails(planData);
-    setPaymentBreakdown(getPaymentBreakdown(price));
+    setPaymentBreakdown(getPaymentBreakdown(adjustedPrice));
   }, [isSignedIn, plan, tests, months, price, navigate]);
 
   const getPlanName = (planId: string) => {
@@ -122,30 +128,38 @@ const ZeVaultCheckout: React.FC = () => {
     const coupon = AVAILABLE_COUPONS[couponCode];
 
     if (!coupon) {
-      setCouponError('Invalid coupon code. Available codes: EVCODERS, OFFSEASON');
+      setCouponError('Invalid coupon code');
       return;
     }
 
     // Calculate discount
     let discountAmount = 0;
     let finalAmount = planDetails.price;
+    let discountValue = coupon.value;
+
+    // Apply 50% discount for OFFSEASON coupon on trial plan
+    if (couponCode === 'OFFSEASON' && planDetails.plan === 'trial') {
+      discountValue = 50;
+    }
 
     if (coupon.type === 'flat') {
       discountAmount = Math.min(coupon.value, planDetails.price - 1);
       finalAmount = Math.max(1, planDetails.price - discountAmount);
     } else if (coupon.type === 'percentage') {
-      discountAmount = Math.round((planDetails.price * coupon.value) / 100);
+      discountAmount = Math.round((planDetails.price * discountValue) / 100);
       finalAmount = Math.max(1, planDetails.price - discountAmount);
     }
 
     setCouponApplied({
       couponCode: couponCode,
       discountType: coupon.type,
-      discountValue: coupon.value,
+      discountValue: discountValue,
       discountAmount: discountAmount,
       originalAmount: planDetails.price,
       finalAmount: finalAmount,
-      description: coupon.description,
+      description: couponCode === 'OFFSEASON' && planDetails.plan === 'trial' 
+        ? '50% discount on final amount' 
+        : coupon.description,
     });
     setCouponInput('');
     setCouponError(null);
@@ -556,7 +570,7 @@ const ZeVaultCheckout: React.FC = () => {
                   {couponError && (
                     <p className="text-xs text-red-400">{couponError}</p>
                   )}
-                  <p className="text-xs text-slate-400">Try: OFFSEASON (20% off)</p>
+                  <p className="text-xs text-slate-400">Have a coupon code? Enter it above</p>
                 </div>
               )}
             </div>

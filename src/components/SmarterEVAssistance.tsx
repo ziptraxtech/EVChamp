@@ -36,7 +36,7 @@ const SmarterEVAssistance: React.FC = () => {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <button 
-              onClick={() => goTo('/buy-plans')} 
+              onClick={() => goTo('/find-ev-chargers')} 
               className="text-white font-semibold px-6 py-3 rounded-lg transition-all text-sm"
               style={{
                 background: 'linear-gradient(120deg, #0a8a52, #1257c4)',

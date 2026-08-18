@@ -180,23 +180,6 @@ const BuyPlans: React.FC = () => {
 
       {/* Plans Section */}
       <div id="plans-section">
-      {/* ZipSureAI Embedded Section */}
-      <section className="py-2 sm:py-4 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 text-center mb-3">Explore ZipSureAI</h2>
-          <p className="text-gray-500 text-center text-sm mb-8">Browse the full ZipSureAI platform below for comprehensive insights and analytics.</p>
-          <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-lg w-full" style={{ height: '80vh', minHeight: '500px' }}>
-            <iframe
-              src="https://zipsureai.com/"
-              title="ZipSureAI Website"
-              className="w-full h-full"
-              style={{ border: 'none', width: '100%', height: '100%' }}
-              allow="fullscreen"
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
-            />
-          </div>
-        </div>
-      </section>
       <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
         <div className="text-center mb-8">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-2 tracking-tight">EVChamp Plans & Pricing</h1>

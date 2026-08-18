@@ -191,21 +191,21 @@ const ZeVaultPage: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
               {/* First Time Trial */}
-              <div className="relative rounded-2xl border-2 border-emerald-400 bg-gradient-to-br from-emerald-50 to-white p-6 hover:shadow-lg transition-all flex flex-col">
+              <div className="relative rounded-2xl border-2 border-emerald-400 bg-gradient-to-br from-emerald-50 to-white p-6 hover:shadow-lg transition-all flex flex-col h-full">
                 <div className="absolute -top-3 right-4">
                   <span className="inline-block rounded-full bg-emerald-500 px-3 py-1 text-xs font-bold text-white shadow-md">
                     TRIAL
                   </span>
                 </div>
-                <div className="mb-4">
+                <div className="mb-4 mt-2">
                   <h3 className="text-xl font-bold text-gray-900">One Time</h3>
                   <p className="text-sm text-gray-600 mt-1">Try it once</p>
                 </div>
                 <div className="mb-6">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-emerald-700">₹300</span>
+                    <span className="text-4xl font-extrabold text-emerald-700">₹199</span>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1"> • Test price — 1 Zeflash AI diagnostic</p>
+                  <p className="text-xs text-gray-600 mt-1"> • 1 Zeflash AI diagnostic</p>
                 </div>
                 <ul className="space-y-3 mb-6 flex-grow">
                   <li className="flex items-start gap-2 text-sm text-gray-700">
@@ -231,8 +231,8 @@ const ZeVaultPage: React.FC = () => {
                 </ul>
                 <button
                   onClick={() => {
-                    console.log('📋 Trial Plan Selected:', { plan: 'trial', tests: 1, months: 0, price: 300, amountInPaise: 30000 });
-                    navigate('/checkout?plan=trial&tests=1&months=0&price=300');
+                    console.log('📋 Trial Plan Selected:', { plan: 'trial', tests: 1, months: 0, price: 199, amountInPaise: 19900 });
+                    navigate('/checkout?plan=trial&tests=1&months=0&price=199');
                     window.scrollTo({ top: 0, behavior: 'auto' });
                   }}
                   className="block w-full text-center rounded-lg text-white font-semibold px-4 py-2.5 shadow-md transition-all"
@@ -246,48 +246,48 @@ const ZeVaultPage: React.FC = () => {
                 </button>
               </div>
 
-              {/* 4 Tests Pack */}
-              <div className="relative rounded-2xl border-2 border-indigo-400 bg-gradient-to-br from-indigo-50 to-white p-6 hover:shadow-lg hover:border-indigo-500 transition-all flex flex-col">
-                <div className="mb-4">
-                  <h3 className="text-xl font-bold text-gray-900">Starter Pack</h3>
-                  <p className="text-sm text-gray-600 mt-1">Regular monitoring</p>
+              {/* Core Pack */}
+              <div className="relative rounded-2xl border-2 border-indigo-400 bg-gradient-to-br from-indigo-50 to-white p-6 hover:shadow-lg hover:border-indigo-500 transition-all flex flex-col h-full">
+                <div className="mb-4 mt-2">
+                  <h3 className="text-xl font-bold text-gray-900">Core Pack</h3>
+                  <p className="text-sm text-gray-600 mt-1">Everyday Driver</p>
                 </div>
                 <div className="mb-6">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-gray-900">₹1,500</span>
+                    <span className="text-4xl font-extrabold text-gray-900">₹1,199</span>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">6 tests  • Valid for 1 year</p>
+                  <p className="text-xs text-gray-600 mt-1">• 4 tests/year (Quarterly)</p>
                 </div>
                 <ul className="space-y-3 mb-6 flex-grow">
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>6 AI diagnostic tests</span>
+                    <span>Free Unlimited EV Charger & Service Center Discovery</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>1 year validity</span>
+                    <span>Free Digital Garage & Renew Vehicle Insurance</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>Trend analysis</span>
+                    <span>4 Zeflash AI Diagnostic Tests/year (Quarterly)</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>Email support</span>
+                    <span>Instant health report</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>Monthly health check-ins</span>
+                    <span>Basic recommendations</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>Easy renewal option</span>
+                    <span>Basic Safety & Overheating Alerts</span>
                   </li>
                 </ul>
                 <button
                   onClick={() => {
-                    console.log('📋 Starter Plan Selected:', { plan: 'starter', tests: 6, months: 12, price: 1500, amountInPaise: 150000 });
-                    navigate('/checkout?plan=starter&tests=6&months=12&price=1500', { replace: false });
+                    console.log('📋 Core Pack Plan Selected:', { plan: 'starter', tests: 4, months: 12, price: 1199, amountInPaise: 119900 });
+                    navigate('/checkout?plan=starter&tests=4&months=12&price=1199', { replace: false });
                   }}
                   className="block w-full text-center rounded-lg text-white font-semibold px-4 py-2.5 shadow-md transition-all"
                   style={{
@@ -296,53 +296,61 @@ const ZeVaultPage: React.FC = () => {
                   onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
                   onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
                 >
-                  Get Started
+                  Get Core Pack
                 </button>
               </div>
 
-              {/* 8 Tests Pack - Popular */}
-              <div className="relative rounded-2xl border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-white p-6 shadow-xl hover:shadow-2xl transition-all flex flex-col">
+              {/* Premium Pack - Most Popular */}
+              <div className="relative rounded-2xl border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-white p-6 shadow-xl hover:shadow-2xl transition-all flex flex-col h-full">
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                   <span className="inline-block rounded-full bg-gradient-to-r from-blue-600 to-cyan-600 px-4 py-1 text-xs font-bold text-white shadow-md">
                     MOST POPULAR
                   </span>
                 </div>
                 <div className="mb-4 mt-2">
-                  <h3 className="text-xl font-bold text-gray-900">Value Pack</h3>
-                  <p className="text-sm text-gray-600 mt-1">Best value</p>
+                  <h3 className="text-xl font-bold text-gray-900">Premium Pack</h3>
+                  <p className="text-sm text-gray-600 mt-1">Pro & Commercial</p>
                 </div>
                 <div className="mb-6">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-blue-700">₹3,000</span>
+                    <span className="text-4xl font-extrabold text-blue-700">₹2,499</span>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">12 tests  • Valid for 1 year</p>
+                  <p className="text-xs text-gray-600 mt-1">• 6 tests/year (Bi-monthly)</p>
                 </div>
                 <ul className="space-y-3 mb-6 flex-grow">
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>12 AI diagnostic tests</span>
+                    <span>Free Unlimited EV Charger & Service Center Discovery</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>1 year validity</span>
+                    <span>Free Digital Garage & Renew Vehicle Insurance</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>Priority support</span>
+                    <span>6 Zeflash AI Diagnostic Tests/year (Bi-monthly)</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>Quarterly performance reports</span>
+                    <span>Get TruEV Value Predictor (Battery Aging & Cell Data Analysis)</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>Free battery optimization tips</span>
+                    <span>1 Annual Comprehensive Audit Reports - ZipsureAi Battery Health Audit</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm text-gray-700">
+                    <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                    <span>1 SoS Breakdown EV Towings - Roadside Assistance (RSA)</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm text-gray-700">
+                    <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                    <span>Real-time Thermal Warnings and Performance loss warnings - Safety & Overheating Alerts</span>
                   </li>
                 </ul>
                 <button
                   onClick={() => {
-                    console.log('📋 Value Pack Plan Selected:', { plan: 'value', tests: 12, months: 12, price: 3000, amountInPaise: 300000 });
-                    navigate('/checkout?plan=value&tests=12&months=12&price=3000', { replace: false });
+                    console.log('📋 Premium Pack Plan Selected:', { plan: 'value', tests: 6, months: 12, price: 2499, amountInPaise: 249900 });
+                    navigate('/checkout?plan=value&tests=6&months=12&price=2499', { replace: false });
                   }}
                   className="block w-full text-center rounded-lg text-white font-semibold px-4 py-2.5 shadow-md transition-all"
                   style={{
@@ -351,59 +359,56 @@ const ZeVaultPage: React.FC = () => {
                   onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
                   onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
                 >
-                  Get Value Pack
+                  Get Premium 
                 </button>
               </div>
 
-              {/* 8 Tests Pack - Popular */}
-              <div className="relative rounded-2xl border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-white p-6 shadow-xl hover:shadow-2xl transition-all flex flex-col">
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  
-                </div>
+              {/* Elite Pack */}
+              <div className="relative rounded-2xl border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-white p-6 shadow-xl hover:shadow-2xl transition-all flex flex-col h-full">
                 <div className="mb-4 mt-2">
-                  <h3 className="text-xl font-bold text-gray-900">Smart Pack</h3>
-                  <p className="text-sm text-gray-600 mt-1">Best value saver</p>
+                  <h3 className="text-xl font-bold text-gray-900">Elite Pack</h3>
+                  <p className="text-sm text-gray-600 mt-1">High-Grade & Luxury</p>
                 </div>
                 <div className="mb-6">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-blue-700">₹6,000</span>
+                    <span className="text-4xl font-extrabold text-blue-700">₹4,999</span>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">24 tests  • Valid for 2 years</p>
+                  <p className="text-xs text-gray-600 mt-1">• 12 tests/year (Monthly)</p>
                 </div>
                 <ul className="space-y-3 mb-6 flex-grow">
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>24 AI diagnostic tests</span>
+                    <span>Free Unlimited EV Charger & Service Center Discovery</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>2 years validity</span>
+                    <span>Free Digital Garage & Renew Vehicle Insurance</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>Priority scheduling</span>
+                    <span>12 Zeflash AI Diagnostic Tests/year (Monthly)</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>Advanced insights</span>
+                    <span>Get TruEV Value Predictor (Battery Aging and Cell Data Analysis)</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>Priority support</span>
+                    <span>2 Annual Comprehensive Audit Reports - ZipsureAi Battery Health Audit</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>Quarterly performance reports</span>
+                    <span>2 SoS Breakdown EV Towings - Roadside Assistance (RSA)</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <svg className="text-blue-600 mt-0.5 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                    <span>Free battery optimization tips</span>
+                    <span>Priority with Emergency AI Dispatch Support - Safety & Overheating Alerts</span>
                   </li>
                 </ul>
                 <button
                   onClick={() => {
-                    console.log('📋 Smart Pack Plan Selected:', { plan: 'smart', tests: 24, months: 24, price: 6000, amountInPaise: 600000 });
-                    navigate('/checkout?plan=smart&tests=24&months=24&price=6000', { replace: false });
+                    console.log('📋 Elite Pack Plan Selected:', { plan: 'smart', tests: 12, months: 12, price: 4999, amountInPaise: 499900 });
+                    navigate('/checkout?plan=smart&tests=12&months=12&price=4999', { replace: false });
                   }}
                   className="block w-full text-center rounded-lg text-white font-semibold px-4 py-2.5 shadow-md transition-all"
                   style={{
@@ -412,7 +417,7 @@ const ZeVaultPage: React.FC = () => {
                   onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
                   onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
                 >
-                  Get Smart Pack
+                  Get Elite Pack
                 </button>
               </div>
             </div>
