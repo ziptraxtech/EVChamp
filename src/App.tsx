@@ -1,9 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import Header from './components/Header';
-import Testimonials from './Testimonials';
-import Footer from './Footer';
+import SiteHeader from './components/SiteHeader';
 import BuyPlans from './components/BuyPlans';
 import RentEV from './components/RentEV';
 import TermsOfUse from './components/TermsOfUse';
@@ -20,8 +18,6 @@ import AdvanceAnalysis from './components/AdvanceAnalysis';
 import DeleteAccount from './components/DeleteAccount';
 import RSAPlans from './components/RSAPlans';
 import SellEV from './components/SellEV';
-import ServicesShowcase from './components/ServicesShowcase';
-import { ScrollReveal } from './components/ScrollReveal';
 import AboutUs from './components/AboutUs';
 import ChargingNetwork from './components/ChargingNetwork';
 import FindEVChargers from './components/FindEVChargers';
@@ -38,258 +34,13 @@ import { scheduleLocalNotifications, setupLocalNotificationTapHandler } from './
 import AdminNotificationPanel from './components/AdminNotificationPanel';
 
 
-import PartnersCarousel from './components/PartnersCarousel';
 import ChatbotPopup from './components/ChatbotPopup';
 import EVMarketplace from './components/marketplace/EVMarketplace';
 import ZeXperience from './components/experience/ZeXperience';
+import LandingPage from './components/LandingPage';
 
 function HomePage() {
-  const navigate = useNavigate();
-  const goTo = (route: string) => {
-    navigate(route);
-    window.scrollTo({ top: 0, behavior: 'auto' });
-  };
-
-  const scrollToTopServices = () => {
-    const section = document.getElementById('top-services');
-    if (section) {
-      const rect = section.getBoundingClientRect();
-      const sectionTop = window.scrollY + rect.top;
-      const centeredTop = sectionTop - (window.innerHeight - rect.height) / 2;
-      const targetTop = Math.max(0, centeredTop - 40);
-
-      window.scrollTo({
-        top: targetTop,
-        behavior: 'smooth',
-      });
-    }
-  };
-
-  return (
-    <div className="home-page bg-white min-h-screen w-full overflow-x-hidden">
-      <Helmet>
-        <title>EVChamp | AI &amp; IoT-Driven EV Fleet Management Platform in India</title>
-        <meta name="description" content="EVChamp is an AI & IoT-driven EV ecosystem for fleet management, certified pre-owned EVs, battery diagnostics, charging stations, roadside assistance, franchise partnerships, and green infrastructure investment." />
-        <meta name="keywords" content="EV fleet management platform, AI EV platform India, IoT for EVs, EV marketplace, battery diagnostics, EV charging network" />
-      </Helmet>
-
-      {/* Hero Section */}
-<section className="relative w-full overflow-hidden bg-white">
-  <picture className="block w-full h-auto">
-    {/* Mobile portrait image */}
-    <source
-      media="(max-width: 768px)"
-      srcSet="/bg-hero-mobile.png"
-    />
-
-    {/* Desktop / laptop landscape image */}
-    <img
-      src="/bg-hero-desktop.png"
-      alt="EVChamp smart electric vehicle platform"
-      className="block w-full h-auto"
-    />
-  </picture>
-
-  {/* Light overlay */}
-  <div
-    className="absolute inset-0 bg-black/10 pointer-events-none"
-    style={{ zIndex: 1 }}
-  />
-
-  {/* Buttons at bottom centre */}
-  <div
-    className="absolute left-1/2 bottom-[7%] -translate-x-1/2 flex items-center justify-center gap-2 sm:gap-3 w-full px-4"
-    style={{ zIndex: 2 }}
-  >
-    <button
-      onClick={scrollToTopServices}
-      className="text-white font-semibold px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg transition-all text-xs sm:text-sm shadow-md whitespace-nowrap"
-      style={{
-        background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
-      onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
-    >
-      Explore Platform
-    </button>
-
-    <button
-      onClick={() => {
-        goTo('/zevault');
-        // Delay to allow page navigation
-        setTimeout(() => {
-          const pricingSection = document.getElementById('pricing-section');
-          if (pricingSection) {
-            pricingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        }, 100);
-      }}
-      className="text-white font-semibold px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg transition-all text-xs sm:text-sm shadow-md whitespace-nowrap"
-      style={{
-        background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
-      onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
-    >
-      EVChamp Super Plans
-    </button>
-  </div>
-</section>
-      {/* Get the EVChamp App */}
-      <section className="bg-white border-b border-gray-100">
-        <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-5xl">
-          <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">Mobile App</p>
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">Get the power of AI and IoT for your Electric vehicle with EVChamp AI Companion App</h2>
-          <p className="text-gray-500 text-xs mb-5">Explore EVChamp services, charging support, and EV assistance, From certified pre-owned EVs and battery diagnostics to IoT hardware, software subscriptions, charging access, roadside assistance, and smart EV support — EVChamp brings every part of the EV journey into one connected platform..</p>
-
-          <div className="flex flex-col sm:flex-row gap-5 items-center">
-            {/* Store badges (replaces QR code) */}
-            <div className="flex-shrink-0 bg-gray-50 border border-gray-200 rounded-xl p-3 flex flex-col items-center gap-2 w-40">
-              <span className="text-xs font-semibold bg-blue-600 text-white px-2.5 py-0.5 rounded-full">Get the App</span>
-              <div className="flex flex-col items-center gap-2 w-full">
-                <a
-                  href="https://play.google.com/store/apps/details?id=com.evchamp.app"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full"
-                >
-                  <img
-                    src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
-                    alt="Get it on Google Play"
-                    className="w-full h-auto object-contain scale-[1.22] origin-center"
-                  />
-                </a>
-                <div className="w-full flex flex-col items-center gap-1 cursor-not-allowed" title="Coming Soon">
-                  <img
-                    src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
-                    alt="Download on the App Store"
-                    className="w-full h-auto object-contain scale-[1.08] origin-center opacity-40"
-                  />
-                  <span className="text-[9px] font-bold text-gray-500 tracking-wide uppercase">Coming Soon</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Right side */}
-            <div className="flex-1 self-start pt-2 text-left">
-            <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1">
-            Open the EVChamp App
-            </h3>
-          <p className="text-gray-500 text-xs sm:text-sm leading-relaxed max-w-md">
-          Tap a badge to open EVChamp on your device. App Store listing will be live soon.
-          </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Services Showcase — existing tiles */}
-      <section id="top-services">
-        <ScrollReveal className="home-section-shell" duration={850} threshold={0.15}>
-          <ServicesShowcase />
-        </ScrollReveal>
-      </section>
-
-      {/* Audience Cards — compact */}
-      <section className="bg-grey-50">
-        <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10">Built for a Smarter EV Future</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-              <h3 className="text-lg font-bold text-gray-900 mb-2">For Individuals</h3>
-              <p className="text-sm text-gray-600 leading-relaxed mb-4">Buy or sell EVs with confidence, access battery diagnostics, get help when needed, and discover nearby charging support.</p>
-              <button 
-                onClick={() => goTo('/buy-used-ev')} 
-                className="text-sm font-medium transition-colors"
-                style={{
-                  background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                Explore Marketplace →
-              </button>
-            </div>
-            <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-              <h3 className="text-lg font-bold text-gray-900 mb-2">For Fleets & Businesses</h3>
-              <p className="text-sm text-gray-600 leading-relaxed mb-4">Monitor vehicle performance, reduce downtime, improve operational efficiency, and manage EV assets with real-time intelligence.</p>
-              <button 
-                onClick={() => goTo('/buy-plans')} 
-                className="text-sm font-medium transition-colors"
-                style={{
-                  background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                View Plans →
-              </button>
-            </div>
-            <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-              <h3 className="text-lg font-bold text-gray-900 mb-2">For Investors & Partners</h3>
-              <p className="text-sm text-gray-600 leading-relaxed mb-4">Explore sustainable infrastructure investment opportunities and franchise models built for long-term growth in India's EV ecosystem.</p>
-              <button 
-                onClick={() => goTo('/find-ev-chargers')} 
-                className="text-sm font-medium transition-colors"
-                style={{
-                  background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                Explore EV Chargers →
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Partners Banner */}
-      <section className="bg-white border-y border-gray-100">
-        <div className="py-10">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-8 text-center">Our Partners</h2>
-          <PartnersCarousel />
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <ScrollReveal duration={900} delay={80} threshold={0.15}>
-        <Testimonials />
-      </ScrollReveal>
-
-      {/* Final CTA */}
-      <section className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-        <div className="container mx-auto px-4 sm:px-6 py-14 text-center max-w-3xl">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-4">Join the EVChamp Network</h2>
-          <p className="text-gray-300 text-base mb-8">Be part of the next generation of electric mobility in India.</p>
-          <div className="flex flex-wrap justify-center gap-3">
-            <button 
-              onClick={() => goTo('/sign-up')} 
-              className="text-white font-semibold px-6 py-3 rounded-lg transition-all text-sm shadow-lg"
-              style={{
-                background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
-              onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
-            >
-              Get Started Free
-            </button>
-            <button onClick={() => goTo('https://play.google.com/apps/internaltest/4701215861025087123')} className="border border-white/30 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/10 transition-all text-sm">
-              Contact Us
-            </button>
-          </div>
-        </div>
-      </section>
-
-      
-
-
-<Footer />
-    </div>
-  );
+  return <LandingPage />;
 }
 
 function UserSettingsPage() {
@@ -359,7 +110,7 @@ function App() {
   return (
     <Router>
       <div className="min-w-0 w-full">
-        <Header />
+        <SiteHeader />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/ev-marketplace" element={
