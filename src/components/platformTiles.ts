@@ -16,6 +16,7 @@ export const PLATFORM_TILES: PlatformTile[] = [
   { icon: '🔩', bg: '#FDE7EF', title: 'ZipBattery', desc: 'Patented AI battery-life optimization', route: '/evtrulife' },
   { icon: '🛰️', bg: '#EEF2FF', title: 'ZipsureAI & IoT Plans', desc: 'Fleet intelligence & monitoring', route: '/buy-plans' },
   { icon: '🌟', bg: '#FEF9E7', title: 'Ze.Xperience', desc: 'Test drives & the EV showcase', route: '/ze-xperience' },
+  { icon: '💳', bg: '#E6F7F1', title: 'EVChamp Pay', desc: 'Fast, secure payments via QR, cards & UPI', route: '/evchamp-pay' },
 ];
 
 export const PROTECTED_ROUTES = [

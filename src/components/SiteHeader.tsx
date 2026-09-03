@@ -27,12 +27,14 @@ export default function SiteHeader() {
   const [platformOpen, setPlatformOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobilePlatformOpen, setMobilePlatformOpen] = useState(false);
   const accountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setPlatformOpen(false);
     setAccountOpen(false);
     setMobileOpen(false);
+    setMobilePlatformOpen(false);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -47,6 +49,7 @@ export default function SiteHeader() {
     setPlatformOpen(false);
     setAccountOpen(false);
     setMobileOpen(false);
+    setMobilePlatformOpen(false);
     navigate(PROTECTED_ROUTES.includes(route) && !isSignedIn ? '/sign-in' : route);
     window.scrollTo({ top: 0, behavior: 'auto' });
   };
@@ -64,7 +67,13 @@ export default function SiteHeader() {
           .sh-navlinks { display: none !important; }
           .sh-cta { display: none !important; }
           .sh-burger { display: inline-flex !important; }
-          .sh-nav { padding: 12px 18px !important; }
+          .sh-nav { padding: 12px 16px !important; gap: 12px !important; }
+          .sh-logo-text { font-size: 19px !important; }
+          .sh-announce { font-size: 12.5px !important; padding: 8px 14px !important; line-height: 1.45; }
+          /* Finger-sized targets for the two controls that stay visible on phones. */
+          .sh-burger { width: 42px !important; height: 42px !important; }
+          .sh-signin { padding: 9px 8px !important; }
+          .sh-menu-item { min-height: 46px; }
         }
       `}</style>
 
@@ -73,7 +82,7 @@ export default function SiteHeader() {
         <nav className="sh-nav" style={{ maxWidth: 1240, margin: '0 auto', padding: '15px 32px', display: 'flex', alignItems: 'center', gap: 30 }}>
           <button onClick={() => goTo('/')} style={{ display: 'flex', alignItems: 'center', gap: 11, background: 'none', border: 'none', cursor: 'pointer', padding: 0, flex: '0 0 auto' }}>
             <img src="/evchamp-logo.png" alt="EVChamp" style={{ width: 34, height: 34, borderRadius: 9, objectFit: 'cover' }} />
-            <span style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 21, color: '#0F172A', letterSpacing: '-0.01em' }}>EVChamp</span>
+            <span className="sh-logo-text" style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 21, color: '#0F172A', letterSpacing: '-0.01em' }}>EVChamp</span>
           </button>
 
           <div className="sh-navlinks" style={{ display: 'flex', alignItems: 'center', gap: 26, marginLeft: 10 }}>
@@ -135,7 +144,7 @@ export default function SiteHeader() {
                 </button>
               ) : (
                 <SignInButton mode="modal">
-                  <button style={{ display: 'inline-flex', alignItems: 'center', gap: 6, ...navLinkStyle }}>
+                  <button className="sh-signin" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, ...navLinkStyle }}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth={2}>
                       <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
@@ -158,7 +167,7 @@ export default function SiteHeader() {
               )}
             </div>
 
-            <button className="sh-burger" aria-label="Menu" onClick={() => setMobileOpen((o) => !o)} style={{ alignItems: 'center', justifyContent: 'center', width: 38, height: 38, borderRadius: 10, border: '1px solid #EDF1F5', background: '#fff', cursor: 'pointer' }}>
+            <button className="sh-burger" aria-label="Menu" aria-expanded={mobileOpen} onClick={() => { setMobileOpen((o) => !o); setMobilePlatformOpen(false); }} style={{ alignItems: 'center', justifyContent: 'center', width: 38, height: 38, borderRadius: 10, border: '1px solid #EDF1F5', background: '#fff', cursor: 'pointer' }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0F172A" strokeWidth={2.2}>
                 {mobileOpen ? <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" /> : <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />}
               </svg>
@@ -168,15 +177,31 @@ export default function SiteHeader() {
 
         {mobileOpen && (
           <div className="sh-menu" style={{ borderTop: '1px solid #EDF1F5', background: '#fff', padding: '12px 18px 18px', maxHeight: '70vh', overflowY: 'auto' }}>
-            {PLATFORM_TILES.map((p) => (
-              <button key={p.title} className="sh-row" onClick={() => goTo(p.route)} style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: 11, borderRadius: 11, border: 'none', background: 'transparent', textAlign: 'left', cursor: 'pointer' }}>
-                <span style={{ width: 34, height: 34, borderRadius: 10, background: p.bg, display: 'grid', placeItems: 'center', fontSize: 16 }}>{p.icon}</span>
-                <span style={{ fontSize: 14.5, fontWeight: 600, color: '#0F172A' }}>{p.title}</span>
-              </button>
-            ))}
+            {/* Platform groups its services the same way the desktop mega-menu does. */}
+            <button
+              className="sh-row sh-menu-item"
+              aria-expanded={mobilePlatformOpen}
+              onClick={() => setMobilePlatformOpen((o) => !o)}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: 11, borderRadius: 11, border: 'none', background: 'transparent', textAlign: 'left', fontSize: 14.5, fontWeight: 600, color: mobilePlatformOpen ? '#1E63FF' : '#334155', cursor: 'pointer' }}
+            >
+              Platform
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth={2.4} style={{ transform: mobilePlatformOpen ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }}>
+                <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+            {mobilePlatformOpen && (
+              <div style={{ marginLeft: 6, paddingLeft: 8, borderLeft: '2px solid #EDF1F5' }}>
+                {PLATFORM_TILES.map((p) => (
+                  <button key={p.title} className="sh-row sh-menu-item" onClick={() => goTo(p.route)} style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: 11, borderRadius: 11, border: 'none', background: 'transparent', textAlign: 'left', cursor: 'pointer' }}>
+                    <span style={{ width: 34, height: 34, borderRadius: 10, background: p.bg, display: 'grid', placeItems: 'center', fontSize: 16 }}>{p.icon}</span>
+                    <span style={{ fontSize: 14.5, fontWeight: 600, color: '#0F172A' }}>{p.title}</span>
+                  </button>
+                ))}
+              </div>
+            )}
             <div style={{ height: 1, background: '#EDF1F5', margin: '10px 0' }} />
             {[['About', '/about'], ['Contact', '/contact'], ['Blog', '/blog'], ['ZeVault', '/zevault']].map(([label, route]) => (
-              <button key={route} className="sh-row" onClick={() => goTo(route)} style={{ display: 'block', width: '100%', padding: 11, borderRadius: 11, border: 'none', background: 'transparent', textAlign: 'left', fontSize: 14.5, fontWeight: 600, color: '#334155', cursor: 'pointer' }}>{label}</button>
+              <button key={route} className="sh-row sh-menu-item" onClick={() => goTo(route)} style={{ display: 'flex', alignItems: 'center', width: '100%', padding: 11, borderRadius: 11, border: 'none', background: 'transparent', textAlign: 'left', fontSize: 14.5, fontWeight: 600, color: '#334155', cursor: 'pointer' }}>{label}</button>
             ))}
             <button onClick={() => goTo(isSignedIn ? '/find-ev-chargers' : '/sign-up')} style={{ width: '100%', marginTop: 10, background: GRAD, color: '#fff', fontSize: 15, fontWeight: 700, padding: '13px', borderRadius: 12, border: 'none', cursor: 'pointer' }}>Get Started</button>
           </div>
@@ -184,7 +209,7 @@ export default function SiteHeader() {
       </header>
 
       {/* Announcement bar — sits directly below the navigation */}
-      <div style={{ background: GRAD, color: '#fff', textAlign: 'center', fontSize: 13, fontWeight: 600, letterSpacing: '0.01em', padding: '9px 16px' }}>
+      <div className="sh-announce" style={{ background: GRAD, color: '#fff', textAlign: 'center', fontSize: 13, fontWeight: 600, letterSpacing: '0.01em', padding: '9px 16px' }}>
         New: EVChamp raises a green-infrastructure fund — franchise &amp; investment slots now open ·{' '}
         <span style={{ textDecoration: 'underline', textUnderlineOffset: 2, cursor: 'pointer' }} onClick={() => goTo('/franchise')}>Learn more →</span>
       </div>
