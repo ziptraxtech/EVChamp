@@ -366,6 +366,21 @@ const RSAPlans: React.FC = () => {
         </div>
 
         <div className="container mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center max-w-5xl relative z-10">
+          {/* Back button — must stay inside this z-10 container, above the blur layers. */}
+          <div className="flex justify-start mb-6">
+            <button
+              type="button"
+              aria-label="Go back"
+              onClick={() => (window.history.length > 1 ? navigate(-1) : navigate('/'))}
+              className="flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-white/30 active:bg-white/40 transition-all duration-200 shadow-lg text-xs sm:text-sm"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} className="flex-shrink-0">
+                <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span className="font-semibold">Back</span>
+            </button>
+          </div>
+
           <div className="animate-slide-in-down mb-8">
             <span className="inline-block px-6 py-3 bg-gradient-to-r from-orange-500/40 to-red-500/40 backdrop-blur-xl rounded-full text-sm font-bold text-orange-100 border border-orange-300/50 mb-4 shadow-lg hover:shadow-xl transition-all hover:scale-105 cursor-default">
               🚨 24/7 Emergency Support Available Nationwide

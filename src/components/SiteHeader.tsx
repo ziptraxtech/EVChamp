@@ -62,6 +62,8 @@ export default function SiteHeader() {
         .sh-menu { animation: shMenuIn .22s cubic-bezier(.22,1,.36,1) both; }
         .sh-row { animation: shRowIn .3s ease both; transition: background .15s ease; }
         .sh-row:hover { background: #F5F8FC !important; }
+        /* Platform keeps its tint on touch, where :hover sticks after a tap. */
+        .sh-row.sh-platform:hover { background: #E2ECFF !important; }
         .sh-burger { display: none !important; }
         @media (max-width: 900px) {
           .sh-navlinks { display: none !important; }
@@ -179,13 +181,13 @@ export default function SiteHeader() {
           <div className="sh-menu" style={{ borderTop: '1px solid #EDF1F5', background: '#fff', padding: '12px 18px 18px', maxHeight: '70vh', overflowY: 'auto' }}>
             {/* Platform groups its services the same way the desktop mega-menu does. */}
             <button
-              className="sh-row sh-menu-item"
+              className="sh-row sh-menu-item sh-platform"
               aria-expanded={mobilePlatformOpen}
               onClick={() => setMobilePlatformOpen((o) => !o)}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: 11, borderRadius: 11, border: 'none', background: 'transparent', textAlign: 'left', fontSize: 14.5, fontWeight: 600, color: mobilePlatformOpen ? '#1E63FF' : '#334155', cursor: 'pointer' }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', boxSizing: 'border-box', padding: 11, marginBottom: 4, borderRadius: 11, border: '1px solid #D7E3FF', background: '#EEF4FF', textAlign: 'left', fontSize: 14.5, fontWeight: 600, color: mobilePlatformOpen ? '#1E63FF' : '#0F172A', cursor: 'pointer' }}
             >
               Platform
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth={2.4} style={{ transform: mobilePlatformOpen ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={mobilePlatformOpen ? '#1E63FF' : '#0F172A'} strokeWidth={2.4} style={{ transform: mobilePlatformOpen ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }}>
                 <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
