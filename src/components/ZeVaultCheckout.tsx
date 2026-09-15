@@ -27,6 +27,17 @@ const AVAILABLE_COUPONS: { [key: string]: { type: 'flat' | 'percentage'; value: 
   },
 };
 
+// Base price -> total with 18% GST. Mirrors the rounding in
+// /api/create-credit-order so the total shown here is exactly what Razorpay
+// charges. GST is added here once, and only once: the plan prices on ZeVault
+// are the pre-GST base.
+const GST_RATE = 0.18;
+const withGST = (baseAmount: number) => Math.round(baseAmount * (1 + GST_RATE) * 100) / 100;
+const formatInr = (amount: number) =>
+  amount % 1 === 0
+    ? amount.toLocaleString('en-IN')
+    : amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 function loadRazorpayScript(): Promise<void> {
   return new Promise((resolve, reject) => {
     if ((window as any).Razorpay) { resolve(); return; }
@@ -82,11 +93,7 @@ const ZeVaultCheckout: React.FC = () => {
       return;
     }
 
-    // Override trial plan price from 300 to 199
-    let adjustedPrice = price;
-    if (plan === 'trial' && price === 300) {
-      adjustedPrice = 199;
-    }
+    const adjustedPrice = price;
 
     const planData = {
       plan,
@@ -466,15 +473,15 @@ const ZeVaultCheckout: React.FC = () => {
 
               <div className="flex items-center justify-between text-sm">
                 <span className="text-slate-400">GST (18%)</span>
-                <span className="text-white font-semibold">₹{((couponApplied?.finalAmount || planDetails.price) * 0.18 % 1 === 0 
-                  ? Math.floor((couponApplied?.finalAmount || planDetails.price) * 0.18).toLocaleString('en-IN') 
-                  : ((couponApplied?.finalAmount || planDetails.price) * 0.18).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }))}</span>
+                <span className="text-white font-semibold">₹{formatInr(
+                  Math.round((couponApplied?.finalAmount || planDetails.price) * GST_RATE * 100) / 100
+                )}</span>
               </div>
 
               <div className="border-t border-slate-700 pt-3 flex items-center justify-between">
                 <span className="font-semibold text-slate-100">Total Amount</span>
                 <span className="text-2xl font-bold text-yellow-300">
-                  ₹{Math.round((couponApplied?.finalAmount || planDetails.price) * 1.18).toLocaleString('en-IN')}
+                  ₹{formatInr(withGST(couponApplied?.finalAmount || planDetails.price))}
                 </span>
               </div>
             </div>
@@ -650,7 +657,7 @@ const ZeVaultCheckout: React.FC = () => {
                   <path d="M21 12a9 9 0 1 1-6.219-8.56" />
                 </svg>
               )}
-              <span>{loading ? 'Processing...' : `Pay ₹${Math.round((couponApplied?.finalAmount || planDetails.price) * 1.18).toLocaleString('en-IN')}`}</span>
+              <span>{loading ? 'Processing...' : `Pay ₹${formatInr(withGST(couponApplied?.finalAmount || planDetails.price))}`}</span>
             </button>
 
             {/* Help Text */}

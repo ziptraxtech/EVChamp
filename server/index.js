@@ -1517,10 +1517,10 @@ app.post('/api/zeflash-add-credits', async (req, res) => {
 // the shared DATABASE_URL; run that at least once before using this locally.
 // Scoped to EVChamp-only for now — see api/index.js for the full rationale.
 const CREDIT_PLANS = {
-  'zeflash-trial':   { priceInr: 300,  lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 300 }, { service: 'zeflash', unitType: 'diagnostic_test', quantity: 1 }] },
-  'zeflash-starter': { priceInr: 1500, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 1500 }] },
-  'zeflash-value':   { priceInr: 3000, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 3000 }] },
-  'zeflash-smart':   { priceInr: 6000, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 6000 }] },
+  'zeflash-trial':   { priceInr: 199,  lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 199 }, { service: 'zeflash', unitType: 'diagnostic_test', quantity: 1 }] },
+  'zeflash-starter': { priceInr: 1499, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 1499 }] },
+  'zeflash-value':   { priceInr: 2999, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 2999 }] },
+  'zeflash-smart':   { priceInr: 4999, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 4999 }] },
 };
 
 // Coupon codes configuration (matching frontend and api/index.js)

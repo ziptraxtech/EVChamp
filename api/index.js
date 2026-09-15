@@ -1559,10 +1559,10 @@ app.post('/api/wallet-deduct', async (req, res) => {
 // The live catalog is EVChamp-only. Add Zeflash/ZipsureAI line items only
 // after their authenticated, idempotent partner endpoints are deployed.
 const CREDIT_PLANS = {
-  'zeflash-trial':   { priceInr: 300,  lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 300 }, { service: 'zeflash', unitType: 'diagnostic_test', quantity: 1 }] },
-  'zeflash-starter': { priceInr: 1500, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 1500 }] },
-  'zeflash-value':   { priceInr: 3000, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 3000 }] },
-  'zeflash-smart':   { priceInr: 6000, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 6000 }] },
+  'zeflash-trial':   { priceInr: 199,  lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 199 }, { service: 'zeflash', unitType: 'diagnostic_test', quantity: 1 }] },
+  'zeflash-starter': { priceInr: 1499, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 1499 }] },
+  'zeflash-value':   { priceInr: 2999, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 2999 }] },
+  'zeflash-smart':   { priceInr: 4999, lineItems: [{ service: 'evchamp', unitType: 'inr', quantity: 4999 }] },
 };
 
 // Server-to-server "grant credit" call to a partner service. STUBBED —
