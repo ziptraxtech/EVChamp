@@ -18,7 +18,7 @@ const SERVICE_CARDS = [
   { icon: '🔋', tag: 'Visit zeflash.app', grad: 'linear-gradient(150deg,#1E63FF,#0BA66A)', title: 'Zeflash', desc: '20-minute field diagnostics with advanced SoH & SoC analysis and instant health reports during charging.', cta: 'Rapid AI battery diagnostics', route: '/zeflash' },
   { icon: '🏷️', tag: 'Zero commission listing', grad: 'linear-gradient(150deg,#2563EB,#0EA5E9)', title: 'Sell Your EV', desc: 'List your electric vehicle and connect with thousands of genuine buyers instantly with zero commission.', cta: 'Best price & fast verification', route: '/sell-ev' },
   { icon: '🛟', tag: 'Plans from ₹999/yr', grad: 'linear-gradient(150deg,#0BA66A,#0891B2)', title: 'RSA Plans', desc: 'Get towing, battery assistance, tyre support and emergency EV help anywhere, anytime.', cta: '24×7 roadside support', route: '/rsa-plans' },
-  { icon: '🔩', tag: 'Patented technology', grad: 'linear-gradient(150deg,#E11D48,#9333EA)', title: 'ZipBattery', desc: 'Extend your EV battery lifespan using our patented AI diagnostics and optimization technology.', cta: 'Learn more about ZipBattery', route: '/evtrulife' },
+  { icon: '🔩', tag: 'Patented technology', grad: 'linear-gradient(150deg,#E11D48,#9333EA)', title: 'ZipsureAi Battery Health Report', desc: 'Extend your EV battery lifespan using our patented AI diagnostics and optimization technology.', cta: 'Learn more about ZipsureAi Battery Health Report', route: '/evtrulife' },
   { icon: '💳', tag: 'QR, cards & UPI', grad: 'linear-gradient(150deg,#0F766E,#0BA66A)', title: 'EVChamp Pay', desc: 'Fast, secure payments for charging sessions, diagnostics and wallet top-ups across the EVChamp network.', cta: 'Explore EVChamp Pay', route: '/evchamp-pay' },
 ];
 
