@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { FaCar, FaBatteryFull, FaRoute, FaClock, FaUsers, FaShieldAlt, FaArrowLeft } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { FaCar, FaBatteryFull, FaRoute, FaClock, FaUsers, FaShieldAlt } from 'react-icons/fa';
 import { useUser } from '@clerk/clerk-react';
 import razorpayService from '../services/razorpayService';
 // Add imports for local images
@@ -159,7 +158,6 @@ const evCars: EVCard[] = [
 ];
 
 const RentEV: React.FC = () => {
-  const navigate = useNavigate();
   const { user } = useUser();
   const [selectedPeriod, setSelectedPeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily');
   const [selectedCar, setSelectedCar] = useState<EVCard | null>(null);
@@ -241,17 +239,6 @@ const RentEV: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-yellow-50">
-      {/* Back Button */}
-      <div className="static sm:absolute sm:top-24 sm:left-6 z-10 px-4 sm:px-0 pt-3 sm:pt-0">
-        <button
-          onClick={() => navigate('/')}
-          className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-white/30 active:bg-white/40 transition-all duration-200 shadow-lg text-xs sm:text-sm"
-        >
-          {FaArrowLeft({ className: "text-base flex-shrink-0" })}
-          <span className="font-semibold">Back</span>
-        </button>
-      </div>
-      
       {/* Hero Section */}
       <section className="pt-14 sm:pt-20 pb-8 sm:pb-12 bg-gradient-to-r from-blue-600 to-green-600 text-white">
         <div className="container mx-auto px-4 sm:px-6 text-center">

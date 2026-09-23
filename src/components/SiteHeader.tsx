@@ -54,6 +54,18 @@ export default function SiteHeader() {
     window.scrollTo({ top: 0, behavior: 'auto' });
   };
 
+  // Goes to the previous entry in history, falling back to home when there
+  // isn't one (e.g. a page opened directly / in a new tab).
+  const goBack = () => {
+    setPlatformOpen(false);
+    setAccountOpen(false);
+    setMobileOpen(false);
+    setMobilePlatformOpen(false);
+    if (window.history.length > 1) navigate(-1);
+    else navigate('/');
+  };
+  const showBack = location.pathname !== '/';
+
   return (
     <div style={{ fontFamily: 'Inter, sans-serif' }}>
       <style>{`
@@ -76,8 +88,18 @@ export default function SiteHeader() {
           .sh-burger { width: 42px !important; height: 42px !important; }
           .sh-signin { padding: 9px 8px !important; }
           .sh-menu-item { min-height: 46px; }
+          /* Icon-only back button on phones — the chevron reads fine without a label
+             and keeps the crowded logo/back/signin/burger row from wrapping. */
+          .sh-back-label { display: none !important; }
+          .sh-back { padding: 8px !important; border-radius: 9px !important; }
         }
       `}</style>
+
+      {/* Announcement bar — sits above the navigation, at the very top of the page */}
+      <div className="sh-announce" style={{ background: GRAD, color: '#fff', textAlign: 'center', fontSize: 13, fontWeight: 600, letterSpacing: '0.01em', padding: '9px 16px' }}>
+        New: EVChamp raises a green-infrastructure fund — franchise &amp; investment slots now open ·{' '}
+        <span style={{ textDecoration: 'underline', textUnderlineOffset: 2, cursor: 'pointer' }} onClick={() => goTo('/franchise')}>Learn more →</span>
+      </div>
 
       {/* Navigation bar */}
       <header style={{ position: 'sticky', top: 0, zIndex: 60, background: 'rgba(255,255,255,.92)', backdropFilter: 'blur(14px)', borderBottom: '1px solid #EDF1F5' }}>
@@ -86,6 +108,20 @@ export default function SiteHeader() {
             <img src="/evchamp-logo.png" alt="EVChamp" style={{ width: 34, height: 34, borderRadius: 9, objectFit: 'cover' }} />
             <span className="sh-logo-text" style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 21, color: '#0F172A', letterSpacing: '-0.01em' }}>EVChamp</span>
           </button>
+
+          {showBack && (
+            <button
+              className="sh-back"
+              onClick={goBack}
+              aria-label="Go back"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#F1F5F9', border: 'none', borderRadius: 8, padding: '7px 11px', color: '#334155', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', flex: '0 0 auto' }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4}>
+                <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span className="sh-back-label">Back</span>
+            </button>
+          )}
 
           <div className="sh-navlinks" style={{ display: 'flex', alignItems: 'center', gap: 26, marginLeft: 10 }}>
             <div onMouseEnter={() => setPlatformOpen(true)} onMouseLeave={() => setPlatformOpen(false)} style={{ position: 'relative' }}>
@@ -209,12 +245,6 @@ export default function SiteHeader() {
           </div>
         )}
       </header>
-
-      {/* Announcement bar — sits directly below the navigation */}
-      <div className="sh-announce" style={{ background: GRAD, color: '#fff', textAlign: 'center', fontSize: 13, fontWeight: 600, letterSpacing: '0.01em', padding: '9px 16px' }}>
-        New: EVChamp raises a green-infrastructure fund — franchise &amp; investment slots now open ·{' '}
-        <span style={{ textDecoration: 'underline', textUnderlineOffset: 2, cursor: 'pointer' }} onClick={() => goTo('/franchise')}>Learn more →</span>
-      </div>
     </div>
   );
 }

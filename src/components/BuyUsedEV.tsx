@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { FaBatteryFull, FaTachometerAlt, FaArrowLeft } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { FaBatteryFull, FaTachometerAlt } from 'react-icons/fa';
 import { useUser } from '@clerk/clerk-react';
 import { Helmet } from 'react-helmet-async';
 
@@ -38,7 +37,6 @@ const usedEVs: UsedEVCard[] = [
 ];
 
 const BuyUsedEV: React.FC = () => {
-  const navigate = useNavigate();
   const { user } = useUser();
   const [selectedCar, setSelectedCar] = useState<UsedEVCard | null>(null);
   const [showEnquiryModal, setShowEnquiryModal] = useState(false);
@@ -52,7 +50,6 @@ const BuyUsedEV: React.FC = () => {
     setShowEnquiryModal(true);
   };
 
-  const BackArrow = FaArrowLeft as React.ElementType;
   const TachometerIcon = FaTachometerAlt as React.ElementType;
   const BatteryIcon = FaBatteryFull as React.ElementType;
 
@@ -64,17 +61,6 @@ const BuyUsedEV: React.FC = () => {
         <meta name="keywords" content="buy used EV in India, certified pre-owned EVs, EV battery diagnostics, EV marketplace India" />
       </Helmet>
 
-      {/* Back Button */}
-      <div className="static sm:absolute sm:top-24 sm:left-6 z-10 px-4 sm:px-0 pt-4 sm:pt-0">
-        <button
-          onClick={() => navigate('/')}
-          className="flex items-center space-x-2 text-gray-700 bg-white/80 border border-gray-200 px-4 py-2 rounded-lg hover:bg-white transition-all text-sm shadow-sm"
-        >
-          <BackArrow className="text-lg" />
-          <span className="font-semibold">Back</span>
-        </button>
-      </div>
-      
       {/* Hero Section */}
       <section className="pt-16 sm:pt-20 pb-10 sm:pb-12 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
         <div className="container mx-auto px-4 sm:px-6 text-center max-w-3xl">
