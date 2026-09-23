@@ -14,7 +14,7 @@ export const PLATFORM_TILES: PlatformTile[] = [
   { icon: '🏷️', bg: '#E0F2FE', title: 'Sell Your EV', desc: 'List with zero commission fees', route: '/sell-ev' },
   { icon: '🛟', bg: '#E9F8F0', title: 'Roadside Assistance', desc: '24×7 EV-trained emergency support', route: '/rsa-plans' },
   { icon: '🔩', bg: '#FDE7EF', title: 'ZipBattery', desc: 'Patented AI battery-life optimization', route: '/evtrulife' },
-  { icon: '🛰️', bg: '#EEF2FF', title: 'ZipsureAI & IoT Plans', desc: 'Fleet intelligence & monitoring', route: '/buy-plans' },
+  { icon: '🤝', bg: '#EEF2FF', title: 'Franchise', desc: 'Partner with us and own an EV hub', route: '/franchise' },
   { icon: '🌟', bg: '#FEF9E7', title: 'Ze.Xperience', desc: 'Test drives & the EV showcase', route: '/ze-xperience' },
   { icon: '💳', bg: '#E6F7F1', title: 'EVChamp Pay', desc: 'Fast, secure payments via QR, cards & UPI', route: '/evchamp-pay' },
 ];
