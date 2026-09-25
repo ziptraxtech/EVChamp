@@ -73,6 +73,15 @@ interface ThemeTokens {
   tiles: string;
 }
 
+// CARTO's basemap tiles require a free API key (https://carto.com/basemaps/apikey) —
+// without it every tile renders with an "API key required" watermark. Falls back to
+// an unauthenticated request (today's watermarked behavior) if it's not configured.
+const CARTO_KEY = process.env.REACT_APP_CARTO_API_KEY;
+function cartoTiles(style: 'dark_all' | 'light_all'): string {
+  const base = `https://{s}.basemaps.cartocdn.com/${style}/{z}/{x}/{y}{r}.png`;
+  return CARTO_KEY ? `${base}?key=${CARTO_KEY}` : base;
+}
+
 function getTokens(dark: boolean): ThemeTokens {
   return dark
     ? {
@@ -87,7 +96,7 @@ function getTokens(dark: boolean): ThemeTokens {
         pillBusyBg: 'rgba(251,191,36,0.15)', pillBusyText: '#fbbf24',
         pillOffBg: '#27272a', pillOffText: '#a1a1aa',
         chipBg: '#27272a', clusterBorder: '#18181b',
-        tiles: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+        tiles: cartoTiles('dark_all'),
       }
     : {
         dark: false,
@@ -101,7 +110,7 @@ function getTokens(dark: boolean): ThemeTokens {
         pillBusyBg: '#FDF3DC', pillBusyText: '#8A5B0A',
         pillOffBg: '#EEF2F7', pillOffText: '#5E7085',
         chipBg: '#EEF2F7', clusterBorder: '#ffffff',
-        tiles: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+        tiles: cartoTiles('light_all'),
       };
 }
 
