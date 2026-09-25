@@ -26,7 +26,9 @@ export default function RegisterModal({
     finish: FINISH_OPTIONS[0],
   });
   const [error, setError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('Please enter your name and a valid email.');
   const [done, setDone] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const nameRef = useRef<HTMLInputElement | null>(null);
 
   const open = mode !== null;
@@ -54,15 +56,36 @@ export default function RegisterModal({
   const set = (k: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setData((d) => ({ ...d, [k]: e.target.value }));
 
-  const submit = () => {
+  const submit = async () => {
     const valid = data.name.trim().length > 0 && EMAIL_RE.test(data.email.trim());
     if (!valid) {
+      setErrorMsg('Please enter your name and a valid email.');
       setError(true);
       return;
     }
     setError(false);
-    // TODO: POST `data` to your API here.
-    setDone(true);
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/ze-xperience-registrations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: testride ? 'testride' : 'interest',
+          name: data.name.trim(),
+          email: data.email.trim(),
+          city: data.city.trim() || undefined,
+          finish: data.finish,
+        }),
+      });
+      if (!res.ok) throw new Error(`Request failed (${res.status})`);
+      setDone(true);
+    } catch (err) {
+      console.error('Ze.Xperience registration failed:', err);
+      setErrorMsg('Something went wrong sending your details. Please try again.');
+      setError(true);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const first = data.name.trim().split(" ")[0];
@@ -119,10 +142,10 @@ export default function RegisterModal({
                 </label>
               </div>
               {error && (
-                <div className="modal__error">Please enter your name and a valid email.</div>
+                <div className="modal__error">{errorMsg}</div>
               )}
-              <button className="modal__submit" onClick={submit}>
-                {testride ? "Book test ride" : "Submit"}
+              <button className="modal__submit" onClick={submit} disabled={submitting}>
+                {submitting ? "Submitting…" : testride ? "Book test ride" : "Submit"}
               </button>
             </div>
           </div>

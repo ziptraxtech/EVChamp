@@ -380,6 +380,22 @@ async function initDB() {
     `;
     await getSQL()`CREATE INDEX IF NOT EXISTS idx_plan_purchases_user ON plan_purchases(clerk_user_id)`;
 
+    // Ze.Xperience "Register interest" / "Book a test ride" modal
+    // (RegisterModal.tsx) — had a literal `// TODO: POST data to your API
+    // here.` comment; it showed a fake success screen and sent nothing.
+    await getSQL()`
+      CREATE TABLE IF NOT EXISTS ze_xperience_registrations (
+        id SERIAL PRIMARY KEY,
+        mode TEXT NOT NULL,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        city TEXT,
+        finish TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `;
+    await getSQL()`CREATE INDEX IF NOT EXISTS idx_ze_xperience_registrations_email ON ze_xperience_registrations(email)`;
+
     dbReady = true;
     return true;
   } catch (err) {
@@ -1810,6 +1826,26 @@ app.post('/api/delete-user-data', async (req, res) => {
     // account even if this fails, so a transient DB error never blocks the
     // user's actual deletion request.
     res.status(500).json({ error: 'Failed to clean up account data', detail: err.message });
+  }
+});
+
+// Ze.Xperience "Register interest" / "Book a test ride" modal — was a
+// client-only stub (fake success screen, nothing sent).
+app.post('/api/ze-xperience-registrations', async (req, res) => {
+  try {
+    const { mode, name, email, city, finish } = req.body || {};
+    if (!mode || !name || !email) {
+      return res.status(400).json({ error: 'mode, name and email are required' });
+    }
+    const [row] = await getSQL()`
+      INSERT INTO ze_xperience_registrations (mode, name, email, city, finish)
+      VALUES (${mode}, ${name}, ${email}, ${city || null}, ${finish || null})
+      RETURNING id
+    `;
+    res.json({ success: true, id: row?.id ?? null });
+  } catch (err) {
+    console.error('[ze-xperience-registrations] Error:', err.message);
+    res.status(500).json({ error: 'Failed to submit registration' });
   }
 });
 

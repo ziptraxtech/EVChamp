@@ -32,6 +32,7 @@ import ZeflashPlans from './components/ZeflashPlans';
 import { initializePushNotifications } from './components/FirebaseNotification';
 import { scheduleLocalNotifications, setupLocalNotificationTapHandler } from './components/LocalNotifications';
 import AdminNotificationPanel from './components/AdminNotificationPanel';
+import { useSyncUserToDB } from './hooks/useSyncUserToDB';
 
 
 import ChatbotPopup from './components/ChatbotPopup';
@@ -96,6 +97,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  // Upserts the signed-in Clerk user into Neon's `users` table — this hook
+  // existed but was never called anywhere, so no signed-in/registered user
+  // was ever recorded in the DB regardless of how they signed up.
+  useSyncUserToDB();
+
   useEffect(() => {
     // Initialize Firebase notifications (if available)
     initializePushNotifications();

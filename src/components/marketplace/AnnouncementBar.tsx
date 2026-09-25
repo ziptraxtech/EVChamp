@@ -3,6 +3,8 @@ import { TOP_OFFER_CAR, offersFor } from "./data/cars";
 import { fmtMoney } from "./lib/format";
 import { useToolkit } from "./context";
 
+const CURRENT_MONTH_NAME = new Date().toLocaleString('en-US', { month: 'long' });
+
 export default function AnnouncementBar() {
   const { cur, openOffers } = useToolkit();
   const total = offersFor(TOP_OFFER_CAR).total;
@@ -19,7 +21,7 @@ export default function AnnouncementBar() {
           <Tag size={11} strokeWidth={2.4} />
         </span>
         {/* lead text — hidden on the smallest screens to keep the bar one line */}
-        <span className="hidden opacity-95 sm:inline">July EV offers are live</span>
+        <span className="hidden opacity-95 sm:inline">{CURRENT_MONTH_NAME} EV offers are live</span>
         <b className="font-display font-extrabold">Benefits up to {fmtMoney(total, cur)}</b>
       </span>
       {/* full pill on desktop */}
