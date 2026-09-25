@@ -139,8 +139,30 @@ const BuyUsedEV: React.FC = () => {
               </div>
               <div className="flex justify-end space-x-4 pt-4">
                 <button onClick={() => setShowEnquiryModal(false)} className="px-6 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100">Cancel</button>
-                <button 
-                  onClick={() => { alert('Thank you for your enquiry! Our team will be in touch.'); setShowEnquiryModal(false); }} 
+                <button
+                  onClick={async () => {
+                    try {
+                      const res = await fetch('/api/used-ev-enquiries', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          userId: user?.id,
+                          customerName: user?.firstName || user?.username || '',
+                          customerEmail: user?.primaryEmailAddress?.emailAddress || '',
+                          carId: selectedCar?.id,
+                          carBrand: selectedCar?.brand,
+                          carName: selectedCar?.name,
+                          carPrice: selectedCar?.price,
+                        }),
+                      });
+                      if (!res.ok) throw new Error(`Request failed (${res.status})`);
+                      alert('Thank you for your enquiry! Our team will be in touch.');
+                    } catch (err) {
+                      console.error('Used EV enquiry submission failed:', err);
+                      alert('Something went wrong sending your enquiry. Please try again or contact us directly.');
+                    }
+                    setShowEnquiryModal(false);
+                  }}
                   className="px-6 py-2 text-white rounded-lg transition-colors"
                   style={{
                     background: 'linear-gradient(120deg, #0a8a52, #1257c4)',

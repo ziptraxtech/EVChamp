@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // The single site-wide footer — same design as the main landing page, reused
@@ -26,6 +26,30 @@ export default function Footer() {
   const goTo = (route: string) => {
     navigate(route);
     window.scrollTo({ top: 0, behavior: 'auto' });
+  };
+
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
+
+  const handleNewsletterJoin = async () => {
+    if (!/^\S+@\S+\.\S+$/.test(newsletterEmail)) {
+      setNewsletterStatus('error');
+      return;
+    }
+    setNewsletterStatus('sending');
+    try {
+      const res = await fetch('/api/newsletter-subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newsletterEmail }),
+      });
+      if (!res.ok) throw new Error(`Request failed (${res.status})`);
+      setNewsletterStatus('done');
+      setNewsletterEmail('');
+    } catch (err) {
+      console.error('Newsletter signup failed:', err);
+      setNewsletterStatus('error');
+    }
   };
 
   return (
@@ -99,9 +123,27 @@ export default function Footer() {
           <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>Stay charged</div>
           <p style={{ fontSize: 13.5, color: '#8FA0BF', margin: '16px 0 12px' }}>Product news &amp; EV insights, monthly.</p>
           <div style={{ display: 'flex', background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.14)', borderRadius: 10, padding: 4, gap: 6 }}>
-            <input type="email" inputMode="email" autoComplete="email" placeholder="Email address" className="ftr-newsinput" style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none', color: '#EAF2EC', fontFamily: 'Inter, sans-serif', fontSize: 13.5, padding: '8px 10px' }} />
-            <button style={{ background: GRAD, color: '#fff', border: 'none', fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 13.5, padding: '8px 14px', borderRadius: 7, cursor: 'pointer' }}>Join</button>
+            <input
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              placeholder="Email address"
+              className="ftr-newsinput"
+              value={newsletterEmail}
+              onChange={(e) => { setNewsletterEmail(e.target.value); if (newsletterStatus !== 'idle') setNewsletterStatus('idle'); }}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleNewsletterJoin(); }}
+              style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none', color: '#EAF2EC', fontFamily: 'Inter, sans-serif', fontSize: 13.5, padding: '8px 10px' }}
+            />
+            <button
+              onClick={handleNewsletterJoin}
+              disabled={newsletterStatus === 'sending'}
+              style={{ background: GRAD, color: '#fff', border: 'none', fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 13.5, padding: '8px 14px', borderRadius: 7, cursor: newsletterStatus === 'sending' ? 'default' : 'pointer', opacity: newsletterStatus === 'sending' ? 0.7 : 1 }}
+            >
+              {newsletterStatus === 'sending' ? '…' : 'Join'}
+            </button>
           </div>
+          {newsletterStatus === 'done' && <p style={{ fontSize: 12.5, color: '#34D399', margin: '8px 0 0' }}>You're subscribed — thanks!</p>}
+          {newsletterStatus === 'error' && <p style={{ fontSize: 12.5, color: '#F87171', margin: '8px 0 0' }}>Enter a valid email to subscribe.</p>}
         </div>
       </div>
       <div style={{ borderTop: '1px solid rgba(255,255,255,.08)' }}>

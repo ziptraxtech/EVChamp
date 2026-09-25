@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useUser, useClerk } from '@clerk/clerk-react';
+import { useUser, useClerk, useAuth } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
 
 const DeleteAccount: React.FC = () => {
   const { isSignedIn, isLoaded, user } = useUser();
   const { signOut } = useClerk();
+  const { getToken } = useAuth();
   const navigate = useNavigate();
 
   const [step, setStep] = useState<'info' | 'confirm' | 'deleting' | 'done' | 'error'>('info');
@@ -15,6 +16,19 @@ const DeleteAccount: React.FC = () => {
     if (confirmText.trim().toUpperCase() !== 'DELETE') return;
     setStep('deleting');
     try {
+      // Clean up our own Postgres rows first — the token stops verifying
+      // once the Clerk account below is gone. Best-effort: a failure here
+      // must not block the user's actual deletion request.
+      try {
+        const token = await getToken();
+        await fetch('/api/delete-user-data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        });
+      } catch (cleanupErr) {
+        console.error('Account data cleanup failed (continuing with deletion):', cleanupErr);
+      }
+
       // Try to delete the account
       await user?.delete();
       setStep('done');

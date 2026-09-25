@@ -115,39 +115,44 @@ const SellEV: React.FC = () => {
     });
   };
 
-  const handleSubmitListing = (e: React.FormEvent) => {
+  const handleSubmitListing = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isSignedIn) {
       alert('Please sign in to list your vehicle');
       return;
     }
-    
-    // Here you would send the data to your backend with user's Clerk data
+
     const submissionData = {
       ...formData,
       userId: user?.id,
       userEmail: user?.primaryEmailAddress?.emailAddress,
       userName: user?.fullName || `${user?.firstName} ${user?.lastName}`,
-      submittedAt: new Date().toISOString()
     };
-    
-    console.log('Submitting vehicle listing:', submissionData);
-    
-    // Success message and reset form
-    alert('Vehicle listing submitted successfully! Our team will contact you within 24 hours to schedule a comprehensive battery diagnostic test and vehicle inspection. The certification process takes 2-3 days.');
-    
-    // Reset form and close modal
-    setShowListingForm(false);
-    setFormData({
-      vehicleModel: '',
-      brand: '',
-      year: '',
-      price: '',
-      mileage: '',
-      location: '',
-      description: '',
-      contactNumber: ''
-    });
+
+    try {
+      const res = await fetch('/api/sell-ev-listings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(submissionData),
+      });
+      if (!res.ok) throw new Error(`Request failed (${res.status})`);
+
+      alert('Vehicle listing submitted successfully! Our team will contact you within 24 hours to schedule a comprehensive battery diagnostic test and vehicle inspection. The certification process takes 2-3 days.');
+      setShowListingForm(false);
+      setFormData({
+        vehicleModel: '',
+        brand: '',
+        year: '',
+        price: '',
+        mileage: '',
+        location: '',
+        description: '',
+        contactNumber: ''
+      });
+    } catch (err) {
+      console.error('Sell EV listing submission failed:', err);
+      alert('Something went wrong submitting your listing. Please try again or contact us directly.');
+    }
   };
 
   const handleBookInspection = (vehicle: Vehicle) => {

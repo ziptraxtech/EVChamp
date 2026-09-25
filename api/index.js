@@ -175,6 +175,59 @@ async function initDB() {
     await getSQL()`CREATE INDEX IF NOT EXISTS idx_outbox_due ON credit_grant_outbox(status, next_attempt_at)`;
     await getSQL()`ALTER TABLE credit_grant_outbox ADD COLUMN IF NOT EXISTS coupon_code TEXT`;
 
+    // Autopay subscriptions — schema existed only in server/db.js (the EC2
+    // Express mirror), never in this file, which is the copy vercel.json
+    // actually routes /api/* traffic to. No route writes to this table yet
+    // (see AutopaySettings.tsx / autopayManager.ts, which call
+    // /api/autopay/* endpoints that don't exist here) — this only closes
+    // the schema gap so the table exists once those routes are built.
+    await getSQL()`
+      CREATE TABLE IF NOT EXISTS autopay_subscriptions (
+        id SERIAL PRIMARY KEY,
+        subscription_id TEXT UNIQUE NOT NULL,
+        clerk_user_id TEXT NOT NULL,
+        plan_id TEXT NOT NULL,
+        plan_name TEXT NOT NULL,
+        plan_details JSONB,
+        razorpay_subscription_id TEXT,
+        status TEXT DEFAULT 'active',
+        start_date TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        next_renewal_date TIMESTAMP WITH TIME ZONE NOT NULL,
+        last_charge_date TIMESTAMP WITH TIME ZONE,
+        failed_attempts INTEGER DEFAULT 0,
+        max_retries INTEGER DEFAULT 3,
+        payment_method JSONB,
+        auto_charge_enabled BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `;
+    await getSQL()`CREATE INDEX IF NOT EXISTS idx_autopay_clerk_user_id ON autopay_subscriptions(clerk_user_id)`;
+    await getSQL()`CREATE INDEX IF NOT EXISTS idx_autopay_subscription_id ON autopay_subscriptions(subscription_id)`;
+    await getSQL()`CREATE INDEX IF NOT EXISTS idx_autopay_status ON autopay_subscriptions(status)`;
+
+    // Coupon usage tracking — same story as autopay_subscriptions above:
+    // schema existed only in server/db.js. PaymentSuccess.tsx already calls
+    // POST /api/coupons/record-usage, which doesn't exist here either.
+    await getSQL()`
+      CREATE TABLE IF NOT EXISTS coupon_usage (
+        id SERIAL PRIMARY KEY,
+        clerk_user_id TEXT NOT NULL,
+        plan_id TEXT NOT NULL,
+        coupon_code TEXT NOT NULL,
+        discount_amount DECIMAL(10, 2),
+        original_price DECIMAL(10, 2),
+        final_price DECIMAL(10, 2),
+        subscription_id TEXT,
+        payment_id TEXT,
+        used_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        UNIQUE(clerk_user_id, plan_id)
+      )
+    `;
+    await getSQL()`CREATE INDEX IF NOT EXISTS idx_coupon_usage_user ON coupon_usage(clerk_user_id)`;
+    await getSQL()`CREATE INDEX IF NOT EXISTS idx_coupon_usage_plan ON coupon_usage(plan_id, clerk_user_id)`;
+
     await getSQL()`
       CREATE TABLE IF NOT EXISTS fcm_tokens (
         id SERIAL PRIMARY KEY,
@@ -222,6 +275,110 @@ async function initDB() {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       )
     `;
+
+    // Contact / Franchise / CPO enquiries — ContactUs.tsx funnels all of
+    // these into one form. Previously email-only (Gmail); this is the
+    // durable backup so a lead survives even if the email send fails.
+    await getSQL()`
+      CREATE TABLE IF NOT EXISTS contact_submissions (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        company TEXT,
+        inquiry_type TEXT,
+        message TEXT NOT NULL,
+        email_sent BOOLEAN NOT NULL DEFAULT FALSE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `;
+    await getSQL()`CREATE INDEX IF NOT EXISTS idx_contact_submissions_created ON contact_submissions(created_at)`;
+
+    // "Sell Your EV" listings (SellEV.tsx) — was console.log()+alert() only.
+    await getSQL()`
+      CREATE TABLE IF NOT EXISTS sell_ev_listings (
+        id SERIAL PRIMARY KEY,
+        clerk_user_id TEXT,
+        user_email TEXT,
+        user_name TEXT,
+        brand TEXT,
+        vehicle_model TEXT,
+        year TEXT,
+        mileage TEXT,
+        price TEXT,
+        location TEXT,
+        contact_number TEXT,
+        description TEXT,
+        status TEXT NOT NULL DEFAULT 'new',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `;
+    await getSQL()`CREATE INDEX IF NOT EXISTS idx_sell_ev_listings_user ON sell_ev_listings(clerk_user_id)`;
+
+    // Service-centre "list your business" submissions (ServiceCentres.tsx)
+    // — was localStorage-only, invisible outside that one browser.
+    await getSQL()`
+      CREATE TABLE IF NOT EXISTS service_centre_listings (
+        id SERIAL PRIMARY KEY,
+        business_name TEXT NOT NULL,
+        manager_name TEXT,
+        phone TEXT,
+        email TEXT,
+        city TEXT,
+        address TEXT,
+        service_type TEXT,
+        status TEXT NOT NULL DEFAULT 'Pending verification',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `;
+
+    // BuyUsedEV.tsx "Enquire Now" modal — was a hardcoded alert(), never
+    // sent anywhere. (Separate from the /ev-marketplace Toolkit's own
+    // test_drive_bookings/offer_leads, which already work.)
+    await getSQL()`
+      CREATE TABLE IF NOT EXISTS used_ev_enquiries (
+        id SERIAL PRIMARY KEY,
+        clerk_user_id TEXT,
+        customer_name TEXT,
+        customer_email TEXT,
+        car_id INTEGER,
+        car_brand TEXT,
+        car_name TEXT,
+        car_price INTEGER,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `;
+
+    // Footer "Stay charged" newsletter signup — the Join button had no
+    // onClick handler at all.
+    await getSQL()`
+      CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+        id SERIAL PRIMARY KEY,
+        email TEXT UNIQUE NOT NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `;
+
+    // RSAPlans / RentEV / BuyPlans purchases — the legacy razorpayService.ts
+    // path creates a real order (see /api/create-order below) but never
+    // verified the signature or recorded anything after payment, unlike the
+    // ZeVaultCheckout flow's outbox/wallet tables.
+    await getSQL()`
+      CREATE TABLE IF NOT EXISTS plan_purchases (
+        id SERIAL PRIMARY KEY,
+        razorpay_order_id TEXT NOT NULL,
+        razorpay_payment_id TEXT NOT NULL,
+        clerk_user_id TEXT,
+        plan_name TEXT,
+        description TEXT,
+        customer_email TEXT,
+        customer_name TEXT,
+        amount_paise INTEGER,
+        currency TEXT NOT NULL DEFAULT 'INR',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        UNIQUE (razorpay_order_id, razorpay_payment_id)
+      )
+    `;
+    await getSQL()`CREATE INDEX IF NOT EXISTS idx_plan_purchases_user ON plan_purchases(clerk_user_id)`;
 
     dbReady = true;
     return true;
@@ -1367,34 +1524,63 @@ app.post('/api/contact', async (req, res) => {
       return res.status(400).json({ error: 'name, email and message are required' });
     }
 
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD,
-      },
-    });
+    // Durable record first — this must not be lost even if the email below
+    // fails (Gmail auth/throttling/etc). See contact_submissions in initDB.
+    let submissionId = null;
+    let dbOk = false;
+    try {
+      const [row] = await getSQL()`
+        INSERT INTO contact_submissions (name, email, company, inquiry_type, message)
+        VALUES (${name}, ${email}, ${company || null}, ${inquiryType || null}, ${message})
+        RETURNING id
+      `;
+      submissionId = row?.id ?? null;
+      dbOk = true;
+    } catch (dbErr) {
+      console.error('[contact] DB insert failed:', dbErr.message);
+    }
 
-    await transporter.sendMail({
-      from: `"EVChamp Enquiry" <${process.env.GMAIL_USER}>`,
-      to: 'Ai.evchamp@gmail.com',
-      replyTo: email,
-      subject: `New Enquiry: ${inquiryType || 'General'} — ${name}`,
-      html: `
-        <h2>New Contact Enquiry</h2>
-        <table cellpadding="8" style="border-collapse:collapse;font-family:sans-serif;font-size:14px">
-          <tr><td><b>Name</b></td><td>${name}</td></tr>
-          <tr><td><b>Email</b></td><td>${email}</td></tr>
-          <tr><td><b>Company</b></td><td>${company || '—'}</td></tr>
-          <tr><td><b>Inquiry Type</b></td><td>${inquiryType || '—'}</td></tr>
-          <tr><td><b>Message</b></td><td style="white-space:pre-wrap">${message}</td></tr>
-        </table>
-      `,
-    });
+    let emailOk = false;
+    try {
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.GMAIL_USER,
+          pass: process.env.GMAIL_APP_PASSWORD,
+        },
+      });
 
-    res.json({ success: true });
+      await transporter.sendMail({
+        from: `"EVChamp Enquiry" <${process.env.GMAIL_USER}>`,
+        to: 'Ai.evchamp@gmail.com',
+        replyTo: email,
+        subject: `New Enquiry: ${inquiryType || 'General'} — ${name}`,
+        html: `
+          <h2>New Contact Enquiry</h2>
+          <table cellpadding="8" style="border-collapse:collapse;font-family:sans-serif;font-size:14px">
+            <tr><td><b>Name</b></td><td>${name}</td></tr>
+            <tr><td><b>Email</b></td><td>${email}</td></tr>
+            <tr><td><b>Company</b></td><td>${company || '—'}</td></tr>
+            <tr><td><b>Inquiry Type</b></td><td>${inquiryType || '—'}</td></tr>
+            <tr><td><b>Message</b></td><td style="white-space:pre-wrap">${message}</td></tr>
+          </table>
+        `,
+      });
+      emailOk = true;
+
+      if (dbOk && submissionId) {
+        await getSQL()`UPDATE contact_submissions SET email_sent = TRUE WHERE id = ${submissionId}`.catch(() => {});
+      }
+    } catch (mailErr) {
+      console.error('[contact] Email send failed:', mailErr.message);
+    }
+
+    if (!dbOk && !emailOk) {
+      return res.status(500).json({ error: 'Failed to record or send your message. Please try again.' });
+    }
+    res.json({ success: true, id: submissionId });
   } catch (err) {
-    console.error('Contact email failed:', err.message);
+    console.error('[contact] Unexpected error:', err.message);
     res.status(500).json({ error: 'Failed to send message' });
   }
 });
@@ -1419,6 +1605,211 @@ app.post('/api/users/sync', async (req, res) => {
   } catch (err) {
     console.error('User sync error:', err.message);
     res.status(500).json({ error: 'Failed to sync user' });
+  }
+});
+
+// "Sell Your EV" listings (SellEV.tsx) — was console.log()+alert() only.
+app.post('/api/sell-ev-listings', async (req, res) => {
+  try {
+    const { brand, vehicleModel, year, mileage, price, location, contactNumber, description, userId, userEmail, userName } = req.body || {};
+    if (!vehicleModel || !contactNumber) {
+      return res.status(400).json({ error: 'vehicleModel and contactNumber are required' });
+    }
+    const [row] = await getSQL()`
+      INSERT INTO sell_ev_listings (clerk_user_id, user_email, user_name, brand, vehicle_model, year, mileage, price, location, contact_number, description)
+      VALUES (${userId || null}, ${userEmail || null}, ${userName || null}, ${brand || null}, ${vehicleModel}, ${year || null}, ${mileage || null}, ${price || null}, ${location || null}, ${contactNumber}, ${description || null})
+      RETURNING id
+    `;
+    res.json({ success: true, id: row?.id ?? null });
+  } catch (err) {
+    console.error('[sell-ev-listings] Error:', err.message);
+    res.status(500).json({ error: 'Failed to submit listing' });
+  }
+});
+
+// Service-centre "list your business" submissions (ServiceCentres.tsx) —
+// was localStorage-only.
+app.post('/api/service-centre-listings', async (req, res) => {
+  try {
+    const { businessName, managerName, phone, email, city, address, serviceType } = req.body || {};
+    if (!businessName) return res.status(400).json({ error: 'businessName is required' });
+    const [row] = await getSQL()`
+      INSERT INTO service_centre_listings (business_name, manager_name, phone, email, city, address, service_type)
+      VALUES (${businessName}, ${managerName || null}, ${phone || null}, ${email || null}, ${city || null}, ${address || null}, ${serviceType || null})
+      RETURNING id
+    `;
+    res.json({ success: true, id: row?.id ?? null });
+  } catch (err) {
+    console.error('[service-centre-listings] Error:', err.message);
+    res.status(500).json({ error: 'Failed to submit listing' });
+  }
+});
+
+// BuyUsedEV.tsx "Enquire Now" modal — was a hardcoded alert(), never sent.
+app.post('/api/used-ev-enquiries', async (req, res) => {
+  try {
+    const { userId, customerName, customerEmail, carId, carBrand, carName, carPrice } = req.body || {};
+    if (!customerEmail) return res.status(400).json({ error: 'customerEmail is required' });
+    const [row] = await getSQL()`
+      INSERT INTO used_ev_enquiries (clerk_user_id, customer_name, customer_email, car_id, car_brand, car_name, car_price)
+      VALUES (${userId || null}, ${customerName || null}, ${customerEmail}, ${carId ?? null}, ${carBrand || null}, ${carName || null}, ${carPrice ?? null})
+      RETURNING id
+    `;
+    res.json({ success: true, id: row?.id ?? null });
+  } catch (err) {
+    console.error('[used-ev-enquiries] Error:', err.message);
+    res.status(500).json({ error: 'Failed to submit enquiry' });
+  }
+});
+
+// Footer "Stay charged" newsletter signup — the Join button had no onClick.
+app.post('/api/newsletter-subscribe', async (req, res) => {
+  try {
+    const { email } = req.body || {};
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      return res.status(400).json({ error: 'A valid email is required' });
+    }
+    await getSQL()`
+      INSERT INTO newsletter_subscribers (email)
+      VALUES (${email})
+      ON CONFLICT (email) DO NOTHING
+    `;
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[newsletter-subscribe] Error:', err.message);
+    res.status(500).json({ error: 'Failed to subscribe' });
+  }
+});
+
+// Generic Razorpay order creation for RSAPlans / RentEV / BuyPlans, which
+// use the legacy razorpayService.ts client (distinct from ZeVaultCheckout's
+// create-credit-order). razorpayService.createOrder() already posts here.
+app.post('/api/create-order', async (req, res) => {
+  try {
+    const { amount, currency = 'INR' } = req.body || {};
+    if (!amount || amount <= 0) return res.status(400).json({ error: 'Invalid amount' });
+    const keyId = process.env.RAZORPAY_KEY_ID || process.env.REACT_APP_RAZORPAY_KEY_ID;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET || process.env.REACT_APP_RAZORPAY_KEY_SECRET;
+    if (!keyId || !keySecret) return res.status(500).json({ error: 'Payments not configured' });
+    const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret });
+    const order = await razorpay.orders.create({
+      amount: Math.round(amount), // already in paise from the client
+      currency,
+      receipt: `evchamp_plan_${Date.now()}`,
+    });
+    res.json({ id: order.id, amount: order.amount, currency: order.currency });
+  } catch (err) {
+    console.error('[create-order] Error:', err.message);
+    res.status(500).json({ error: 'Could not create order' });
+  }
+});
+
+// Verifies the Razorpay signature for the /api/create-order flow above and
+// records the purchase — this path previously had NO verification and NO
+// durable record at all once the checkout modal closed.
+app.post('/api/verify-order-payment', async (req, res) => {
+  try {
+    const {
+      razorpay_order_id: orderId,
+      razorpay_payment_id: paymentId,
+      razorpay_signature: signature,
+      planName, description, amount, currency, customerEmail, customerName,
+    } = req.body || {};
+    if (!orderId || !paymentId || !signature) {
+      return res.status(400).json({ error: 'Missing Razorpay payment fields' });
+    }
+    const keySecret = process.env.RAZORPAY_KEY_SECRET || process.env.REACT_APP_RAZORPAY_KEY_SECRET;
+    if (!keySecret) return res.status(500).json({ error: 'Payments not configured' });
+
+    const expected = crypto.createHmac('sha256', keySecret).update(`${orderId}|${paymentId}`).digest('hex');
+    if (expected !== signature) return res.status(400).json({ error: 'Invalid payment signature' });
+
+    // Best-effort Clerk identity — BuyPlans/RentEV are behind ProtectedRoute
+    // (always signed in), but RSAPlans is directly reachable by guests.
+    let clerkUserId = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+        if (clerkSecretKey) {
+          const tokenPayload = await verifyToken(authHeader.split(' ')[1], { secretKey: clerkSecretKey });
+          clerkUserId = tokenPayload.sub || null;
+        }
+      } catch (_) { /* guest checkout — proceed without an identity */ }
+    }
+
+    await getSQL()`
+      INSERT INTO plan_purchases (razorpay_order_id, razorpay_payment_id, clerk_user_id, plan_name, description, customer_email, customer_name, amount_paise, currency)
+      VALUES (${orderId}, ${paymentId}, ${clerkUserId}, ${planName || null}, ${description || null}, ${customerEmail || null}, ${customerName || null}, ${amount || null}, ${currency || 'INR'})
+      ON CONFLICT (razorpay_order_id, razorpay_payment_id) DO NOTHING
+    `;
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[verify-order-payment] Error:', err.message);
+    res.status(500).json({ error: 'Could not verify payment', detail: err.message });
+  }
+});
+
+// PaymentSuccess.tsx already calls this after every purchase that used a
+// coupon; the route simply didn't exist (silent 404, swallowed client-side).
+app.post('/api/coupons/record-usage', async (req, res) => {
+  try {
+    // PaymentSuccess.tsx sends `userId`, not `clerkUserId` — matching its
+    // actual payload here (this previously 404'd, so the mismatch never
+    // surfaced).
+    const { userId, planId, couponCode, discountAmount, originalPrice, finalPrice, subscriptionId, paymentId } = req.body || {};
+    if (!userId || !planId || !couponCode) {
+      return res.status(400).json({ error: 'userId, planId and couponCode are required' });
+    }
+    await getSQL()`
+      INSERT INTO coupon_usage (clerk_user_id, plan_id, coupon_code, discount_amount, original_price, final_price, subscription_id, payment_id)
+      VALUES (${userId}, ${planId}, ${couponCode}, ${discountAmount ?? null}, ${originalPrice ?? null}, ${finalPrice ?? null}, ${subscriptionId || null}, ${paymentId || null})
+      ON CONFLICT (clerk_user_id, plan_id) DO NOTHING
+    `;
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[coupons/record-usage] Error:', err.message);
+    res.status(500).json({ error: 'Failed to record coupon usage' });
+  }
+});
+
+// DeleteAccount.tsx previously called only Clerk's own user.delete() — the
+// app's own Postgres rows (profile, wallet balance, push tokens) were left
+// behind under the now-deleted clerk_id. Call this BEFORE user.delete() so
+// the caller's own token still verifies. Financial/transaction history
+// (wallet_transactions, plan_purchases, sell_ev_listings, used_ev_enquiries,
+// credit_grant_outbox) is anonymized (clerk_user_id cleared) rather than
+// deleted, so accounting records survive without staying linked to an
+// identity that no longer exists.
+app.post('/api/delete-user-data', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Missing Authorization header' });
+    }
+    const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+    if (!clerkSecretKey) return res.status(500).json({ error: 'Server auth not configured' });
+    const tokenPayload = await verifyToken(authHeader.split(' ')[1], { secretKey: clerkSecretKey });
+    const clerkUserId = tokenPayload.sub;
+    if (!clerkUserId) return res.status(401).json({ error: 'Invalid token' });
+
+    await getSQL()`DELETE FROM users WHERE clerk_id = ${clerkUserId}`;
+    await getSQL()`DELETE FROM wallet_balance WHERE clerk_user_id = ${clerkUserId}`;
+    await getSQL()`DELETE FROM fcm_tokens WHERE clerk_user_id = ${clerkUserId}`;
+    await getSQL()`UPDATE wallet_transactions SET clerk_user_id = 'deleted-user' WHERE clerk_user_id = ${clerkUserId}`;
+    await getSQL()`UPDATE credit_grant_outbox SET clerk_user_id = 'deleted-user' WHERE clerk_user_id = ${clerkUserId}`;
+    await getSQL()`UPDATE plan_purchases SET clerk_user_id = NULL WHERE clerk_user_id = ${clerkUserId}`;
+    await getSQL()`UPDATE sell_ev_listings SET clerk_user_id = NULL WHERE clerk_user_id = ${clerkUserId}`;
+    await getSQL()`UPDATE used_ev_enquiries SET clerk_user_id = NULL WHERE clerk_user_id = ${clerkUserId}`;
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[delete-user-data] Error:', err.message);
+    // Best-effort — DeleteAccount.tsx still proceeds to delete the Clerk
+    // account even if this fails, so a transient DB error never blocks the
+    // user's actual deletion request.
+    res.status(500).json({ error: 'Failed to clean up account data', detail: err.message });
   }
 });
 

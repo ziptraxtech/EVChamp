@@ -229,7 +229,7 @@ Your payment cannot be processed because the Razorpay Key ID is missing.
 
       razorpay.on('payment.success', (response: any) => {
         console.log('%c✅ Payment successful:', 'color: #00cc00; font-weight: bold;', response);
-        this.handlePaymentSuccess(response, order);
+        this.handlePaymentSuccess(response, order, { planName: name, description, userEmail, userName });
       });
 
       razorpay.on('payment.failed', (response: any) => {
@@ -257,19 +257,51 @@ Your payment cannot be processed because the Razorpay Key ID is missing.
     }
   }
 
-  // Handle successful payment
-  private handlePaymentSuccess(response: any, order: OrderDetails): void {
-    // You can implement your success logic here
-    // For example, redirect to success page, update database, etc.
+  // Handle successful payment. This previously just redirected with no
+  // server-side signature verification and no durable record of the
+  // purchase — RSAPlans/RentEV/BuyPlans money moved with nothing but
+  // Razorpay's own dashboard to prove what was bought or by whom.
+  private async handlePaymentSuccess(
+    response: any,
+    order: OrderDetails,
+    meta: { planName: string; description: string; userEmail?: string; userName?: string }
+  ): Promise<void> {
     console.log('Payment successful:', response);
-    
+
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+      const verifyRes = await fetch(`${apiUrl}/verify-order-payment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
+          planName: meta.planName,
+          description: meta.description,
+          amount: order.amount,
+          currency: order.currency,
+          customerEmail: meta.userEmail,
+          customerName: meta.userName,
+        }),
+      });
+      if (!verifyRes.ok) {
+        console.error('⚠️ Payment signature verification failed server-side:', await verifyRes.text());
+      }
+    } catch (err) {
+      // The customer has already been charged by Razorpay regardless of
+      // whether our own verification/record call succeeds — don't block
+      // the redirect on it, just log for follow-up.
+      console.error('⚠️ Could not verify/record payment:', err);
+    }
+
     // Redirect to success page with payment details
     const params = new URLSearchParams({
       razorpay_payment_id: response.razorpay_payment_id,
       razorpay_order_id: response.razorpay_order_id,
       razorpay_signature: response.razorpay_signature,
     });
-    
+
     window.location.href = `/payment-success?${params.toString()}`;
   }
 

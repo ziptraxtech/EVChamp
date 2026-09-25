@@ -177,7 +177,7 @@ const ServiceCentres: React.FC = () => {
     [managerListings, serviceType]
   );
 
-  const handleFormSubmit = (event: React.FormEvent) => {
+  const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     const newListing: ManagerListing = {
@@ -192,10 +192,25 @@ const ServiceCentres: React.FC = () => {
       status: 'Pending verification',
     };
 
+    // Keep the existing local echo so the listing still shows up below
+    // immediately, regardless of network conditions.
     const updated = [newListing, ...managerListings];
     setManagerListings(updated);
     localStorage.setItem(MANAGER_STORAGE_KEY, JSON.stringify(updated));
-    setSubmitMessage('Service centre submitted successfully. It is now visible below as a manager listing.');
+
+    try {
+      const res = await fetch('/api/service-centre-listings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error(`Request failed (${res.status})`);
+      setSubmitMessage('Service centre submitted successfully. It is now visible below as a manager listing.');
+    } catch (err) {
+      console.error('Service centre listing submission failed:', err);
+      setSubmitMessage('Saved locally, but we could not reach our servers to confirm your submission. Please contact us if this persists.');
+    }
+
     setForm({
       businessName: '',
       managerName: '',
