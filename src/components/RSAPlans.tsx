@@ -16,132 +16,234 @@ interface RSAPlan {
   highlight?: boolean;
   badge?: string;
   provider?: string;
+  planType: 'subscription' | 'direct';
+  pricePerCustomer?: number;
+  incidentRate?: string;
+  coolingPeriod?: number;
+  planValidity?: number;
 }
 
 const rsaPlans: RSAPlan[] = [
+  // Subscription Plans
   {
     id: 1,
-    name: 'RSA Basic',
+    name: 'Basic',
     price: 999,
     duration: 'Annual',
     tagline: 'Essential roadside cover for everyday EV riders',
     features: [
-      'Emergency towing (up to 25 km)',
-      'On-site battery jump assistance',
-      'Flat tyre support',
-      '24×7 helpline access',
-      'Minor on-road repairs',
+      '24/7 Roadside Assistance Helpline',
+      'Battery Emergency Support & Jumpstart',
+      'Flat Tyre Repair (First Occurrence)',
+      'Vehicle Towing up to 25 KM',
+      'Key Lockout Assistance',
+      'Fuel/Charge Delivery Service',
+      'Basic Mechanical Diagnostics',
+      '4 Service Calls per Year',
+      'PAN-India Coverage',
+      'Incident-based Cooling Period: 72 Hours',
     ],
     idealFor: 'Individual EV owners & daily commuters',
     provider: 'EVChamp',
+    planType: 'subscription',
+    pricePerCustomer: 25,
+    incidentRate: '20%',
+    coolingPeriod: 72,
+    planValidity: 365,
   },
   {
     id: 2,
-    name: 'RSA Standard',
-    price: 1999,
+    name: 'Standard',
+    price: 1199,
     duration: 'Annual',
     tagline: 'Comprehensive cover with faster response',
     features: [
-      'Emergency towing (up to 75 km)',
-      'On-site battery charging & swap assistance',
-      'Flat tyre & minor mechanical support',
-      'Priority 24×7 helpline',
-      'Fuel / charge delivery assistance',
-      'Hotel & cab arrangement (1 incident/year)',
-      'Key lockout assistance',
+      'Priority 24/7 Roadside Assistance',
+      'Battery Replacement (Accidental Damage)',
+      'Flat Tyre Repair & Replacement (3x per year)',
+      'Vehicle Towing up to 50 KM',
+      'Key Lockout & Assistance',
+      'Emergency Charging Service',
+      'Advanced Mechanical Diagnostics',
+      '8 Service Calls per Year',
+      'PAN-India Coverage with Priority Dispatch',
+      '45-Minute Response Time Guarantee',
     ],
     idealFor: 'Regular EV users & small fleet operators',
     highlight: true,
     badge: 'Most Popular',
     provider: 'EVChamp',
+    planType: 'subscription',
+    pricePerCustomer: 50,
+    incidentRate: '20%',
+    coolingPeriod: 72,
+    planValidity: 365,
   },
   {
     id: 3,
-    name: 'RSA Premium',
-    price: 3499,
+    name: 'Premium',
+    price: 1499,
     duration: 'Annual',
     tagline: 'Full-spectrum protection for fleets & power users',
     features: [
-      'Emergency towing (unlimited distance)',
-      'Dedicated fleet support executive',
-      'On-site battery diagnostics & repair',
-      'Flat tyre, mechanical & electrical support',
-      'Priority dispatch — response within 45 min',
-      'Hotel, cab & relay driving (3 incidents/year)',
-      'Key lockout & accident management',
-      'Monthly health check reminder',
-      'Trip breakdown protection (intercity)',
+      'Priority 24/7 On-Spot Repair Support',
+      'Complete Battery Replacement Coverage',
+      'Unlimited Flat Tyre Repair & Replacement',
+      'Vehicle Towing up to 100 KM',
+      'Unlimited Key Lockout Assistance',
+      'Premium Emergency Charging Service',
+      'Complete Vehicle Diagnostics',
+      'Unlimited Service Calls per Year',
+      'VIP PAN-India Coverage with Priority Dispatch',
+      '30-Minute Response Time Guarantee',
     ],
     idealFor: 'Fleet owners, ride-sharing operators & enterprises',
     badge: 'Best Value',
     provider: 'EVChamp',
+    planType: 'subscription',
+    pricePerCustomer: 100,
+    incidentRate: '20%',
+    coolingPeriod: 72,
+    planValidity: 365,
   },
-  // ReadyAssist Plans
+  // Direct Selling Plans
   {
     id: 4,
-    name: 'ReadyAssist Basic',
-    price: 1499,
-    duration: 'Annual',
-    tagline: 'Comprehensive roadside support for all vehicle types',
+    name: 'RSA Basic',
+    price: 999,
+    duration: 'One-Time',
+    tagline: 'Essential roadside cover - Direct purchase',
     features: [
-      'Emergency towing (up to 50 km)',
-      'Flat tyre repair & replacement',
-      'Battery jumpstart assistance',
-      '24×7 emergency helpline',
-      'Key unlock assistance',
-      'Starting problem diagnosis',
-      'Fuel delivery service',
-      '11,000+ service providers nationwide',
+      '24/7 Roadside Assistance Helpline',
+      'Battery Emergency Support & Jumpstart',
+      'Flat Tyre Repair (First Occurrence)',
+      'Vehicle Towing up to 25 KM',
+      'Key Lockout Assistance',
+      'Fuel/Charge Delivery Service',
+      'Basic Mechanical Diagnostics',
+      'Single Service Call',
+      'PAN-India Coverage',
+      'Incident-based Cooling Period: 72 Hours',
     ],
-    idealFor: 'Individual vehicle owners & daily commuters',
-    provider: 'ReadyAssist',
+    idealFor: 'Individual EV owners seeking one-time coverage',
+    provider: 'EVChamp',
+    planType: 'direct',
   },
   {
     id: 5,
-    name: 'ReadyAssist Pro',
-    price: 2499,
-    duration: 'Annual',
-    tagline: 'Premium care with priority dispatch & extended coverage',
+    name: 'RSA Standard',
+    price: 1999,
+    duration: 'One-Time',
+    tagline: 'Comprehensive cover - Direct purchase',
     features: [
-      'Emergency towing (up to 100 km)',
-      'Priority 45-minute dispatch guarantee',
-      'Flat tyre & mechanical support',
-      'Battery diagnostics & charging',
-      'Key unlock & starting problem support',
-      'Fuel/charge delivery',
-      'Hotel & cab arrangement',
-      'Professional fitment services',
-      'AI-powered command center support',
-      'Multi-channel assistance (call, app, SMS)',
+      'Priority 24/7 Roadside Assistance',
+      'Battery Replacement (Accidental Damage)',
+      'Flat Tyre Repair & Replacement (Up to 2 times)',
+      'Vehicle Towing up to 50 KM',
+      'Emergency Charging Service',
+      'Advanced Mechanical Diagnostics',
+      'Up to 2 Service Calls Included',
+      'Priority Dispatch Response',
+      'PAN-India Coverage',
+      'Valid for Single Incident Coverage',
     ],
-    idealFor: 'Regular commuters & small business owners',
+    idealFor: 'Regular EV users seeking one-time coverage',
     highlight: true,
-    badge: 'Partner Choice',
-    provider: 'ReadyAssist',
+    badge: 'Most Popular',
+    provider: 'EVChamp',
+    planType: 'direct',
   },
   {
     id: 6,
+    name: 'RSA Premium',
+    price: 3499,
+    duration: 'One-Time',
+    tagline: 'Full-spectrum protection - Direct purchase',
+    features: [
+      '24/7 On-Spot Repair Support',
+      'Complete Battery Replacement (Accidental Damage)',
+      'Unlimited Flat Tyre Repair & Replacement',
+      'Vehicle Towing up to 100 KM',
+      'Unlimited Key Lockout Assistance',
+      'Premium Emergency Charging Service',
+      'Complete Vehicle Diagnostics',
+      'Up to 3 Service Calls Included',
+      'VIP Priority Dispatch Response',
+      'Enterprise-Grade PAN-India Coverage',
+    ],
+    idealFor: 'Fleet owners seeking one-time coverage',
+    badge: 'Best Value',
+    provider: 'EVChamp',
+    planType: 'direct',
+  },
+  {
+    id: 7,
+    name: 'ReadyAssist Basic',
+    price: 1499,
+    duration: 'One-Time',
+    tagline: 'Comprehensive support - Direct purchase',
+    features: [
+      '24/7 On-Spot Repair Support',
+      'Flat Tyre Repair (Included)',
+      'Key Locked Assistance (Included)',
+      'Towing Service - Regular (Incident to Drop) - 50 KM',
+      'Accidental Towing (Incident to Drop) - 100 KM',
+      'Free Ambulance Support (In Case of Accidents)',
+      'PAN-India Support with 11,000+ Service Providers',
+      '24/7 Multilingual Customer Support',
+      'Doctor on Call - Upto 1 consultation',
+      'Lawyer on Call - Upto 1 consultation',
+    ],
+    idealFor: 'Individual vehicle owners seeking one-time coverage',
+    provider: 'ReadyAssist',
+    planType: 'direct',
+  },
+  {
+    id: 8,
+    name: 'ReadyAssist Pro',
+    price: 2499,
+    duration: 'One-Time',
+    tagline: 'Premium care - Direct purchase',
+    features: [
+      '24/7 On-Spot Repair Support',
+      'Flat Tyre Repair (Included)',
+      'Key Locked Assistance (Included)',
+      'Towing Service - Regular (Incident to Drop) - 100 KM',
+      'Accidental Towing (Incident to Drop) - 100 KM',
+      'Free Ambulance Support (In Case of Accidents)',
+      'PAN-India Support',
+      '24/7 Customer Support',
+      'Doctor on Call - Upto 1 consultation',
+      'Lawyer on Call - Upto 1 consultation',
+    ],
+    idealFor: 'Regular commuters seeking one-time coverage',
+    highlight: true,
+    badge: 'Partner Choice',
+    provider: 'ReadyAssist',
+    planType: 'direct',
+  },
+  {
+    id: 9,
     name: 'ReadyAssist Fleet+',
     price: 4999,
-    duration: 'Annual',
-    tagline: 'Enterprise-grade fleet management & support',
+    duration: 'One-Time',
+    tagline: 'Enterprise-grade support - Direct purchase',
     features: [
-      'Unlimited emergency towing',
-      'Dedicated fleet support executive',
-      '24/7 AI-powered command center',
-      'Real-time vehicle tracking & diagnostics',
-      'On-site battery diagnostics & repair',
-      'Priority dispatch — response within 30 min',
-      'Bulk fitment services at doorstep',
-      'Comprehensive insurance claims assistance',
-      'Monthly health check reminders',
-      'Commercial vehicle specialized support',
-      '3000+ trained EV mechanics',
-      'CNG retrofitment consultation',
+      '24/7 On-Spot Repair Support',
+      'Flat Tyre Repair (Included)',
+      'Key Locked Assistance (Included)',
+      'Towing Service - Regular (Incident to Drop) - 100 KM',
+      'Accidental Towing (Incident to Drop) - 100 KM',
+      'Free Ambulance Support (In Case of Accidents)',
+      'PAN-India Support',
+      '24/7 Customer Support',
+      'Doctor on Call - Upto 1 consultation',
+      'Lawyer on Call - Upto 1 consultation',
     ],
-    idealFor: 'Fleet operators, ride-sharing companies & enterprises',
+    idealFor: 'Fleet operators seeking one-time coverage',
     badge: 'Enterprise',
     provider: 'ReadyAssist',
+    planType: 'direct',
   },
 ];
 
@@ -152,6 +254,7 @@ const RSAPlans: React.FC = () => {
   const [showDetails, setShowDetails] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [activeProvider, setActiveProvider] = useState<'all' | 'EVChamp' | 'ReadyAssist'>('all');
+  const [planType, setPlanType] = useState<'subscription' | 'direct'>('subscription');
   const detailsSectionRef = useRef<HTMLDivElement>(null);
 
   const handleSelect = (plan: RSAPlan) => {
@@ -194,9 +297,10 @@ const RSAPlans: React.FC = () => {
     }
   };
 
-  const filteredPlans = activeProvider === 'all' 
+  const filteredPlans = (activeProvider === 'all' 
     ? rsaPlans 
-    : rsaPlans.filter(plan => plan.provider === activeProvider);
+    : rsaPlans.filter(plan => plan.provider === activeProvider)
+  ).filter(plan => plan.planType === planType);
 
   return (
     <div className="min-h-screen bg-white">
@@ -486,37 +590,33 @@ const RSAPlans: React.FC = () => {
           </div>
         </section>
 
-        {/* Provider Filter Section */}
+        {/* Plan Type Toggle Section */}
         <section className="flex justify-center gap-4 mb-12 flex-wrap animate-slide-in-up">
           <button
-            onClick={() => setActiveProvider('all')}
-            className={`px-6 py-3 rounded-full font-bold transition-all duration-300 transform hover:scale-105 text-xs sm:text-sm ${
-              activeProvider === 'all'
-                ? 'bg-gradient-to-r from-orange-400 to-red-500 text-white shadow-lg shadow-orange-500/50 scale-105'
-                : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-orange-400 hover:shadow-md'
+            onClick={() => {
+              setPlanType('subscription');
+              setSelectedPlan(null);
+            }}
+            className={`px-8 py-4 rounded-full font-bold transition-all duration-300 transform hover:scale-105 text-sm sm:text-base ${
+              planType === 'subscription'
+                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/50 scale-105'
+                : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-blue-400 hover:shadow-md'
             }`}
           >
-            🎯 All Plans
+            📅 Subscription Selling Plan
           </button>
           <button
-            onClick={() => setActiveProvider('EVChamp')}
-            className={`px-6 py-3 rounded-full font-bold transition-all duration-300 transform hover:scale-105 text-xs sm:text-sm ${
-              activeProvider === 'EVChamp'
-                ? 'bg-gradient-to-r from-orange-400 to-amber-500 text-white shadow-lg shadow-orange-500/50 scale-105'
-                : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-orange-400 hover:shadow-md'
+            onClick={() => {
+              setPlanType('direct');
+              setSelectedPlan(null);
+            }}
+            className={`px-8 py-4 rounded-full font-bold transition-all duration-300 transform hover:scale-105 text-sm sm:text-base ${
+              planType === 'direct'
+                ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/50 scale-105'
+                : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-green-400 hover:shadow-md'
             }`}
           >
-            ⚡ EVChamp Plans
-          </button>
-          <button
-            onClick={() => setActiveProvider('ReadyAssist')}
-            className={`px-6 py-3 rounded-full font-bold transition-all duration-300 transform hover:scale-105 text-xs sm:text-sm ${
-              activeProvider === 'ReadyAssist'
-                ? 'bg-gradient-to-r from-yellow-400 to-amber-500 text-white shadow-lg shadow-yellow-500/50 scale-105'
-                : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-yellow-400 hover:shadow-md'
-            }`}
-          >
-            🔧 ReadyAssist Plans
+            💳 Direct Selling Plan
           </button>
         </section>
 
