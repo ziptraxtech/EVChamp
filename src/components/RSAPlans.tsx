@@ -254,7 +254,7 @@ const RSAPlans: React.FC = () => {
   const [showDetails, setShowDetails] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [activeProvider, setActiveProvider] = useState<'all' | 'EVChamp' | 'ReadyAssist'>('all');
-  const [planType, setPlanType] = useState<'subscription' | 'direct'>('subscription');
+  const [planType, setPlanType] = useState<'subscription' | 'direct'>('direct');
   const detailsSectionRef = useRef<HTMLDivElement>(null);
 
   const handleSelect = (plan: RSAPlan) => {
@@ -590,34 +590,14 @@ const RSAPlans: React.FC = () => {
           </div>
         </section>
 
-        {/* Plan Type Toggle Section */}
-        <section className="flex justify-center gap-4 mb-12 flex-wrap animate-slide-in-up">
-          <button
-            onClick={() => {
-              setPlanType('subscription');
-              setSelectedPlan(null);
-            }}
-            className={`px-8 py-4 rounded-full font-bold transition-all duration-300 transform hover:scale-105 text-sm sm:text-base ${
-              planType === 'subscription'
-                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/50 scale-105'
-                : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-blue-400 hover:shadow-md'
-            }`}
-          >
-            📅 Subscription Selling Plan
-          </button>
-          <button
-            onClick={() => {
-              setPlanType('direct');
-              setSelectedPlan(null);
-            }}
-            className={`px-8 py-4 rounded-full font-bold transition-all duration-300 transform hover:scale-105 text-sm sm:text-base ${
-              planType === 'direct'
-                ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/50 scale-105'
-                : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-green-400 hover:shadow-md'
-            }`}
-          >
-            💳 Direct Selling Plan
-          </button>
+        {/* Plan Type Header - Direct Selling Plans Only */}
+        <section className="text-center mb-12 animate-slide-in-up">
+          <h2 className="text-4xl sm:text-5xl font-black mb-4 bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent">
+             Direct Selling Plans
+          </h2>
+          <p className="text-lg text-gray-600 font-semibold max-w-2xl mx-auto">
+            One-time purchase roadside assistance plans with flexible coverage options for your EV
+          </p>
         </section>
 
         {/* Trust Badges */}
@@ -745,18 +725,18 @@ const RSAPlans: React.FC = () => {
                 </ul>
 
                 <button
-                  className={`w-full py-3 px-4 rounded-xl font-bold transition-all duration-300 transform text-sm sm:text-base opacity-50 cursor-not-allowed ${
+                  onClick={() => handleSelect(plan)}
+                  className={`w-full py-3 px-4 rounded-xl font-bold transition-all duration-300 transform text-sm sm:text-base hover:scale-105 active:scale-95 ${
                     selectedPlan?.id === plan.id
                       ? plan.provider === 'ReadyAssist'
                         ? 'bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-lg shadow-yellow-500/50'
                         : 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg shadow-orange-500/50'
                       : plan.provider === 'ReadyAssist'
-                      ? 'bg-gradient-to-r from-yellow-400 to-amber-500 text-white shadow-md'
-                      : 'bg-gradient-to-r from-orange-400 to-red-500 text-white shadow-md'
+                      ? 'bg-gradient-to-r from-yellow-400 to-amber-500 text-white shadow-md hover:shadow-lg'
+                      : 'bg-gradient-to-r from-orange-400 to-red-500 text-white shadow-md hover:shadow-lg'
                   }`}
-                  disabled
                 >
-                  {selectedPlan?.id === plan.id ? '✓ Selected' : 'Select Plan'}
+                  {selectedPlan?.id === plan.id ? '✓ Selected - Proceed to Order' : 'Select Plan'}
                 </button>
               </div>
             </div>
