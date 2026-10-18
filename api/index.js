@@ -284,6 +284,8 @@ async function initDB() {
         id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
         email TEXT NOT NULL,
+        phone TEXT,
+        state TEXT,
         company TEXT,
         inquiry_type TEXT,
         message TEXT NOT NULL,
@@ -291,6 +293,10 @@ async function initDB() {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       )
     `;
+    // CREATE TABLE IF NOT EXISTS above won't add columns to a table that
+    // already exists in production from before phone/state were added.
+    await getSQL()`ALTER TABLE contact_submissions ADD COLUMN IF NOT EXISTS phone TEXT`;
+    await getSQL()`ALTER TABLE contact_submissions ADD COLUMN IF NOT EXISTS state TEXT`;
     await getSQL()`CREATE INDEX IF NOT EXISTS idx_contact_submissions_created ON contact_submissions(created_at)`;
 
     // "Sell Your EV" listings (SellEV.tsx) — was console.log()+alert() only.
@@ -1535,9 +1541,9 @@ app.patch('/api/audits/:auditId/certificate', async (req, res) => {
 // Contact enquiry — sends email to Ai.evchamp@gmail.com
 app.post('/api/contact', async (req, res) => {
   try {
-    const { name, email, company, inquiryType, message } = req.body;
-    if (!name || !email || !message) {
-      return res.status(400).json({ error: 'name, email and message are required' });
+    const { name, email, phone, state, company, inquiryType, message } = req.body;
+    if (!name || !email || !phone || !message) {
+      return res.status(400).json({ error: 'name, email, phone and message are required' });
     }
 
     // Durable record first — this must not be lost even if the email below
@@ -1546,8 +1552,8 @@ app.post('/api/contact', async (req, res) => {
     let dbOk = false;
     try {
       const [row] = await getSQL()`
-        INSERT INTO contact_submissions (name, email, company, inquiry_type, message)
-        VALUES (${name}, ${email}, ${company || null}, ${inquiryType || null}, ${message})
+        INSERT INTO contact_submissions (name, email, phone, state, company, inquiry_type, message)
+        VALUES (${name}, ${email}, ${phone || null}, ${state || null}, ${company || null}, ${inquiryType || null}, ${message})
         RETURNING id
       `;
       submissionId = row?.id ?? null;
@@ -1576,6 +1582,8 @@ app.post('/api/contact', async (req, res) => {
           <table cellpadding="8" style="border-collapse:collapse;font-family:sans-serif;font-size:14px">
             <tr><td><b>Name</b></td><td>${name}</td></tr>
             <tr><td><b>Email</b></td><td>${email}</td></tr>
+            <tr><td><b>Phone</b></td><td>${phone || '—'}</td></tr>
+            <tr><td><b>State</b></td><td>${state || '—'}</td></tr>
             <tr><td><b>Company</b></td><td>${company || '—'}</td></tr>
             <tr><td><b>Inquiry Type</b></td><td>${inquiryType || '—'}</td></tr>
             <tr><td><b>Message</b></td><td style="white-space:pre-wrap">${message}</td></tr>

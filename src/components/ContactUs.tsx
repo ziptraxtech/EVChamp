@@ -18,6 +18,8 @@ const ContactUs: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
+    state: '',
     company: '',
     inquiryType: '',
     message: '',
@@ -42,7 +44,7 @@ const ContactUs: React.FC = () => {
       });
       if (!res.ok) throw new Error('Failed to send');
       setSubmitted(true);
-      setFormData({ name: '', email: '', company: '', inquiryType: '', message: '' });
+      setFormData({ name: '', email: '', phone: '', state: '', company: '', inquiryType: '', message: '' });
     } catch {
       setError('Something went wrong. Please try again or email us directly.');
     } finally {
@@ -93,6 +95,16 @@ const ContactUs: React.FC = () => {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
                       <input type="email" name="email" value={formData.email} onChange={handleChange} required className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm" placeholder="your@email.com" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Contact Number *</label>
+                      <input type="tel" name="phone" value={formData.phone} onChange={handleChange} required className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm" placeholder="+91 98765 43210" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+                      <input type="text" name="state" value={formData.state} onChange={handleChange} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm" placeholder="e.g. Haryana (optional)" />
                     </div>
                   </div>
                   <div>
