@@ -238,7 +238,7 @@ const ZeVaultPage: React.FC = () => {
                   onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
                   onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
                 >
-                  Start Trial
+                  Try Zeflash & RSA
                 </button>
               </div>
 
@@ -309,7 +309,7 @@ const ZeVaultPage: React.FC = () => {
                 </div>
                 <div className="mb-6">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-blue-700">₹2,999</span>
+                    <span className="text-4xl font-extrabold text-blue-700">₹3,499</span>
                   </div>
                   <p className="text-xs text-gray-600 mt-1">• 8 tests/year (Bi-monthly)</p>
                 </div>
@@ -345,8 +345,8 @@ const ZeVaultPage: React.FC = () => {
                 </ul>
                 <button
                   onClick={() => {
-                    console.log('📋 Premium Pack Plan Selected:', { plan: 'value', tests: 6, months: 12, price: 2999, amountInPaise: 299900 });
-                    navigate('/checkout?plan=value&tests=6&months=12&price=2999', { replace: false });
+                    console.log('📋 Premium Pack Plan Selected:', { plan: 'value', tests: 6, months: 12, price: 3499, amountInPaise: 349900 });
+                    navigate('/checkout?plan=value&tests=6&months=12&price=3499', { replace: false });
                   }}
                   className="block w-full text-center rounded-lg text-white font-semibold px-4 py-2.5 shadow-md transition-all"
                   style={{
@@ -367,7 +367,7 @@ const ZeVaultPage: React.FC = () => {
                 </div>
                 <div className="mb-6">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-blue-700">₹4,999</span>
+                    <span className="text-4xl font-extrabold text-blue-700">₹5,999</span>
                   </div>
                   <p className="text-xs text-gray-600 mt-1">• 12 tests/year (Monthly)</p>
                 </div>
@@ -403,8 +403,8 @@ const ZeVaultPage: React.FC = () => {
                 </ul>
                 <button
                   onClick={() => {
-                    console.log('📋 Elite Pack Plan Selected:', { plan: 'smart', tests: 12, months: 12, price: 4999, amountInPaise: 499900 });
-                    navigate('/checkout?plan=smart&tests=12&months=12&price=4999', { replace: false });
+                    console.log('📋 Elite Pack Plan Selected:', { plan: 'smart', tests: 12, months: 12, price: 5999, amountInPaise: 599900 });
+                    navigate('/checkout?plan=smart&tests=12&months=12&price=5999', { replace: false });
                   }}
                   className="block w-full text-center rounded-lg text-white font-semibold px-4 py-2.5 shadow-md transition-all"
                   style={{

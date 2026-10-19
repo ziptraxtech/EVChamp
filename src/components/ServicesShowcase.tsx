@@ -351,7 +351,7 @@ const ServicesShowcase: React.FC = () => {
                     background: 'linear-gradient(120deg, #0a8a52, #1257c4)',
                   }}
                 >
-                  Start Trial
+                  Try Zeflash & RSA
                 </button>
               </div>
             </div>

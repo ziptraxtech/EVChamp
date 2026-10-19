@@ -154,7 +154,7 @@ export default function LandingPage() {
               Explore Platform
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
             </button>
-            <button onClick={() => goTo(TRIAL_CHECKOUT)} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#fff', border: '1.5px solid #1D66F9', color: '#1D66F9', fontSize: 15.5, fontWeight: 700, padding: '15px 26px', borderRadius: 12, cursor: 'pointer', whiteSpace: 'nowrap' }}>Start Trial</button>
+            <button onClick={() => goTo(TRIAL_CHECKOUT)} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#fff', border: '1.5px solid #1D66F9', color: '#1D66F9', fontSize: 15.5, fontWeight: 700, padding: '15px 26px', borderRadius: 12, cursor: 'pointer', whiteSpace: 'nowrap' }}>Try Zeflash & RSA</button>
           </div>
           <div className="lp-stats" style={{ display: 'flex', gap: 40, marginTop: 40, flexWrap: 'wrap' }}>
             {[{ n: '2000', l: 'Charging points' }, { n: '100', l: 'Service centres' }, { n: '50K', l: 'Happy users' }].map((s) => (
@@ -388,8 +388,8 @@ export default function LandingPage() {
                 </div>
               ))}
             </div>
-            <button onClick={() => goTo(TRIAL_CHECKOUT)} style={{ display: 'block', width: '100%', textAlign: 'center', background: GRAD, color: '#fff', fontSize: 15.5, fontWeight: 700, padding: 15, borderRadius: 12, marginTop: 26, border: 'none', cursor: 'pointer', boxShadow: '0 10px 24px rgba(30,99,255,.24)', fontFamily: 'inherit' }}>Start Trial</button>
-            <button onClick={() => goTo('/buy-plans')} style={{ display: 'block', width: '100%', textAlign: 'center', color: '#64748B', fontSize: 14, fontWeight: 600, marginTop: 14, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>Explore annual plans →</button>
+            <button onClick={() => goTo(TRIAL_CHECKOUT)} style={{ display: 'block', width: '100%', textAlign: 'center', background: GRAD, color: '#fff', fontSize: 15.5, fontWeight: 700, padding: 15, borderRadius: 12, marginTop: 26, border: 'none', cursor: 'pointer', boxShadow: '0 10px 24px rgba(30,99,255,.24)', fontFamily: 'inherit' }}>Try Zeflash & RSA</button>
+            <button onClick={() => goTo('/zevault')} style={{ display: 'block', width: '100%', textAlign: 'center', color: '#64748B', fontSize: 14, fontWeight: 600, marginTop: 14, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>Explore annual plans →</button>
           </div>
         </div>
       </section>
