@@ -153,9 +153,12 @@ export default function LandingPage() {
             Everything you need for a smarter EV experience — certified pre-owned EVs, battery diagnostics, charging, roadside assistance and IoT fleet intelligence, all on one connected platform.
           </p>
           <div style={{ display: 'flex', gap: 14, marginTop: 32, flexWrap: 'wrap' }}>
-            <button onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: GRAD, color: '#fff', fontSize: 15.5, fontWeight: 600, padding: '15px 26px', borderRadius: 12, boxShadow: '0 10px 24px rgba(30,99,255,.26)', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+            <button onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: GRAD, color: '#fff', fontSize: 15.5, fontWeight: 600, padding: '15px 26px', borderRadius: 12, boxShadow: '0 10px 24px rgba(30,99,255,.26)', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }} className="hidden sm:inline-flex">
               Explore Platform
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            </button>
+            <button onClick={() => goTo('/zevault')} style={{ display: isMobile ? 'inline-flex' : 'none', alignItems: 'center', justifyContent: 'center', gap: 8, background: GRAD, border: 'none', color: '#fff', fontSize: 15.5, fontWeight: 700, padding: '15px 26px', borderRadius: 12, cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 10px 24px rgba(30,99,255,.26)' }}>
+              ZeVault
             </button>
             <button onClick={() => goTo(RSA_PLANS)} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: GRAD, border: 'none', color: '#fff', fontSize: 15.5, fontWeight: 700, padding: '15px 26px', borderRadius: 12, cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 10px 24px rgba(30,99,255,.26)' }}>Try Zeflash & RSA</button>
           </div>
