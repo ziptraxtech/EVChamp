@@ -12,6 +12,9 @@ const GRAD = 'linear-gradient(100deg,#0BA66A 0%,#1E63FF 100%)';
 // One-time Zeflash battery diagnostic trial (₹199) — handled by the ZeVault checkout route.
 const TRIAL_CHECKOUT = '/checkout?plan=trial&tests=1&months=0&price=199';
 
+// RSA Plans page
+const RSA_PLANS = '/rsa-plans';
+
 
 const SERVICE_CARDS = [
   { icon: '⚡', tag: 'Live map & navigation', grad: 'linear-gradient(150deg,#F59E0B,#EA580C)', title: 'Charging Stations', desc: 'Locate nearby charging points, check real-time availability, and plan your route with confidence.', cta: 'Find EV chargers near you', route: '/find-ev-chargers' },
@@ -154,7 +157,7 @@ export default function LandingPage() {
               Explore Platform
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
             </button>
-            <button onClick={() => goTo(TRIAL_CHECKOUT)} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#fff', border: '1.5px solid #1D66F9', color: '#1D66F9', fontSize: 15.5, fontWeight: 700, padding: '15px 26px', borderRadius: 12, cursor: 'pointer', whiteSpace: 'nowrap' }}>Try Zeflash & RSA</button>
+            <button onClick={() => goTo(RSA_PLANS)} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: GRAD, border: 'none', color: '#fff', fontSize: 15.5, fontWeight: 700, padding: '15px 26px', borderRadius: 12, cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 10px 24px rgba(30,99,255,.26)' }}>Try Zeflash & RSA</button>
           </div>
           <div className="lp-stats" style={{ display: 'flex', gap: 40, marginTop: 40, flexWrap: 'wrap' }}>
             {[{ n: '2000', l: 'Charging points' }, { n: '100', l: 'Service centres' }, { n: '50K', l: 'Happy users' }].map((s) => (
