@@ -157,10 +157,10 @@ export default function LandingPage() {
               Explore Platform
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
             </button>
-            <button onClick={() => goTo('/zevault')} style={{ display: isMobile ? 'inline-flex' : 'none', alignItems: 'center', justifyContent: 'center', gap: 8, background: GRAD, border: 'none', color: '#fff', fontSize: 15.5, fontWeight: 700, padding: '15px 26px', borderRadius: 12, cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 10px 24px rgba(30,99,255,.26)' }}>
-              ZeVault
+            <button onClick={() => goTo('/zevault')} style={{ display: isMobile ? 'inline-flex' : 'none', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'linear-gradient(120deg, #7c3aed, #4f46e5)', border: 'none', color: '#fff', fontSize: 15.5, fontWeight: 700, padding: '15px 26px', borderRadius: 12, cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 10px 24px rgba(124,58,237,.26)' }}>
+              Get ZeFlash AI & RSA
             </button>
-            <button onClick={() => goTo(RSA_PLANS)} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: GRAD, border: 'none', color: '#fff', fontSize: 15.5, fontWeight: 700, padding: '15px 26px', borderRadius: 12, cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 10px 24px rgba(30,99,255,.26)' }}>Try Zeflash & RSA</button>
+            <button onClick={() => goTo(RSA_PLANS)} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: GRAD, border: 'none', color: '#fff', fontSize: 15.5, fontWeight: 700, padding: '15px 26px', borderRadius: 12, cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 10px 24px rgba(30,99,255,.26)' }}>RSA Plans</button>
           </div>
           <div className="lp-stats" style={{ display: 'flex', gap: 40, marginTop: 40, flexWrap: 'wrap' }}>
             {[{ n: '2000', l: 'Charging points' }, { n: '100', l: 'Service centres' }, { n: '50K', l: 'Happy users' }].map((s) => (
