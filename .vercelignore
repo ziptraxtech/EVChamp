@@ -7,8 +7,6 @@ README.md
 **/*.test.js
 **/*.spec.ts
 **/*.spec.js
-src
-public
 android
 ios
 build-and-test.sh
