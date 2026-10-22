@@ -27,7 +27,6 @@ Chatbot2.0
 ev-champ-chatbot
 *.pdf
 *.jpeg
-*.png
 .vscode
 .idea
 .DS_Store
