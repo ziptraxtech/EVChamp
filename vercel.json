@@ -8,6 +8,14 @@
       "maxDuration": 30
     }
   },
+  "redirects": [
+    {
+      "source": "/advance-analysis",
+      "has": [{ "type": "query", "key": "mode", "value": "audit" }],
+      "destination": "https://zipsureai.com/safe-scan/?mode=audit",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/users/sync",
