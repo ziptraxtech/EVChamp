@@ -176,52 +176,7 @@ const rsaPlans: RSAPlan[] = [
     provider: 'EVChamp',
     planType: 'direct',
   },
-  {
-    id: 7,
-    name: 'ReadyAssist Basic',
-    price: 1499,
-    duration: 'One-Time',
-    tagline: 'Comprehensive support - Direct purchase',
-    features: [
-      '24/7 On-Spot Repair Support',
-      'Flat Tyre Repair (Included)',
-      'Key Locked Assistance (Included)',
-      'Towing Service - Regular (Incident to Drop) - 50 KM',
-      'Accidental Towing (Incident to Drop) - 100 KM',
-      'Free Ambulance Support (In Case of Accidents)',
-      'PAN-India Support with 11,000+ Service Providers',
-      '24/7 Multilingual Customer Support',
-      'Doctor on Call - Upto 1 consultation',
-      'Lawyer on Call - Upto 1 consultation',
-    ],
-    idealFor: 'Individual vehicle owners seeking one-time coverage',
-    provider: 'ReadyAssist',
-    planType: 'direct',
-  },
-  {
-    id: 8,
-    name: 'ReadyAssist Pro',
-    price: 2499,
-    duration: 'One-Time',
-    tagline: 'Premium care - Direct purchase',
-    features: [
-      '24/7 On-Spot Repair Support',
-      'Flat Tyre Repair (Included)',
-      'Key Locked Assistance (Included)',
-      'Towing Service - Regular (Incident to Drop) - 100 KM',
-      'Accidental Towing (Incident to Drop) - 100 KM',
-      'Free Ambulance Support (In Case of Accidents)',
-      'PAN-India Support',
-      '24/7 Customer Support',
-      'Doctor on Call - Upto 1 consultation',
-      'Lawyer on Call - Upto 1 consultation',
-    ],
-    idealFor: 'Regular commuters seeking one-time coverage',
-    highlight: true,
-    badge: 'Partner Choice',
-    provider: 'ReadyAssist',
-    planType: 'direct',
-  },
+
   {
     id: 9,
     name: 'ReadyAssist Fleet+',
@@ -533,10 +488,10 @@ const RSAPlans: React.FC = () => {
 
       <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-20">
 
-        {/* Partner Info Cards Section */}
-        <section id="plans" className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 scroll-mt-20">
+        {/* Partner Info Cards Section with ZeVault Comparison */}
+        <section id="plans" className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16 scroll-mt-20">
           {/* EVChamp Card */}
-          <div className="group relative bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 rounded-3xl shadow-lg hover:shadow-2xl border-2 border-orange-200 hover:border-orange-400 transition-all duration-300 transform hover:-translate-y-2 animate-slide-in-left p-8 overflow-hidden">
+          <div className="group relative bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 rounded-3xl shadow-lg hover:shadow-2xl border-2 border-orange-200 hover:border-orange-400 transition-all duration-300 transform hover:-translate-y-2 animate-slide-in-left p-8 overflow-hidden h-fit">
             <div className="absolute inset-0 bg-gradient-to-br from-orange-400/5 to-amber-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-3xl"></div>
             <div className="absolute -right-20 -top-20 w-40 h-40 bg-orange-200 rounded-full opacity-10 group-hover:opacity-20 transition-opacity duration-300"></div>
             <div className="relative z-10">
@@ -561,32 +516,47 @@ const RSAPlans: React.FC = () => {
             </div>
           </div>
 
-          {/* ReadyAssist Card */}
-          <div className="group relative bg-gradient-to-br from-yellow-50 via-amber-50 to-yellow-50 rounded-3xl shadow-lg hover:shadow-2xl border-2 border-yellow-200 hover:border-yellow-400 transition-all duration-300 transform hover:-translate-y-2 animate-slide-in-right p-8 overflow-hidden" style={{ animationDelay: '0.2s' }}>
-            <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-amber-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-3xl"></div>
-            <div className="absolute -left-20 -bottom-20 w-40 h-40 bg-yellow-200 rounded-full opacity-10 group-hover:opacity-20 transition-opacity duration-300"></div>
-            <div className="relative z-10">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 bg-gradient-to-br from-yellow-100 to-amber-100 rounded-full shadow-lg">
-                  <img src="/readyassist.png" alt="ReadyAssist" className="w-14 h-14" />
-                </div>
-                <div>
-                  <h3 className="text-3xl font-black bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent">ReadyAssist</h3>
-                  <p className="text-sm font-bold text-yellow-600 mt-1">⭐ Partnership Leader</p>
-                </div>
-              </div>
-              <p className="text-gray-700 text-sm mb-6 leading-relaxed border-l-4 border-yellow-400 pl-4 font-medium">
-                India's top-rated 24/7 vehicle care company with 11,000+ service providers and 3M+ satisfied customers across 19,100+ pincodes.
-              </p>
-              <div className="space-y-3">
-                {['🤖 AI-powered command center 24/7', '🚗 Support for all vehicle types', '⭐ 4.6★ Google rating (3M+ reviews)', '🔧 Professional fitment services'].map((feature, idx) => (
-                  <div key={idx} className="flex items-center gap-3 p-3 rounded-lg hover:bg-yellow-100/50 transition-all transform hover:translate-x-1 group/item cursor-pointer">
-                    <span className="text-yellow-600 font-bold text-lg">✓</span>
-                    <p className="text-sm text-gray-700 font-medium">{feature}</p>
-                  </div>
-                ))}
-              </div>
+          {/* ZeVault Plans Comparison Table */}
+          <div className="bg-gradient-to-br from-white via-emerald-50/30 to-white rounded-3xl shadow-lg border-2 border-emerald-100 p-6 animate-slide-in-right overflow-hidden">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 text-center">ZeVault Plans</h3>
+            <p className="text-center text-gray-600 text-xs sm:text-sm mb-4 font-medium">Quick comparison of diagnostic plans</p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs sm:text-sm">
+                <thead>
+                  <tr className="border-b-2 border-emerald-300 bg-gradient-to-r from-emerald-50 via-indigo-50 to-blue-50">
+                    <th className="text-left py-2 px-2 font-bold text-gray-800 whitespace-nowrap">Plan</th>
+                    <th className="text-center py-2 px-1.5 font-bold text-emerald-600 whitespace-nowrap">One Time</th>
+                    <th className="text-center py-2 px-1.5 font-bold text-indigo-600 whitespace-nowrap">Core</th>
+                    <th className="text-center py-2 px-1.5 font-bold text-blue-600 whitespace-nowrap">Premium</th>
+                    <th className="text-center py-2 px-1.5 font-bold text-blue-700 whitespace-nowrap">Elite</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { feature: 'Price', values: ['₹199', '₹1.5K', '₹3.5K', '₹5.9K'] },
+                    { feature: 'Tests/Yr', values: ['1', '4', '6', '12'] },
+                    { feature: 'Frequency', values: ['Once', 'Q-ly', 'Bi-M', 'M-ly'] },
+                    { feature: 'Value Tool', values: ['-', '-', '✓', '✓'] },
+                    { feature: 'Reports', values: ['-', '-', '1', '2'] },
+                    { feature: 'Towing', values: ['-', '-', '1', '2'] },
+                  ].map((row, idx) => (
+                    <tr key={row.feature} className={`border-b border-emerald-100 hover:bg-emerald-50/60 transition-colors ${idx % 2 === 0 ? 'bg-white/40' : 'bg-white'}`}>
+                      <td className="py-2 px-2 font-semibold text-gray-800 whitespace-nowrap text-xs">{row.feature}</td>
+                      {row.values.map((value, vidx) => (
+                        <td key={vidx} className="text-center py-2 px-1.5 text-gray-700 font-medium">{value}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+            <p className="text-center text-xs text-gray-500 mt-3 italic">Q-ly = Quarterly | Bi-M = Bi-monthly | M-ly = Monthly</p>
+            <button 
+              onClick={() => navigate('/zevault')}
+              className="w-full mt-5 py-3 px-4 rounded-xl font-bold text-sm sm:text-base bg-gradient-to-r from-emerald-500 to-indigo-500 text-white shadow-md hover:shadow-lg transition-all transform hover:scale-105 active:scale-95"
+            >
+              🔋 Get Zeflash AI & RSA
+            </button>
           </div>
         </section>
 
@@ -769,92 +739,8 @@ const RSAPlans: React.FC = () => {
           </div>
         </section>
 
-        {/* ReadyAssist About Section */}
-        <section className="bg-gradient-to-br from-yellow-500 via-amber-500 to-yellow-600 rounded-3xl shadow-2xl border-2 border-yellow-400 p-10 sm:p-12 mb-16 text-white overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-48 -mt-48 blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full -ml-48 -mb-48 blur-3xl"></div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center relative z-10">
-            <div className="animate-slide-in-up">
-              <h2 className="text-4xl font-bold mb-6">About ReadyAssist</h2>
-              <p className="text-lg leading-relaxed mb-6 text-blue-50">
-                ReadyAssist is India's top-rated 24/7 vehicle care company, trusted by millions of customers with a 4.6/5 Google rating. With 11,000+ service providers and coverage across 19,100+ pincodes, they deliver reliable, on-time support across India.
-              </p>
-              <div className="space-y-3 mb-8">
-                {[
-                  { icon: '🎯', stat: '3M+', label: 'Customers Served' },
-                  { icon: '⭐', stat: '4.6/5', label: 'Google Rating' },
-                  { icon: '👨‍🔧', stat: '11,000+', label: 'Service Providers' },
-                  { icon: '🌐', stat: '19,100+', label: 'Pincodes Covered' },
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-3 bg-white/10 rounded-lg px-4 py-3 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all transform hover:scale-105 group/stat">
-                    <span className="text-3xl">{item.icon}</span>
-                    <div>
-                      <p className="font-bold text-lg">{item.stat}</p>
-                      <p className="text-sm text-yellow-100">{item.label}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            <div className="bg-white/95 rounded-2xl p-8 shadow-2xl animate-slide-in-up" style={{ animationDelay: '0.1s' }}>
-              <h3 className="font-bold text-2xl text-gray-900 mb-6">ReadyAssist Services</h3>
-              <div className="space-y-4">
-                {[
-                  { icon: '🚐', title: 'Towing Services', desc: 'Safe & reliable 24/7' },
-                  { icon: '🛞', title: 'Flat Tyre Support', desc: 'Fast repair & replacement' },
-                  { icon: '⚡', title: 'Battery Jumpstart', desc: 'Quick & efficient' },
-                  { icon: '🔧', title: 'On-spot Repairs', desc: 'Starting & diagnostics' },
-                  { icon: '📹', title: 'Dashcam Installation', desc: 'Professional fitment' },
-                  { icon: '👩‍🔧', title: 'Project Shakthi', desc: '250+ women technicians' },
-                ].map((service, idx) => (
-                  <div key={service.title} className="flex items-start gap-3 pb-3 border-b border-gray-200 last:border-0 hover:translate-x-2 transition-transform group/service cursor-pointer">
-                    <span className="text-3xl">{service.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-gray-900 group-hover/service:text-yellow-600 transition-colors">{service.title}</p>
-                      <p className="text-xs text-gray-600">{service.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Comparison Table */}
-        <section className="bg-white rounded-2xl shadow-md border border-gray-100 p-8 mb-16 overflow-x-auto">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Plan Comparison</h2>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b-2 border-gray-300 bg-gradient-to-r from-orange-50 to-red-50">
-                <th className="text-left py-3 px-4 font-bold text-gray-800">Feature</th>
-                <th className="text-center py-3 px-4 font-bold text-orange-600">EVChamp Basic</th>
-                <th className="text-center py-3 px-4 font-bold text-orange-600">EVChamp Standard</th>
-                <th className="text-center py-3 px-4 font-bold text-red-600">EVChamp Premium</th>
-                <th className="text-center py-3 px-4 font-bold text-yellow-600">ReadyAssist Basic</th>
-                <th className="text-center py-3 px-4 font-bold text-purple-600">ReadyAssist Pro</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                { feature: 'Price (Annual)', values: ['₹999', '₹1,999', '₹3,499', '₹1,499', '₹2,499'] },
-                { feature: 'Towing Distance', values: ['25 km', '75 km', 'Unlimited', '50 km', '100 km'] },
-                { feature: '24×7 Helpline', values: ['✓', '✓ Priority', '✓ Priority', '✓', '✓ Multi-channel'] },
-                { feature: 'Dispatch Time', values: ['-', '-', '45 min', '-', '45 min'] },
-                { feature: 'Hotel & Cab', values: ['-', '1x/year', '3x/year', '-', 'Yes'] },
-                { feature: 'EV Specialists', values: ['✓', '✓', '✓', '✓ All vehicles', '✓ AI-powered'] },
-              ].map((row, idx) => (
-                <tr key={row.feature} className={`border-b border-gray-200 ${idx % 2 === 0 ? 'bg-gray-50' : ''}`}>
-                  <td className="py-3 px-4 font-semibold text-gray-800">{row.feature}</td>
-                  {row.values.map((value, vidx) => (
-                    <td key={vidx} className="text-center py-3 px-4 text-gray-700">{value}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
+        
 
         {/* Order Summary & CTA */}
         {selectedPlan && !showDetails && (

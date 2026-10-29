@@ -71,3 +71,4 @@ jspm_packages/
 VERCEL_SETUP.md
 QUICK_REFERENCE.md
 .DS_Store
+.env.sandbox
