@@ -518,7 +518,7 @@ const RSAPlans: React.FC = () => {
 
           {/* ZeVault Plans Comparison Table */}
           <div className="bg-gradient-to-br from-white via-emerald-50/30 to-white rounded-3xl shadow-lg border-2 border-emerald-100 p-6 animate-slide-in-right overflow-hidden">
-            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 text-center">ZeVault Plans</h3>
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 text-center">EVChamp Plans</h3>
             <p className="text-center text-gray-600 text-xs sm:text-sm mb-4 font-medium">Quick comparison of diagnostic plans</p>
             <div className="overflow-x-auto">
               <table className="w-full text-xs sm:text-sm">
