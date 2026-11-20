@@ -106,9 +106,13 @@ const Franchise: React.FC = () => {
         <div className="absolute inset-0 bg-slate-950/55" />
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950/60 via-slate-900/45 to-slate-900/30" />
         <div className="relative container mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center max-w-3xl">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight">
-            Own Green Assets &amp; Earn 16–20% Projected ROI<span className="text-green-400">*</span> with an EVChamp Franchise
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 leading-tight">
+            Now Green EV Assets can Earn up to 20%<span className="text-green-400">*</span> Annually
           </h1>
+          <p className="text-lg sm:text-xl font-semibold text-white/90 mb-1">
+            as an EVChamp's ZipAsset Franchise Partner
+          </p>
+          <p className="text-xs sm:text-sm text-green-300 mb-5">(*RoI Projected over 5 years)</p>
           <p className="text-gray-300 text-base sm:text-lg leading-relaxed mb-6">
             Partner with EVChamp to build profitable electric mobility infrastructure and tap into India's fastest-growing clean energy sector.
           </p>
