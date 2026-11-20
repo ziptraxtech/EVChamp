@@ -16,8 +16,52 @@ const benefits = [
   'Brand association with EV innovation',
   'Multiple revenue opportunities',
   'Operational support and business guidance',
-  'Up to 30% ROI from Year 1',
+  'Projected 16–20% annual returns over a 60-month term*',
 ];
+
+// Figures from the EVChamp Micro-Utility franchise plan sheet. All are indicative.
+const plans = [
+  {
+    name: 'Plan A',
+    title: '4 × 6 kW Network',
+    price: '₹6.00 Lakh',
+    roi: '96.3%',
+    rewards60: '₹5,77,760',
+    yieldPath: '13.5% Y1 → 48.1% Y4–5',
+    y45Cash: '₹2,88,880/yr',
+    total5yr: '₹11,77,760',
+    featured: true,
+  },
+  {
+    name: 'Plan B',
+    title: '24 kW Combo Terminal',
+    price: '₹5.00 Lakh',
+    roi: '88.5%',
+    rewards60: '₹4,42,426',
+    yieldPath: '13% Y1 → 44% Y4–5',
+    y45Cash: '₹2,21,213/yr',
+    total5yr: '₹9,42,426',
+    featured: false,
+  },
+];
+
+const planHighlights = [
+  { title: '100% Payback @ Month 36', desc: 'Subscription returned by month 36, backed by a zero-loss early exit option.' },
+  { title: '22%+ Project IRR', desc: '60-month operating term on decentralised EV fast-charging units.' },
+  { title: 'Decentralised Grid', desc: 'Units deployed across 2–4 multi-transit host hubs for optimal fleet utilisation.' },
+  { title: 'Powered by ZipsureAI', desc: 'Edge AI to optimise charging, power routing, and predictive maintenance.' },
+];
+
+const assetComparison = [
+  { asset: 'EVChamp Plan A', sub: true, yield: '13.5% Y1 → 48.1% Y4–5', rewards: '₹11,77,760', security: '100% subscription back at Mo 36; zero-loss option' },
+  { asset: 'EVChamp Plan B', sub: true, yield: '13% Y1 → 44% Y4–5', rewards: '₹9,42,426', security: '100% subscription back at Mo 36; zero-loss option' },
+  { asset: 'Bank FD', sub: false, yield: '6.8% – 7.1%', rewards: '~₹2.10 L', security: 'Locked; value eroded by inflation' },
+  { asset: 'Senior Bonds', sub: false, yield: '7.5% – 8.2%', rewards: '~₹2.30 L', security: 'Subject to credit rating risk' },
+  { asset: 'REIT', sub: false, yield: '6.5% – 7.2%', rewards: '~₹2.05 L', security: 'Lease cycle & vacancy risk' },
+];
+
+const PLAN_DISCLAIMER =
+  '*All figures are projected and indicative in nature, based on expected growth in infrastructure utilisation, and subject to market and operational conditions. Returns are not guaranteed. The company does not seek any direct investments; partners subscribe to franchise plans and receive returns as “rewards”.';
 
 const testimonials = [
   { quote: 'Joining EVChamp was the smartest business decision I made. The AI platform is a game-changer, and the support I get is incredible.', name: 'Rajesh Kumar', role: 'Pro Franchisee, Delhi' },
@@ -36,11 +80,17 @@ const Franchise: React.FC = () => {
     });
   };
 
+  // Opens the contact form pre-filled for the chosen franchise plan.
+  const applyForPlan = (plan: string) => {
+    navigate(`/contact?${new URLSearchParams({ type: 'Franchise Partnership', plan })}`);
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  };
+
   return (
     <div className="bg-white min-h-screen">
       <Helmet>
         <title>EV Franchise Partnership in India | Join the EVChamp Growth Network</title>
-        <meta name="description" content="Become an EVChamp franchise partner and join a growing network built around EV charging, diagnostics, mobility services, and sustainable infrastructure." />
+        <meta name="description" content="Own green assets with an EVChamp franchise. EV fast-charging micro-utility plans from ₹5 lakh with projected 16–20% annual returns over a 60-month term." />
         <meta name="keywords" content="EV franchise India, EV business opportunity, charging franchise, EV partnership, electric mobility franchise" />
       </Helmet>
 
@@ -56,9 +106,11 @@ const Franchise: React.FC = () => {
         <div className="absolute inset-0 bg-slate-950/55" />
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950/60 via-slate-900/45 to-slate-900/30" />
         <div className="relative container mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center max-w-3xl">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">Build the Future with EVChamp</h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight">
+            Own Green Assets &amp; Earn 16–20% Projected ROI<span className="text-green-400">*</span> with an EVChamp Franchise
+          </h1>
           <p className="text-gray-300 text-base sm:text-lg leading-relaxed mb-6">
-            EVChamp Franchise Partnership offers a business opportunity for entrepreneurs and organizations looking to enter the fast-growing electric mobility sector.
+            Partner with EVChamp to build profitable electric mobility infrastructure and tap into India's fastest-growing clean energy sector.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <button 
@@ -73,11 +125,129 @@ const Franchise: React.FC = () => {
               Apply Now
             </button>
             <button
-            onClick={() => window.open('https://www.investyz.com/', '_blank', 'noopener,noreferrer')}
+              onClick={() => document.getElementById('franchise-plans')?.scrollIntoView({ behavior: 'smooth' })}
+              className="bg-white/10 border border-white/30 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/20 transition-all text-sm"
+            >
+              View Plans
+            </button>
+            <button
+            onClick={() => window.open('https://zip-invest.vercel.app/', '_blank', 'noopener,noreferrer')}
             className="border border-white/30 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/10 transition-all text-sm"
           >
-            Investyz
+            ZipAsset
           </button>
+          </div>
+          <p className="text-[11px] text-gray-400 mt-5">*Projected average annual returns over a 60-month term. Subject to market and operational conditions.</p>
+        </div>
+      </section>
+
+      {/* Franchise Plans */}
+      <section id="franchise-plans" className="bg-white scroll-mt-24">
+        <div className="container mx-auto px-4 sm:px-6 py-14 sm:py-20 max-w-6xl">
+          <div className="max-w-3xl mx-auto text-center mb-10">
+            <span className="inline-block text-green-600 font-semibold text-sm uppercase tracking-wider mb-3">
+              EVChamp Micro-Utility
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Franchise Deployment Plans
+            </h2>
+            <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+              Subscribe to a franchise plan and earn rewards on decentralised EV fast-charging infrastructure.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {plans.map((plan) => (
+              <div
+                key={plan.name}
+                className={`relative rounded-2xl border bg-white p-6 sm:p-7 shadow-sm hover:shadow-xl transition-all ${
+                  plan.featured ? 'border-green-400 ring-1 ring-green-200' : 'border-gray-200'
+                }`}
+              >
+                {plan.featured && (
+                  <span className="absolute -top-3 left-6 rounded-full bg-green-600 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
+                    Highest rewards
+                  </span>
+                )}
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-500">{plan.name}</p>
+                <h3 className="text-lg font-bold text-gray-900 mb-4">{plan.title}</h3>
+
+                <p className="text-3xl sm:text-4xl font-extrabold text-gray-900">{plan.price}</p>
+                <p className="text-sm text-gray-500 mb-5">Subscription</p>
+
+                <div className="rounded-xl bg-green-50 border border-green-100 p-4 mb-5">
+                  <p className="text-sm font-bold text-green-700">✓ Estimated {plan.roi} expected reward ROI*</p>
+                  <p className="text-xs text-green-800 mt-1">60-month expected rewards: <b>{plan.rewards60}</b></p>
+                </div>
+
+                <dl className="space-y-3 text-sm">
+                  <div className="flex justify-between gap-4 border-b border-gray-100 pb-3">
+                    <dt className="text-gray-600">Payback</dt>
+                    <dd className="font-bold text-gray-900 text-right">Month 36 <span className="font-medium text-green-700">(100% returned)</span></dd>
+                  </div>
+                  <div className="flex justify-between gap-4 border-b border-gray-100 pb-3">
+                    <dt className="text-gray-600">Est. yield</dt>
+                    <dd className="font-bold text-gray-900 text-right">{plan.yieldPath}</dd>
+                  </div>
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-gray-600">Y4–Y5 expected cash rewards</dt>
+                    <dd className="font-bold text-green-700 text-right">{plan.y45Cash}</dd>
+                  </div>
+                </dl>
+
+                <button
+                  onClick={() => applyForPlan(plan.name)}
+                  className="w-full mt-6 text-white font-semibold px-6 py-3 rounded-xl transition-all"
+                  style={{ background: 'linear-gradient(120deg, #0a8a52, #1257c4)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
+                >
+                  Apply for {plan.name}
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-10">
+            {planHighlights.map((h) => (
+              <div key={h.title} className="rounded-xl border border-gray-100 bg-gray-50 p-5">
+                <p className="text-sm font-bold text-gray-900 mb-1">{h.title}</p>
+                <p className="text-xs text-gray-600 leading-relaxed">{h.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Asset class comparison */}
+          <div className="mt-14">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 text-center mb-6">
+              How the Plans Compare with Other Asset Classes
+            </h3>
+            <div className="overflow-x-auto rounded-2xl border border-gray-200">
+              <table className="w-full min-w-[640px] text-sm">
+                <thead className="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
+                  <tr>
+                    <th className="px-4 py-3 font-semibold">Franchise &amp; Asset</th>
+                    <th className="px-4 py-3 font-semibold">Est. Yield / Expected Rewards</th>
+                    <th className="px-4 py-3 font-semibold">5-Yr Net Rewards / Cash</th>
+                    <th className="px-4 py-3 font-semibold">Capital Security</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {assetComparison.map((row) => (
+                    <tr key={row.asset} className={`border-t border-gray-100 ${row.sub ? 'bg-green-50/60' : ''}`}>
+                      <td className="px-4 py-3 font-semibold text-gray-900">
+                        {row.asset}
+                        {row.sub && <span className="ml-1 text-xs font-normal text-gray-500">(Sub.)</span>}
+                      </td>
+                      <td className={`px-4 py-3 ${row.sub ? 'font-bold text-green-700' : 'text-gray-700'}`}>{row.yield}</td>
+                      <td className={`px-4 py-3 ${row.sub ? 'font-bold text-gray-900' : 'text-gray-700'}`}>{row.rewards}</td>
+                      <td className="px-4 py-3 text-gray-600">{row.security}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-[11px] text-gray-500 leading-relaxed mt-4">{PLAN_DISCLAIMER}</p>
           </div>
         </div>
       </section>
@@ -256,10 +426,10 @@ const Franchise: React.FC = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-4 border-b border-gray-100 pb-4">
             <span className="text-sm text-gray-600">
-              Indicative Initial Investment
+              Franchise Plans
             </span>
-            <span className="text-sm font-bold text-gray-900">
-              From ₹15 Lakh
+            <span className="text-sm font-bold text-gray-900 text-right">
+              From ₹5 Lakh subscription
             </span>
           </div>
 
@@ -277,7 +447,7 @@ const Franchise: React.FC = () => {
               Revenue Potential
             </span>
             <span className="text-sm font-bold text-green-700 text-right">
-              Depends on Usage and Market
+              Projected 16–20% p.a.*
             </span>
           </div>
 

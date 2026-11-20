@@ -101,7 +101,7 @@ const AboutUs: React.FC = () => {
               { icon: '📊', label: 'Software Plans', desc: 'Monitoring and optimization subscriptions' },
               { icon: '🛣️', label: 'Roadside Assistance', desc: 'Emergency EV support across India' },
               { icon: '⚡', label: 'Charging Network', desc: 'Station access across India' },
-              { icon: '📈', label: 'INVESTYZ', desc: 'Green infrastructure investment' },
+              { icon: '📈', label: 'ZipAsset', desc: 'Green infrastructure investment' },
             ].map((item) => (
               <div
                 key={item.label}

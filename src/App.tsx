@@ -156,6 +156,7 @@ function App() {
           <Route path="/checkout" element={<ZeVaultCheckout />} />
           <Route path="/find-ev-chargers" element={<FindEVChargers />} />
           <Route path="/investyz" element={<FindEVChargers />} />
+          <Route path="/zipasset" element={<FindEVChargers />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/zeflash-plans" element={<ZeflashPlans />} />

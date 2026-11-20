@@ -97,8 +97,8 @@ export default function SiteHeader() {
 
       {/* Announcement bar — sits above the navigation, at the very top of the page */}
       <div className="sh-announce" style={{ background: GRAD, color: '#fff', textAlign: 'center', fontSize: 13, fontWeight: 600, letterSpacing: '0.01em', padding: '9px 16px' }}>
-        New: EVChamp raises a green-infrastructure fund — franchise &amp; investment slots now open ·{' '}
-        <span style={{ textDecoration: 'underline', textUnderlineOffset: 2, cursor: 'pointer' }} onClick={() => goTo('/franchise')}>Learn more →</span>
+        EVChamp franchise plans now open · Projected 16-20% annual returns* ·{' '}
+        <span style={{ textDecoration: 'underline', textUnderlineOffset: 2, cursor: 'pointer' }} onClick={() => goTo('/franchise')}>Apply now →</span>
       </div>
 
       {/* Navigation bar */}
